@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:paddingLeft="5.0dip" android:paddingTop="10.0dip" android:paddingRight="5.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent" android:paddingStart="5.0dip" android:paddingEnd="5.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/txtWhatToShow" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strDisplayLocations" />
+    <LinearLayout android:orientation="horizontal" android:id="@id/layoutCb1" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/txtWhatToShow">
+        <CheckBox android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/chSDCard" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/strPhoneMemory" android:layout_weight="1.0" />
+        <CheckBox android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/chGoogleDrive" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/txtGoogleDrive" android:layout_weight="1.0" />
+    </LinearLayout>
+    <View android:id="@id/separator" android:layout_below="@id/layoutCb1" style="@style/BlueSeparatorBar" />
+    <RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/separator">
+        <ListView android:id="@id/lstBackups" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:gravity="center" android:id="@id/txtEmptyList" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strNoBackups" android:drawableTop="@drawable/emptybackuplist" android:drawablePadding="10.0dip" android:layout_centerInParent="true" />
+        <ProgressBar android:id="@id/progress" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="1.0dip" android:layout_above="@id/txtEmptyList" android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+</RelativeLayout>

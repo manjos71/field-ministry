@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:paddingLeft="5.0dip" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="5.0dip" android:paddingEnd="5.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:paddingLeft="16.0dip" android:paddingTop="24.0dip" android:paddingRight="16.0dip" android:layout_width="wrap_content" android:layout_height="64.0dip" android:paddingStart="16.0dip" android:paddingEnd="16.0dip">
+        <RatingBar android:id="@id/priorityBar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:max="3" android:numStars="3" android:rating="0.0" android:stepSize="1.0" android:layout_alignParentBottom="true" style="@style/priorityRatingBarBig" />
+        <ImageView android:id="@id/imgRemovePrio" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="16.0dip" android:src="?MA_themeDiscardLargeImage" android:layout_toRightOf="@id/priorityBar" android:layout_marginStart="16.0dip" android:layout_toEndOf="@id/priorityBar" style="@style/ImageWithSelectBackground" />
+    </RelativeLayout>
+    <include android:paddingTop="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" layout="@layout/action_setcancel" />
+</LinearLayout>

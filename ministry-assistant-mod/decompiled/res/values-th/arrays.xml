@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>วันที่</item>
+        <item>เจ้าของบ้าน</item>
+        <item>บทสนทนา</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>ชาย</item>
+        <item>หญิง</item>
+        <item>เด็ก</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>เวลาที่ยังเหลือ</item>
+        <item>เวลาที่เกิน</item>
+        <item>เวลาที่วางแผน</item>
+        <item>รายงานประจำเดือน</item>
+        <item>รายเยี่ยมเก่า</item>
+        <item>เขตล่าสุด</item>
+        <item>ปักหมุดรายเยี่ยม</item>
+        <item>ตารางกลับเยี่ยม</item>
+        <item>สถิติงานรับใช้</item>
+        <item>เทคนิคงานรับใช้</item>
+        <item>เวลาเยี่ยม</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>แสดงช่องระยะทางตลอดเวลา</item>
+        <item>เฉพาะไพโอเนียร์พิเศษ</item>
+        <item>ไม่แสดงช่องระยะทาง</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>แสดงช่อง LDC เสมอ</item>
+        <item>สำหรับไพโอเนียร์ประจำ</item>
+        <item>ไม่แสดงช่อง LDC</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>การซิงค์ด้วยตัวเอง</item>
+        <item>การซิงค์อัติโนมัติ</item>
+        <item>ยกเลิกการซิงค์</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>สว่าง</item>
+        <item>มืด</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>ชั่วโมงและนาที (ชม.นาที)</item>
+        <item>ชั่วโมงและตัวเลขทศนิยม (ชช.ท)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>ส่งเป็นข้อความอักษร</item>
+        <item>ส่งเป็นอีเมลล์</item>
+        <item>ลบ</item>
+        <item>เพิ่ม ที่คั่นบุ๊คมาร์ค</item>
+        <item>ยกเลิก ที่คั่นบุ๊คมาร์ค</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>ไม่สนใจ</item>
+        <item>ไม่มีเวลา</item>
+        <item>เพิ่มเป็นรายเยี่ยม</item>
+        <item>ช่องมองลอดในประตู(ตาแมว)</item>
+        <item>ยกเลิกRemove</item>
+        <item>จดหมายLetter</item>
+        <item>แก้้ไขชื่อ</item>
+        <item>ตั้งค่าใหม่</item>
+        <item>เปลี่ยนวัน</item>
+        <item>ตั้งค่าที่คั่น</item>
+        <item>ยกเลิกที่คั่น</item>
+        <item>เพิ่มการเยี่ยม</item>
+        <item>แก้ไขการเยี่ยม</item>
+        <item>จัดการพื้นที่ใหม่</item>
+        <item>ไม่มีคน</item>
+        <item>เพิ่ม ชื่อ</item>
+        <item>ภาษาอื่น</item>
+        <item>ไม่อยู่บ้าน</item>
+        <item>ไม่ได้เรียก</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>แก้ไข</item>
+        <item>ลบ</item>
+        <item>แสดงบัตรเขตDisplay card</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>ไม่สนใจ</item>
+        <item>ไม่มีเวลา</item>
+        <item>จดหมาย</item>
+        <item>ไม่มีคน/ว่างเปล่า</item>
+        <item>ภาษาอื่น</item>
+        <item>ไม่อยู่บ้าน</item>
+        <item>ไม่ได้เรียก</item>
+        <item>ห้ามเข้า/ห้ามบุกรุก</item>
+        <item>ล็อคประตู</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>รายงานแบบพื้นฐาน</item>
+        <item>รายงานแบบเรียบง่าย</item>
+        <item>รายงานแบบละเอียด</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>ลบ</item>
+    </string-array>
+</resources>

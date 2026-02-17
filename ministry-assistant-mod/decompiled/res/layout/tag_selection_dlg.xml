@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TabHost android:id="@id/tabHost" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@id/textResults">
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <TabWidget android:id="@android:id/tabs" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+            <FrameLayout android:id="@android:id/tabcontent" android:layout_width="fill_parent" android:layout_height="fill_parent">
+                <RelativeLayout android:id="@id/tab1" android:layout_width="fill_parent" android:layout_height="fill_parent">
+                    <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/textTags" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strTagsMustHave" android:drawablePadding="10.0dip" android:paddingStart="5.0dip" style="@style/TagdialogText" />
+                    <ScrollView android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@id/checkArchived" android:layout_below="@id/textTags">
+                        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                            <com.lostpixels.fieldservice.ui.FlowLayout android:id="@id/tagsType" android:padding="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" f:horizontalSpacing="6.0dip" f:verticalSpacing="12.0dip" xmlns:f="http://schemas.android.com/apk/res-auto" />
+                            <View android:background="#ffe0e0e0" android:layout_width="fill_parent" android:layout_height="1.0dip" />
+                            <com.lostpixels.fieldservice.ui.FlowLayout android:id="@id/tagsTime" android:padding="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" f:horizontalSpacing="6.0dip" f:verticalSpacing="12.0dip" xmlns:f="http://schemas.android.com/apk/res-auto" />
+                            <View android:background="#ffe0e0e0" android:layout_width="fill_parent" android:layout_height="1.0dip" />
+                            <com.lostpixels.fieldservice.ui.FlowLayout android:id="@id/tagsGender" android:padding="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" f:horizontalSpacing="6.0dip" f:verticalSpacing="12.0dip" xmlns:f="http://schemas.android.com/apk/res-auto" />
+                            <View android:background="#ffe0e0e0" android:layout_width="fill_parent" android:layout_height="1.0dip" />
+                            <com.lostpixels.fieldservice.ui.FlowLayout android:id="@id/tagsCustom" android:padding="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" f:horizontalSpacing="6.0dip" f:verticalSpacing="12.0dip" xmlns:f="http://schemas.android.com/apk/res-auto" />
+                        </LinearLayout>
+                    </ScrollView>
+                    <CheckBox android:textSize="16.0sp" android:id="@id/checkArchived" android:paddingTop="10.0dip" android:paddingBottom="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/showArchived" android:layout_alignParentBottom="true" style="@style/TagdialogText" />
+                </RelativeLayout>
+                <ScrollView android:id="@id/tab2" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/textNeighborhood" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strSelectNeighborhoods" android:drawablePadding="10.0dip" android:paddingStart="5.0dip" style="@style/TagdialogText" />
+                        <com.lostpixels.fieldservice.ui.FlowLayout android:id="@id/containerNeighborhood" android:padding="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" f:horizontalSpacing="6.0dip" f:verticalSpacing="12.0dip" xmlns:f="http://schemas.android.com/apk/res-auto" />
+                    </LinearLayout>
+                </ScrollView>
+                <ScrollView android:id="@id/tab3" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/textCities" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strShowCities" android:drawablePadding="10.0dip" android:paddingStart="5.0dip" style="@style/TagdialogText" />
+                        <com.lostpixels.fieldservice.ui.FlowLayout android:id="@id/containerCities" android:padding="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" f:horizontalSpacing="6.0dip" f:verticalSpacing="12.0dip" xmlns:f="http://schemas.android.com/apk/res-auto" />
+                    </LinearLayout>
+                </ScrollView>
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+    <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/textResults" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strNumResults" android:layout_alignParentBottom="true" android:paddingStart="5.0dip" style="@style/TagdialogText" />
+</RelativeLayout>

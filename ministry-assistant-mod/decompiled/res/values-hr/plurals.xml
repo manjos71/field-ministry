@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="alp_pmsg_connect_x_dots">
+        <item quantity="other">"Poveži najmanje %1$d točke.
+Pokušaj ponovno…"</item>
+        <item quantity="one">"Poveži najmanje %1$d točke.
+Pokušaj ponovno…"</item>
+    </plurals>
+    <plurals name="mtrl_badge_content_description">
+        <item quantity="other">%d novih obavijesti</item>
+        <item quantity="one">%d nova obavijest</item>
+        <item quantity="few">%d nove obavijesti</item>
+    </plurals>
+</resources>

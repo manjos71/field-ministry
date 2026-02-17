@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="alp_pmsg_connect_x_dots">
+        <item quantity="other">少なくとも %1$d 個の点を結んでください。もう一度どうぞ…</item>
+        <item quantity="one">少なくとも %1$d 個の点を結んでください。もう一度どうぞ…</item>
+    </plurals>
+    <plurals name="mtrl_badge_content_description">
+        <item quantity="other">%d 件の新しい通知</item>
+        <item quantity="one">%d 件の新しい通知</item>
+    </plurals>
+</resources>

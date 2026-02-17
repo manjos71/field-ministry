@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.lostpixels.fieldservice.ui.MapWrapperLayout android:id="@id/mapFrame" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout android:id="@id/fragmentContainer" android:layout_width="fill_parent" android:layout_height="fill_parent"
+      xmlns:android="http://schemas.android.com/apk/res/android" />
+    <CheckBox android:id="@id/chMapGps" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:layout_marginRight="5.0dip" android:layout_marginBottom="10.0dip" android:button="@drawable/button_map_gps" android:minWidth="48.0dip" android:layout_alignParentTop="true" android:layout_alignParentRight="true" android:layout_marginEnd="5.0dip" android:layout_alignParentEnd="true" />
+    <CheckBox android:id="@id/chMyLocation" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="5.0dip" android:button="@drawable/button_myl" android:minWidth="48.0dip" android:layout_below="@id/chMapGps" android:layout_alignParentRight="true" android:layout_marginEnd="5.0dip" android:layout_alignParentEnd="true" />
+</com.lostpixels.fieldservice.ui.MapWrapperLayout>

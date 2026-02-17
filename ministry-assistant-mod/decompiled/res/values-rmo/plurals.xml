@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="alp_pmsg_connect_x_dots">
+        <item quantity="other">"Hunte kres %1$d Punkte ketene.
+Kre les pale …"</item>
+        <item quantity="one">"Hunte kres %1$d Punkte ketene.
+Kre les pale …"</item>
+    </plurals>
+</resources>

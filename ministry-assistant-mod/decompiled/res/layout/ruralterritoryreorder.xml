@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.mobeta.android.dslv.DragSortListView android:id="@id/listAddresses" android:layout_width="fill_parent" android:layout_height="fill_parent" android:drawSelectorOnTop="false" android:layout_above="@id/buttons" dslv:drag_enabled="true" dslv:drag_handle_id="@id/drag_handle" dslv:float_alpha="0.6" dslv:use_default_controller="true"
+      xmlns:dslv="http://schemas.android.com/apk/res/com.lostpixels.fieldservice" />
+    <include android:id="@id/buttons" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true" layout="@layout/action_okcancel" />
+</RelativeLayout>

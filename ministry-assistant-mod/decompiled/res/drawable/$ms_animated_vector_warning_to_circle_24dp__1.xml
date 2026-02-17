@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<objectAnimator android:interpolator="@android:anim/decelerate_interpolator" android:duration="@integer/ms_default_error_tab_animation_duration" android:valueFrom="@integer/ms_warning_end_translate_y" android:valueTo="0" android:propertyName="translateY"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" />

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>နေ့စွဲ</item>
+        <item>အိမ်ရှင်</item>
+        <item>ဒိုင်ယာလော့</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>ယောကျ်ား</item>
+        <item>မိန်းမ</item>
+        <item>ကလေး</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>နာရီဒီလောက်လိုသေးတယ်</item>
+        <item>နာရီကျော်နေပြီ</item>
+        <item>နာရီက ကွက်တိပဲ</item>
+        <item>လစဥ်မှတ်တမ်း</item>
+        <item>မသွားတာကြာတဲ့ လည်ပတ်မှု</item>
+        <item>နောက်ဆုံးရပ်ကွက်</item>
+        <item>ပထမစာမျက်နှာမှာ လည်ပတ်မှုများ မှတ်ပေး</item>
+        <item>ဒီနေ့သွားမဲ့ လည်ပတ်မှုများ</item>
+        <item>လည်ပတ်မှု စာရင်းအင်းများ</item>
+        <item>အသုံးပြုပုံများ</item>
+        <item>ပြန်လည်ပတ်မှုတွေကို တွေနိုင်မဲ့ အချိန်များ</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>အမြဲတမ်း မိုင်အကွာအဝးကို ပြသ</item>
+        <item>အထူးရှေ့ဆောင် မှသာလျှင်</item>
+        <item>ဘယ်တော့မှ မိုင်အကွာအဝးကို မပြနဲ့</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>LDC အပိုင်း အမြဲပြ</item>
+        <item>မှန်မှန်ရှေ့ဆောင်မှသာလျှင်</item>
+        <item>LDC အပိုင်း ဘယ်တော့မှမပြနဲ့</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>ကိုယ်တိုင် အံကိုက်အောင်လုပ်မယ်</item>
+        <item>အော်တို အံကိုက်အောင်လုပ်မယ်</item>
+        <item>အံကိုက်အောင်လုပ်ခြင်း ပိတ်</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>အရောင်ဖျော့</item>
+        <item>အရောင်ရင့်</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>နာရီ နဲ့ မိနစ် (hh.mm)</item>
+        <item>နာရီ နဲ့ ဒသမကိန်း (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Message ပို့မယ်</item>
+        <item>အီးမေးလ် ပို့မယ်</item>
+        <item>ဖျက်</item>
+        <item>အမှတ်အသား ထည့်မယ်</item>
+        <item>အမှတ်အသား ဖယ်ရှား</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>စိတ်မဝင်စား</item>
+        <item>အချိန်မရှိ</item>
+        <item>လည်ပတ်မှု အနေနဲ့ ထည့်မယ်</item>
+        <item>တံခါးပေါက်အသေး Peephole</item>
+        <item>ဖယ်ရှား</item>
+        <item>အက္ခရာ</item>
+        <item>နာမည် ပြင်မယ်</item>
+        <item>ပြန်စ</item>
+        <item>နေ့စွဲ ပြောင်း</item>
+        <item>အမှတ်အသား လုပ်</item>
+        <item>အမှတ်အသား ဖယ်ရှား</item>
+        <item>ပြန်လည်ပတ်မှု ထည့်ပါ</item>
+        <item>ပြန်လည်ပတ်မှု ပြင်မယ်</item>
+        <item>ဧရိယာ ပြန်စီမယ်</item>
+        <item>အိမ်အလွတ်</item>
+        <item>နာမည် ထည့်မယ်</item>
+        <item>တခြား ဘာသာစကား</item>
+        <item>အိမ်မှာ မရှိ</item>
+        <item>မခေါ်ရသေး</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>ပြင်မယ်</item>
+        <item>ဖျက်</item>
+        <item>ကဒ်ပြပါ</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>စိတ်မဝင်စား</item>
+        <item>အချိန်မရှိ</item>
+        <item>အက္ခရာ</item>
+        <item>လူမရှိ</item>
+        <item>တခြား ဘာသာစကား</item>
+        <item>အိမ်မှာမရှိ</item>
+        <item>မခေါ်ရသေး</item>
+        <item>မကျူးကျော်ရ နယ်မြေ</item>
+        <item>သော့ခတ်ထား</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>ပုံမှန် မှတ်တမ်း</item>
+        <item>ရိုးရှင်းတဲ့ မှတ်တမ်း</item>
+        <item>အသေးစိတ်ကျတဲ့ မှတ်တမ်း</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>ဖျက်</item>
+    </string-array>
+</resources>

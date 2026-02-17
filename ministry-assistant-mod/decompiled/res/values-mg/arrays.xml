@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Daty</item>
+        <item>tompon-trano</item>
+        <item>Resaka</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Lehilahy</item>
+        <item>Vehivavy</item>
+        <item>Ankizy</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Ora tsy feno</item>
+        <item>Ora mihoatra</item>
+        <item>Ora novinavinaina</item>
+        <item>"Tatitra isam'bolana"</item>
+        <item>Fiverenana taloha</item>
+        <item>Faritany farany</item>
+        <item>Fitsidihana napetaka</item>
+        <item>Fiverenana nomanina</item>
+        <item>Famakafakana fanompoana</item>
+        <item>Toro hevitra</item>
+        <item>Fotoana hiverenana</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Aseho ny fandaniana</item>
+        <item>Raha toa ka Mpisavalalana manokana ihany</item>
+        <item>Tsy aseho ny fandaniana</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Aseho foana ny faritra AsaA</item>
+        <item>Raha mpisavalalana maharitra ihany</item>
+        <item>Tsy aseho mihitsy ny faritra AsaA</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Fampifanarahana mivantana</item>
+        <item>Mandeha hoazy ny fampifanarahana</item>
+        <item>Ajanonana ny fampifanarahana</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Theme Mazava</item>
+        <item>Theme Matroka</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Ora sy minitra (hh.mm)</item>
+        <item>Ora sy ambiny (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Halefa sms</item>
+        <item>Halefa e-mail</item>
+        <item>Hamafa</item>
+        <item>Hanampy mari-pitadidiana</item>
+        <item>Remove mari-pitadidiana</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Tsy Liana</item>
+        <item>Tsy manampotoana</item>
+        <item>Ampidirina ho Fiverenana mitsidika</item>
+        <item>Tsy mivoaka</item>
+        <item>Hanala</item>
+        <item>Taratasy</item>
+        <item>Hanova Anarana</item>
+        <item>"Hamerina amin'ny Laoniny"</item>
+        <item>Hanova daty</item>
+        <item>Hametraka mari-pitadidiana</item>
+        <item>Hamafa mari-pitadidiana</item>
+        <item>Hanampy Fiverenana mitsidika</item>
+        <item>Hanova Fiverenana mitsidika</item>
+        <item>Handamina toerana</item>
+        <item>Tsy afaka</item>
+        <item>Hanampy Anarana</item>
+        <item>Fiteny hafa</item>
+        <item>Tsy Tratra</item>
+        <item>Tsy antsoina</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Hanova</item>
+        <item>Hamafa</item>
+        <item>Hampiseho Karatra</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Tsy liana</item>
+        <item>Tsy manam-potoana</item>
+        <item>Taratasy</item>
+        <item>Foana</item>
+        <item>Fiteny hafa</item>
+        <item>Tsy tao an-trano</item>
+        <item>Tsy antsoina</item>
+        <item>Tsy azo idirana</item>
+        <item>Trano mihidy</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Tatitra mahazatra</item>
+        <item>Tatitra notsorina</item>
+        <item>tatitra an-tsipirihany</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Hamafa</item>
+    </string-array>
+</resources>

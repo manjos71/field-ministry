@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Datum</item>
+        <item>Besök</item>
+        <item>Samtal</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Man</item>
+        <item>Kvinna</item>
+        <item>Barn</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Tid ifrån målet</item>
+        <item>Tid före schemat</item>
+        <item>Planerad tid</item>
+        <item>Månadsrapport</item>
+        <item>Gamla besök</item>
+        <item>Senaste distriktet</item>
+        <item>Fästa besök</item>
+        <item>Schemalagda besök</item>
+        <item>Tjänstestatistik</item>
+        <item>Tjänstetips</item>
+        <item>Tid för besöket</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Visa alltid fält för körsträcka</item>
+        <item>Enbart vid profil Specialpionjär</item>
+        <item>Visa aldrig fält för körsträcka</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Visa alltid LDC tiden</item>
+        <item>Enbart för reguljära pionjärer</item>
+        <item>Visa aldrig LDC tiden</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Manuell synkning</item>
+        <item>Automatisk synkning</item>
+        <item>Stäng av synkning</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Ljust tema</item>
+        <item>Mörkt tema</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Timmar och minuter (hh.mm)</item>
+        <item>Timmar och decimal (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Skicka som SMS</item>
+        <item>Skicka som e-mail</item>
+        <item>Ta bort</item>
+        <item>Bokmärk</item>
+        <item>Ta bort bokmärke</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Ej intresserad</item>
+        <item>Ej tid</item>
+        <item>Lägg till som återbesök</item>
+        <item>Tittöga</item>
+        <item>Ta bort</item>
+        <item>Brev</item>
+        <item>Ändra namn</item>
+        <item>Återställ</item>
+        <item>Ändra datum</item>
+        <item>Sätt bokmärke</item>
+        <item>Ta bort bokmärke</item>
+        <item>Lägg till besök</item>
+        <item>Ändra besök</item>
+        <item>Organisera lantdistrikt</item>
+        <item>Tomt</item>
+        <item>Lägg till namn</item>
+        <item>Annat språk</item>
+        <item>Ej hemma</item>
+        <item>Vill ej ha besök</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Ändra</item>
+        <item>Ta bort</item>
+        <item>Visa distriktskort</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Ej intresserad</item>
+        <item>Ej tid</item>
+        <item>Brev</item>
+        <item>Tomt</item>
+        <item>Annat språk</item>
+        <item>Ej hemma</item>
+        <item>Vill ej ha besök</item>
+        <item>Tillträde förbjudet</item>
+        <item>Låst</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Minimal rapport</item>
+        <item>Förenklad rapport</item>
+        <item>Detaljerad rapport</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Ta bort</item>
+    </string-array>
+</resources>

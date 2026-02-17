@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/layoutFrequency" android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/textFrequency" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txtScheduleFrequency" android:layout_toLeftOf="@id/spinnerDays" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" android:layout_toStartOf="@id/spinnerDays" android:layout_alignParentStart="true" />
+        <Spinner android:id="@id/spinnerDays" android:layout_width="120.0dip" android:layout_height="wrap_content" android:layout_alignTop="@id/textFrequency" android:layout_alignParentRight="true" android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/layoutTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16.0dip" android:layout_below="@id/layoutFrequency">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/textTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txtScheduleTime" android:layout_toLeftOf="@id/btnTime" android:layout_alignParentLeft="true" android:layout_toStartOf="@id/btnTime" android:layout_alignParentStart="true" />
+        <com.lostpixels.fieldservice.ui.SpinnerButton android:id="@id/btnTime" android:layout_width="120.0dip" android:layout_height="wrap_content" android:layout_alignTop="@id/textTime" android:layout_alignParentRight="true" android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/layoutKeep" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16.0dip" android:layout_below="@id/layoutTime">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/textKeepBackups" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txtBackupFiles" android:layout_toLeftOf="@id/spinnerBackupFiles" android:layout_alignParentLeft="true" android:layout_toStartOf="@id/spinnerBackupFiles" android:layout_alignParentStart="true" />
+        <Spinner android:id="@id/spinnerBackupFiles" android:layout_width="120.0dip" android:layout_height="wrap_content" android:layout_alignTop="@id/textKeepBackups" android:layout_alignParentRight="true" android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+    <LinearLayout android:orientation="horizontal" android:id="@id/layoutCb1" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="16.0dip" android:layout_below="@id/layoutKeep">
+        <CheckBox android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/chSDCard" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strPhoneMemory" android:layout_weight="1.0" />
+        <CheckBox android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/chGoogleDrive" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/txtGoogleDrive" android:layout_weight="1.0" />
+    </LinearLayout>
+</RelativeLayout>

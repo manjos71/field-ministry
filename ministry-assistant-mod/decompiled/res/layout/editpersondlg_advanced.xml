@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:id="@id/layout" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ScrollView android:background="?MA_themeBackground" android:paddingLeft="3.0dip" android:paddingTop="3.0dip" android:paddingRight="3.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent" android:paddingStart="3.0dip" android:paddingEnd="3.0dip">
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="@color/label_text_color" android:id="@id/txtTimeForVisit" android:paddingLeft="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:text="@string/strBestVisitTime" android:paddingStart="10.0dip" />
+            <View android:id="@id/separator3" style="@style/BlueSeparatorBar" />
+            <RelativeLayout android:id="@id/visitTimeLayout" android:paddingBottom="5.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="5.0dip">
+                <LinearLayout android:orientation="horizontal" android:id="@id/layoutCbV1" android:paddingLeft="3.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:paddingStart="3.0dip">
+                    <CheckBox android:id="@id/chMorning" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strMorning" android:layout_weight="1.0" />
+                    <CheckBox android:id="@id/chDay" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strDay" android:layout_weight="1.0" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:id="@id/layoutCbV2" android:paddingLeft="3.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/layoutCbV1" android:paddingStart="3.0dip">
+                    <CheckBox android:id="@id/chEvening" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strEvening" android:layout_weight="1.0" />
+                    <CheckBox android:id="@id/chWeekend" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strWeekend" android:layout_weight="1.0" />
+                </LinearLayout>
+                <View android:id="@id/separator15" android:layout_below="@id/layoutCbV2" style="@style/GraySeparatorBar" />
+                <LinearLayout android:orientation="horizontal" android:id="@id/layoutCbV3" android:paddingLeft="3.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/separator15" android:paddingStart="3.0dip">
+                    <CheckBox android:id="@id/chMonday" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strMonday" android:layout_weight="1.0" />
+                    <CheckBox android:id="@id/chFriday" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strFriday" android:layout_weight="1.0" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:id="@id/layoutCbV4" android:paddingLeft="3.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/layoutCbV3" android:paddingStart="3.0dip">
+                    <CheckBox android:id="@id/chTuesday" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strTuesday" android:layout_weight="1.0" />
+                    <CheckBox android:id="@id/chSaturday" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strSaturday" android:layout_weight="1.0" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:id="@id/layoutCbV5" android:paddingLeft="3.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/layoutCbV4" android:paddingStart="3.0dip">
+                    <CheckBox android:id="@id/chWednesday" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strWednesday" android:layout_weight="1.0" />
+                    <CheckBox android:id="@id/chSunday" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strSunday" android:layout_weight="1.0" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:id="@id/layoutCbV6" android:paddingLeft="3.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/layoutCbV5" android:paddingStart="3.0dip">
+                    <CheckBox android:id="@id/chThursday" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/strThursday" android:layout_weight="1.0" />
+                </LinearLayout>
+            </RelativeLayout>
+            <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="@color/label_text_color" android:id="@id/txtContactInfo" android:paddingLeft="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:text="@string/lblContactInfo" android:paddingStart="10.0dip" />
+            <View android:id="@id/separator5" style="@style/BlueSeparatorBar" />
+            <LinearLayout android:orientation="vertical" android:paddingLeft="5.0dip" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="5.0dip" android:paddingStart="5.0dip" android:paddingEnd="5.0dip">
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="18.0sp" android:id="@id/edtCellPhone" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/strCellPhone" android:singleLine="true" android:phoneNumber="true" android:capitalize="sentences" android:imeOptions="actionNext" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="18.0sp" android:id="@id/edtHomePhone" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/strHomePhone" android:singleLine="true" android:phoneNumber="true" android:capitalize="sentences" android:imeOptions="actionNext" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="18.0sp" android:id="@id/edtVideoPhone" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/strVideoPhone" android:singleLine="true" android:phoneNumber="true" android:capitalize="sentences" android:imeOptions="actionNext" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="18.0sp" android:id="@id/edtEmail" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/strEmailAddress" android:singleLine="true" android:capitalize="sentences" android:inputType="textEmailAddress" android:imeOptions="actionDone" />
+            </LinearLayout>
+            <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="@color/label_text_color" android:id="@id/txtLanguageInfo" android:paddingLeft="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:text="@string/lblLanguageInfo" android:paddingStart="10.0dip" />
+            <View android:id="@id/separator6" style="@style/BlueSeparatorBar" />
+            <LinearLayout android:orientation="vertical" android:paddingLeft="5.0dip" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="5.0dip" android:paddingStart="5.0dip" android:paddingEnd="5.0dip">
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="18.0sp" android:id="@id/edtMotherTongue" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/strMotherTongue" android:singleLine="true" android:capitalize="sentences" android:inputType="textAutoCorrect|textCapWords" android:imeOptions="actionNext" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="18.0sp" android:id="@id/edtLanguages" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/strLanguages" android:maxLines="3" android:capitalize="words" android:inputType="textAutoCorrect|textCapWords" android:imeOptions="actionNext" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="18.0sp" android:id="@id/edtCountry" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/strCountry" android:singleLine="true" android:capitalize="words" android:inputType="textAutoCorrect|textCapWords" android:imeOptions="actionDone" />
+            </LinearLayout>
+            <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="@color/label_text_color" android:id="@id/txtGeneralInfo" android:paddingLeft="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:text="@string/lblGeneralInfo" android:paddingStart="10.0dip" />
+            <View android:id="@id/separator7" style="@style/BlueSeparatorBar" />
+            <LinearLayout android:orientation="vertical" android:paddingLeft="5.0dip" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="5.0dip" android:paddingStart="5.0dip" android:paddingEnd="5.0dip">
+                <EditText android:scrollbarStyle="insideInset" android:textSize="16.0sp" android:gravity="top" android:id="@id/edtGeneralInfo" android:scrollbars="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/lblGeneralInfo" android:lines="10" android:capitalize="sentences" android:inputType="textLongMessage|textAutoCorrect|textCapSentences|textMultiLine" android:imeOptions="actionDone" android:overScrollMode="always" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

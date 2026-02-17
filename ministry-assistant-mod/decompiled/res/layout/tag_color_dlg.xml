@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_width="wrap_content" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:paddingBottom="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_marginRight="10.0dip" android:maxWidth="300.0dip" android:layout_marginStart="10.0dip" android:layout_marginEnd="10.0dip">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:textStyle="bold" android:id="@id/textView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strSelectColorBy" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" android:layout_alignParentStart="true" fontPath="fonts/OpenSans-Bold.ttf" style="@style/TagdialogText" />
+        <View android:id="@id/separator" android:layout_below="@id/textView" style="@style/BlueSeparatorBar" />
+        <RadioGroup android:id="@id/radioGroupColor" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/separator">
+            <RadioButton android:textAppearance="?android:textAppearanceMedium" android:id="@id/rdColorType" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strColorByType" style="@style/TagdialogText" />
+            <RadioButton android:textAppearance="?android:textAppearanceMedium" android:id="@id/rdColorDate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strColorByAge" style="@style/TagdialogText" />
+        </RadioGroup>
+    </RelativeLayout>
+</ScrollView>

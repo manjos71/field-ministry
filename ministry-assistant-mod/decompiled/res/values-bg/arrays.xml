@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Дата</item>
+        <item>Домакин</item>
+        <item>Диалог</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Мъж</item>
+        <item>Жена</item>
+        <item>Дете</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Време назад</item>
+        <item>Време напред</item>
+        <item>Планирано време</item>
+        <item>Месечен отчет</item>
+        <item>Стари посещения</item>
+        <item>Последен район</item>
+        <item>Pinned visits</item>
+        <item>Планирани посещения</item>
+        <item>Статистика за службата</item>
+        <item>Бележки за службата</item>
+        <item>Време на посещения</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Винаги да се показва поле с пробег</item>
+        <item>Само за специален пионер</item>
+        <item>Никога да не се показва поле с пробег</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Винаги показвай РСК поле</item>
+        <item>Само за специален пионер</item>
+        <item>Никога не показвай РСК поле</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Ръчно синхронизиране</item>
+        <item>Автоматично синхронизиране</item>
+        <item>Изключване на синхронизиране</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Светла тема</item>
+        <item>Тъмна тема</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Часове и минути (ч.м)</item>
+        <item>Часове и минути (чч.м)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Изпрати като съобщение</item>
+        <item>Изпрати като e-mail</item>
+        <item>Изтрий</item>
+        <item>Добави отметка</item>
+        <item>Премахни отметка</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Не се интересува</item>
+        <item>Няма време</item>
+        <item>Добави като повторно посещение</item>
+        <item>На шпионката</item>
+        <item>Отказ</item>
+        <item>Премахни</item>
+        <item>Редактирай име</item>
+        <item>Изчисти</item>
+        <item>Промени дата</item>
+        <item>Задай отметка</item>
+        <item>Премахни отметка</item>
+        <item>Добави посещение</item>
+        <item>Редактирай посещение</item>
+        <item>Пренареждане на площ</item>
+        <item>Свободен</item>
+        <item>Добави име</item>
+        <item>Друг език</item>
+        <item>Не си е у дома</item>
+        <item>Не вдига</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Редактирай</item>
+        <item>Изтрий</item>
+        <item>Покажи карта</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Не се интересува</item>
+        <item>Няма време</item>
+        <item>Писмо</item>
+        <item>Празно</item>
+        <item>Друг език</item>
+        <item>Не е у дома</item>
+        <item>Не отговаря</item>
+        <item>No trespassing</item>
+        <item>Заключена врата</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Основен отчет</item>
+        <item>Опростен отчет</item>
+        <item>Подробен отчет</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Изтрий</item>
+    </string-array>
+</resources>

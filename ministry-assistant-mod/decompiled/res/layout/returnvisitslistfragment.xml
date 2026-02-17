@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_alignParentTop="true"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.lostpixels.fieldservice.ui.expandablelistview.FloatingGroupExpandableListView android:id="@id/SectionListView" android:layout_width="fill_parent" android:layout_height="fill_parent" android:cacheColorHint="@android:color/transparent" android:groupIndicator="@null" style="@style/ExpandListviewStyle" />
+    <RelativeLayout android:id="@id/EmptySectionListView" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_centerInParent="true">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:gravity="center" android:id="@id/EmptySectionListText" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/strNothingToDisplay" android:drawableTop="@drawable/emptypersonlist" android:drawablePadding="10.0dip" />
+        <TextView android:textAppearance="?android:textAppearanceSmall" android:gravity="center" android:id="@id/EmptySectionListExplaination" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_margin="20.0dip" android:text="@string/infoTooManyFilters" android:layout_below="@id/EmptySectionListText" android:layout_centerInParent="true" />
+        <Button android:id="@id/btnClearFilters" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strClearFilters" android:layout_below="@id/EmptySectionListExplaination" android:layout_centerHorizontal="true" android:textAllCaps="false" style="@style/Widget.AppCompat.Button.Colored" />
+    </RelativeLayout>
+</RelativeLayout>

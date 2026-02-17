@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:paddingLeft="10.0dip" android:paddingRight="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minWidth="300.0dip" android:paddingStart="10.0dip" android:paddingEnd="10.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ScrollView android:id="@id/scrollViewLayout" android:layout_width="fill_parent" android:layout_height="0.0dip" android:fillViewport="true" android:layout_weight="1.0">
+        <LinearLayout android:orientation="vertical" android:id="@id/llEdits" android:paddingBottom="20.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <com.lostpixels.fieldservice.ui.SpinnerButton android:textSize="16.0sp" android:layout_gravity="center_horizontal" android:id="@id/changeDate" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="16.0dip" android:layout_marginTop="10.0dip" android:layout_marginRight="16.0dip" android:layout_marginBottom="10.0dip" android:text="Date" android:layout_marginStart="16.0dip" android:layout_marginEnd="16.0dip" />
+            <RelativeLayout android:orientation="horizontal" android:id="@id/llDoneMinistry" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="8.0dip">
+                <TextView android:textSize="20.0sp" android:id="@id/doneMinistry" android:paddingLeft="5.0dip" android:paddingTop="0.0dip" android:paddingBottom="4.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/done_ministry" android:layout_toLeftOf="@id/chDoneMinistry" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" android:paddingStart="5.0dip" android:layout_toStartOf="@id/chDoneMinistry" android:layout_alignParentStart="true" />
+                <androidx.appcompat.widget.AppCompatCheckBox android:id="@id/chDoneMinistry" android:paddingLeft="5.0dip" android:paddingRight="-4.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="0.0dip" android:layout_alignParentTop="true" android:layout_alignParentRight="true" android:scaleX="1.5" android:scaleY="1.5" android:paddingStart="5.0dip" android:paddingEnd="-4.0dip" android:layout_alignParentEnd="true" app:buttonTint="#ff4153af" />
+            </RelativeLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@id/llHours" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/hoursminus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/del" android:paddingEnd="5.0dip" />
+                <LinearLayout android:focusable="true" android:focusableInTouchMode="true" android:layout_width="0.0px" android:layout_height="0.0px" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/hours" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/strHoursBig" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                <ImageView android:id="@id/hoursclock" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/clockbutton" android:paddingStart="5.0dip" />
+                <ImageView android:id="@id/hoursplus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@id/llRBCHours" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/rbchoursminus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/del" android:paddingEnd="5.0dip" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/rbchours" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/strRBCHours" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                <ImageView android:id="@id/rbchoursplus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@id/llPlacements" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/pubminus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/placements" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/publicationsCapital" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                <ImageView android:id="@id/pubplus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+            </LinearLayout>
+            <LinearLayout android:orientation="vertical" android:id="@id/llDetailedPlacements" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <LinearLayout android:orientation="horizontal" android:id="@id/llMags" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                    <ImageView android:id="@id/magsminus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                    <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/magazines" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/strMagazinesBig" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                    <ImageView android:id="@id/magsplus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:id="@id/llBros" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                    <ImageView android:id="@id/brosminus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                    <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/brochures" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/strBroschuresBig" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                    <ImageView android:id="@id/brosplus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:id="@id/llBooks" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                    <ImageView android:id="@id/booksminus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                    <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/books" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/strBooksBig" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                    <ImageView android:id="@id/booksplus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:id="@id/llTracts" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                    <ImageView android:id="@id/tractsminus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                    <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/tracts" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/strTractsBig" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                    <ImageView android:id="@id/tractsplus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@id/llVideosShown" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/videosShownMinus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/videosShown" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/videoShowingsCapital" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                <ImageView android:id="@id/videosShownPlus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+            </LinearLayout>
+            <LinearLayout android:id="@id/llVideos" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/videosminus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/videos" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/strVideosBig" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                <ImageView android:id="@id/videosplus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@id/llRVs" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/returnvisitsminus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/returnvisits" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/strReturnVisitsBig" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                <ImageView android:id="@id/returnvisitsplus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:id="@id/llStudy" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/studiesminus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/studies" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/strIndividualStudies" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                <ImageView android:id="@id/studiesplus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+            </LinearLayout>
+            <LinearLayout android:id="@id/llMileage" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/mileageminus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/mileage" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/strKilometersBig" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                <ImageView android:id="@id/mileageplus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+            </LinearLayout>
+            <LinearLayout android:id="@id/llCustom1" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/custom1minus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/custom1" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/prefCustomOne" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                <ImageView android:id="@id/custom1plus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+            </LinearLayout>
+            <LinearLayout android:id="@id/llCustom2" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/custom2minus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/custom2" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/prefCustomTwo" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                <ImageView android:id="@id/custom2plus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+            </LinearLayout>
+            <LinearLayout android:id="@id/llCustom3" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <ImageView android:id="@id/custom3minus" android:paddingRight="5.0dip" android:paddingBottom="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/delbutton" android:paddingEnd="5.0dip" />
+                <com.thebnich.floatinghintedittext.FloatingHintEditText android:textSize="16.0sp" android:id="@id/custom3" android:paddingTop="0.0dip" android:layout_width="0.0px" android:layout_height="wrap_content" android:text="" android:hint="@string/prefCustomThree" android:layout_weight="1.0" android:imeOptions="actionNext" />
+                <ImageView android:id="@id/custom3plus" android:paddingLeft="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbutton" android:paddingStart="5.0dip" />
+            </LinearLayout>
+            <com.thebnich.floatinghintedittext.FloatingHintEditText android:scrollbarStyle="insideInset" android:textSize="16.0sp" android:id="@id/comment" android:paddingTop="0.0dip" android:scrollbars="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="" android:hint="@string/strComment" android:scrollHorizontally="false" android:inputType="textAutoComplete|textAutoCorrect|textCapSentences|textMultiLine|textShortMessage" android:imeOptions="actionDone" />
+        </LinearLayout>
+    </ScrollView>
+    <include android:id="@id/bottomPanel" android:layout_width="fill_parent" android:layout_height="wrap_content" layout="@layout/action_addcancel" />
+</LinearLayout>

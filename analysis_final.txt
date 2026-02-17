@@ -1,0 +1,48 @@
+Analyzing nebular-planetary...
+
+  error - lib/providers/theme_provider.dart:139:16 - The argument type 'CardTheme' can't be assigned to the parameter type 'CardThemeData?'.  - argument_type_not_assignable
+  error - lib/providers/theme_provider.dart:238:18 - The argument type 'DialogTheme' can't be assigned to the parameter type 'DialogThemeData?'.  - argument_type_not_assignable
+  error - lib/screens/interested_tab.dart:260:164 - The getter 'city' isn't defined for the type 'Territory'. Try importing the library that defines 'city', correcting the name to the name of an existing getter, or defining a getter or field named 'city'. - undefined_getter
+  error - lib/screens/interested_tab.dart:272:49 - The named parameter 'streetId' is required, but there's no corresponding argument. Try adding the required argument. - missing_required_argument
+  error - lib/screens/interested_tab.dart:272:49 - The named parameter 'territoryId' is required, but there's no corresponding argument. Try adding the required argument. - missing_required_argument
+  error - lib/screens/interested_tab.dart:273:35 - The named parameter 'territory' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'territory'. - undefined_named_parameter
+  error - lib/screens/interested_tab.dart:274:35 - The named parameter 'street' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'street'. - undefined_named_parameter
+  error - lib/screens/settings_tab.dart:329:31 - Undefined name 'databaseServiceProvider'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib/screens/settings_tab.dart:330:22 - The method 'getSetting' can't be unconditionally invoked because the receiver can be 'null'. Try making the call conditional (using '?.') or adding a null check to the target ('!'). - unchecked_use_of_nullable_value
+  error - lib/screens/settings_tab.dart:349:31 - Undefined name 'databaseServiceProvider'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib/screens/settings_tab.dart:351:14 - The method 'saveSetting' can't be unconditionally invoked because the receiver can be 'null'. Try making the call conditional (using '?.') or adding a null check to the target ('!'). - unchecked_use_of_nullable_value
+warning - lib/models/visit.dart:142:9 - Dead code. Try removing the code, or fixing the code before it so that it can be reached. - dead_code
+warning - lib/providers/backup_provider.dart:139:12 - The value of 'refresh' should be used. Try using the result by invoking a member, passing it to a function, or returning it from this function. - unused_result
+warning - lib/providers/territory_provider.dart:58:13 - The value of the field '_ref' isn't used. Try removing the field, or using it. - unused_field
+warning - lib/providers/theme_provider.dart:29:13 - The value of the field '_ref' isn't used. Try removing the field, or using it. - unused_field
+warning - lib/screens/home_tab.dart:7:8 - Unused import: '../services/database_service.dart'. Try removing the import directive. - unused_import
+warning - lib/screens/maps_tab.dart:152:11 - The value of the local variable 'updated' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib/services/service_report_service.dart:1:8 - Unused import: 'dart:convert'. Try removing the import directive. - unused_import
+warning - patches/win32/lib/src/guid.dart:6:8 - Unused import: 'dart:ffi'. Try removing the import directive. - unused_import
+   info - lib/config/theme.dart:47:9 - 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/models/visit.dart:73:42 - Unnecessary braces in a string interpolation. Try removing the braces. - unnecessary_brace_in_string_interps
+   info - lib/providers/theme_provider.dart:51:49 - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/home_tab.dart:13:8 - The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib/screens/home_tab.dart:388:55 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/home_tab.dart:535:24 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/home_tab.dart:537:43 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/interested_tab.dart:139:67 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/interested_tab.dart:153:54 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/interested_tab.dart:167:56 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/settings_tab.dart:38:11 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/screens/settings_tab.dart:89:11 - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation. - prefer_const_constructors
+   info - lib/screens/settings_tab.dart:114:26 - The 'child' argument should be last in widget constructor invocations. Try moving the argument to the end of the argument list. - sort_child_properties_last
+   info - lib/screens/settings_tab.dart:270:36 - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/settings_tab.dart:270:58 - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/settings_tab.dart:286:40 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/street_detail_screen.dart:103:62 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/street_detail_screen.dart:259:60 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/street_detail_screen.dart:470:46 - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext. - use_build_context_synchronously
+   info - lib/screens/territory_detail_screen.dart:64:60 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/screens/territory_list_screen.dart:78:60 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/widgets/status_selector.dart:46:41 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/widgets/visit_history_accordion.dart:42:34 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib/widgets/visit_history_accordion.dart:254:64 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - patches/win32/lib/src/guid.dart:12:3 - Parameter 'list' could be a super parameter. Trying converting 'list' to a super parameter. - use_super_parameters
+
+44 issues found.

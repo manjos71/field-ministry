@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:paddingLeft="5.0dip" android:paddingRight="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="5.0dip" android:paddingEnd="5.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/txtInsertPublication" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txtInsertPublication" android:layout_toLeftOf="@id/btnAddNew" android:layout_alignBottom="@id/btnAddNew" android:layout_alignParentLeft="true" android:layout_toStartOf="@id/btnAddNew" android:layout_alignParentStart="true" />
+    <ImageView android:id="@id/btnAddNew" android:paddingTop="10.0dip" android:paddingRight="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/addbuttonbig" android:layout_alignParentRight="true" android:paddingEnd="10.0dip" android:layout_alignParentEnd="true" />
+    <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/txtMissingPubs" android:paddingTop="20.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/infoAddPublication" android:layout_below="@id/btnAddNew" android:layout_centerHorizontal="true" />
+    <RelativeLayout android:id="@id/layoutPublication" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/btnAddNew">
+        <net.simonvt.widget.NumberPicker android:id="@id/lstPublications" android:focusable="true" android:focusableInTouchMode="true" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_toLeftOf="@id/imageDelete" android:layout_alignParentLeft="true" android:layout_toStartOf="@id/imageDelete" android:layout_alignParentStart="true" style="@style/NumberPickerSmall" />
+        <ImageView android:id="@id/imageDelete" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="?MA_themeTrashCan" android:layout_alignParentRight="true" android:layout_centerVertical="true" android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+    <FrameLayout android:id="@id/llComment" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/layoutPublication">
+        <EditText android:textSize="18.0sp" android:id="@id/edtComment" android:focusable="true" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/strComment" android:singleLine="true" android:capitalize="sentences" android:inputType="textAutoCorrect|textCapSentences" android:imeOptions="actionDone" />
+    </FrameLayout>
+    <CheckBox android:id="@id/chkAddToReport" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txtAddPubToReport" android:layout_below="@id/llComment" android:layout_alignParentLeft="true" android:layout_alignParentStart="true" />
+    <include android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/chkAddToReport" layout="@layout/action_addcancel" />
+</RelativeLayout>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Data</item>
+        <item>Domownik</item>
+        <item>Dialog</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Mężczyzna</item>
+        <item>Kobieta</item>
+        <item>Dziecko</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Czas zaległy</item>
+        <item>Czas do celu</item>
+        <item>Czas zaplanowany na dzisiaj</item>
+        <item>Sprawozdanie miesięczne</item>
+        <item>Dawne wizyty</item>
+        <item>Ostatni teren</item>
+        <item>Przypięte wizyty</item>
+        <item>Zaplanowane wizyty</item>
+        <item>Statystyki służby</item>
+        <item>Wskazówki</item>
+        <item>Osoby spotkane w tym czasie</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Zawsze pokazuj pole przebiegu</item>
+        <item>Tylko w przypadku pioniera specjalnego</item>
+        <item>Nigdy nie pokazuj pola przebiegu</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Zawsze pokazuj pole LDPB</item>
+        <item>Tylko jeśli pionier stały</item>
+        <item>Nigdy nie pokazuj pola LDPB</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Synchronizacja ręczna</item>
+        <item>Synchronizacja automatyczna</item>
+        <item>Synchronizacja wyłączona</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Jasny</item>
+        <item>Ciemny</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Godziny i minuty (hh.mm)</item>
+        <item>Godziny i części dziesiętne (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Wyślij SMS-em</item>
+        <item>Wyślij e-mailem</item>
+        <item>Usuń</item>
+        <item>Dodaj zakładkę</item>
+        <item>Usuń zakładkę</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Niezainteresowany</item>
+        <item>Brak czasu</item>
+        <item>Dodaj jako odwiedziny ponowne</item>
+        <item>Wizjer</item>
+        <item>Usuń</item>
+        <item>List</item>
+        <item>Edytuj nazwę</item>
+        <item>Resetuj</item>
+        <item>Zmień datę</item>
+        <item>Ustaw zakładkę</item>
+        <item>Usuń zakładkę</item>
+        <item>Dodaj wizytę</item>
+        <item>Edytuj wizytę</item>
+        <item>Zorganizowany obszar</item>
+        <item>Pustostan</item>
+        <item>Dodaj nazwę</item>
+        <item>Inny język</item>
+        <item>Nieobecny</item>
+        <item>Nie odwiedzać</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Edytuj</item>
+        <item>Usuń</item>
+        <item>Wyświetl kartę</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Niezainteresowany</item>
+        <item>Brak czasu</item>
+        <item>List</item>
+        <item>Pustostan</item>
+        <item>Inny język</item>
+        <item>Nieobecny</item>
+        <item>Nie odwiedzać</item>
+        <item>Zakaz wstępu</item>
+        <item>Zamknięte drzwi</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Podstawowe sprawozdanie</item>
+        <item>Uproszczone sprawozdanie</item>
+        <item>Szczegółowe sprawozdanie</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Usuń</item>
+    </string-array>
+</resources>

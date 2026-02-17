@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>تاريخ</item>
+        <item>صاحب البيت</item>
+        <item>الحوار</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>رجل</item>
+        <item>امرأة</item>
+        <item>شباب</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>وقت ناقص</item>
+        <item>وقت متقدّم</item>
+        <item>وقت مخطط</item>
+        <item>التقرير الشهري</item>
+        <item>الزيارات القديمة</item>
+        <item>المقاطعة الاخيرة</item>
+        <item>زيارات المشار اليها</item>
+        <item>زيارات المخططة</item>
+        <item>إحصائيات الخدمة</item>
+        <item>نصائح الخدمة</item>
+        <item>وقت الزيارات</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>تظهر دائما حقل الأميال</item>
+        <item>فقط إذا كان فاتح خصوصي</item>
+        <item>لا تظهر حقل الأميال</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>إظهار حقل LDC دائمًا</item>
+        <item>فقط إذا فاتح عادي</item>
+        <item>عدم إظهار حقل LDC مطلقًا</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>المزامنة اليدوية</item>
+        <item>المزامنة التلقائية</item>
+        <item>تعطيل المزامنة</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>مظهر فاتح</item>
+        <item>مظهر داكن</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>ساعة ودقائق</item>
+        <item>ساعة وعشري</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>إرسال كرسالة نصية</item>
+        <item>إرسال كبريد إلكتروني</item>
+        <item>حذف</item>
+        <item>ضع إشارة مرجعية</item>
+        <item>حذف إشارة مرجعية</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>غير مهتم</item>
+        <item>دون وقت</item>
+        <item>إضافة كزيارة مكررة</item>
+        <item>ثقب الباب</item>
+        <item>حذف</item>
+        <item>رسالة</item>
+        <item>تعديل الاسم</item>
+        <item>إعادة</item>
+        <item>تغيير التاريخ</item>
+        <item>ضع إشارة مرجعية</item>
+        <item>حذف إشارة مرجعية</item>
+        <item>إضافة زيارة</item>
+        <item>تعديل زيارة</item>
+        <item>إعادة ترتيب المنطقة</item>
+        <item>شاغر</item>
+        <item>إضافة اسم</item>
+        <item>لغة اخرى</item>
+        <item>ليس في البيت</item>
+        <item>لا تتصل</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>تعديل</item>
+        <item>حذف</item>
+        <item>عرض البطاقة</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>غير مهتم</item>
+        <item>دون وقت</item>
+        <item>رسالة</item>
+        <item>فارغ</item>
+        <item>لغة اخرى</item>
+        <item>ليس في البيت</item>
+        <item>لا تتصل</item>
+        <item>ممنوع المرور</item>
+        <item>باب مغلق</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>التقرير الأساسي</item>
+        <item>تقرير مبسط</item>
+        <item>تقرير مفصل</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>حذف</item>
+    </string-array>
+</resources>

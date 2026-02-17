@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="AddressIndex" />
+    <item type="id" name="StreetIndex" />
+    <item type="id" name="VisitIndex" />
+</resources>

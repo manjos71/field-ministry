@@ -1,0 +1,5 @@
+name: win32
+version: 5.2.0
+description: "Local patched win32 with compatibility shim for older Dart SDKs"
+environment:
+  sdk: '>=2.17.0 <4.0.0'

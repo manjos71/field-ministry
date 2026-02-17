@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:paddingLeft="10.0dip" android:paddingRight="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="10.0dip" android:paddingEnd="10.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/textStart" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5.0dip" android:text="@string/lblStartFloor" />
+        <Spinner android:id="@id/spinnerStart" android:layout_width="200.0dip" android:layout_height="wrap_content" android:layout_below="@id/textStart" android:layout_alignLeft="@id/textStart" android:layout_alignStart="@id/textStart" />
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/textView1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:text="@string/lblTo" android:layout_below="@id/spinnerStart" />
+        <Spinner android:id="@id/spinnerEnd" android:layout_width="200.0dip" android:layout_height="wrap_content" android:layout_below="@id/textView1" android:layout_alignLeft="@id/textStart" android:layout_alignStart="@id/textStart" />
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/textView3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:text="@string/lblDoorsPerFloors" android:layout_below="@id/spinnerEnd" />
+        <Spinner android:id="@id/spinnerApartments" android:layout_width="200.0dip" android:layout_height="wrap_content" android:layout_below="@id/textView3" android:layout_alignLeft="@id/textStart" android:layout_alignStart="@id/textStart" />
+        <RadioGroup android:id="@id/radioGroup1" android:paddingTop="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/spinnerApartments">
+            <RadioButton android:id="@id/rdPerFloor" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/strFloorNumbering" />
+            <RadioButton android:id="@id/rdIncremental" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strIncrementalNumbering" />
+            <RadioButton android:id="@id/rdLetters" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strLetterNumbering" />
+            <RadioButton android:id="@id/rdLeftRightMiddle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strLeftMiddleRight" />
+            <RadioButton android:id="@id/rdLeftRight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strLeftRight" />
+        </RadioGroup>
+        <com.thebnich.floatinghintedittext.FloatingHintEditText android:id="@id/editStartNumber" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/strStartNumber" android:layout_below="@id/radioGroup1" android:inputType="numberSigned" android:imeOptions="actionDone" />
+        <include android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/editStartNumber" layout="@layout/action_createcancel" />
+    </RelativeLayout>
+</ScrollView>

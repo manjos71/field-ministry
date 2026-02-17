@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Dato</item>
+        <item>Beboer</item>
+        <item>Samtale</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Mand</item>
+        <item>Kvinde</item>
+        <item>Barn</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Tid bagefter</item>
+        <item>Tid foran</item>
+        <item>Planlagt tid</item>
+        <item>Månedsrapport</item>
+        <item>Gamle besøg</item>
+        <item>Sidste distrikt</item>
+        <item>Fastgjorte besøg</item>
+        <item>Planlagte besøg</item>
+        <item>Tjenestestatistik</item>
+        <item>Tips</item>
+        <item>Tidspunkt for besøg</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Vis altid feltet til kilometertal</item>
+        <item>Kun for specialpionerer</item>
+        <item>Vis aldrig felt til kilometertal</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Vis altid LDC felt</item>
+        <item>Kun hvis almindelig pioner</item>
+        <item>Vis aldrig LDC felt</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Manuel synkronisering</item>
+        <item>Automatisk synkronisering</item>
+        <item>Deaktiver synkronisering</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Lyst tema</item>
+        <item>Mørkt tema</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Timer og minutter (hh.mm)</item>
+        <item>Timer og decimaler (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Send som SMS</item>
+        <item>Send som e-mail</item>
+        <item>Slet</item>
+        <item>Tilføj bogmærke</item>
+        <item>Fjern bogmærke</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Ingen interesse</item>
+        <item>Prøv igen senere</item>
+        <item>Tilføj som genbesøg</item>
+        <item>Dørspion</item>
+        <item>Fjern</item>
+        <item>Brev</item>
+        <item>Rediger navn</item>
+        <item>Nulstil</item>
+        <item>Skift dato</item>
+        <item>Sæt bogmærke</item>
+        <item>Fjern bogmærke</item>
+        <item>Tilføj besøg</item>
+        <item>Rediger besøg</item>
+        <item>Arranger område</item>
+        <item>Ubeboet</item>
+        <item>Tilføj navn</item>
+        <item>Andet sprog</item>
+        <item>Ikke hjemme</item>
+        <item>Ønsker ikke besøg</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Rediger</item>
+        <item>Slet</item>
+        <item>Vis kort</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Ingen interesse</item>
+        <item>Havde ikke tid</item>
+        <item>Brev</item>
+        <item>Ubeboet</item>
+        <item>Andet sprog</item>
+        <item>Ikke hjemme</item>
+        <item>Ønsker ikke besøg</item>
+        <item>Adgang forbudt</item>
+        <item>Låst indgang</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Standard rapport</item>
+        <item>Simplificeret rapport</item>
+        <item>Detaljeret rapport</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Slet</item>
+    </string-array>
+</resources>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>日期</item>
+        <item>住户</item>
+        <item>对话</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>男性</item>
+        <item>女性</item>
+        <item>孩童</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>还需多少时间</item>
+        <item>目标时间</item>
+        <item>预计时间</item>
+        <item>当月报告</item>
+        <item>旧的续访</item>
+        <item>最新的区域</item>
+        <item>标明的续访</item>
+        <item>已安排的续访</item>
+        <item>传道统计</item>
+        <item>传道助手使用密诀</item>
+        <item>目前可拜访的续访</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>总是显示里程数栏位</item>
+        <item>只有是特别先驱时才显示</item>
+        <item>不要显示里程数栏位</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>总时显示LDC栏位</item>
+        <item>只在正规先驱的情况</item>
+        <item>不要显示LDC栏位</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>手动同步</item>
+        <item>自动同步</item>
+        <item>不要同步</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>较亮的使用风格</item>
+        <item>较暗的使用风格</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>小时和分钟(hh.mm)</item>
+        <item>小时和小数点(hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>用短信发送</item>
+        <item>用电子邮件发送</item>
+        <item>删除</item>
+        <item>设置书签</item>
+        <item>删除书签</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>不感兴趣</item>
+        <item>没有时间</item>
+        <item>加入续访</item>
+        <item>窥视孔</item>
+        <item>删除</item>
+        <item>信件</item>
+        <item>编辑名称</item>
+        <item>重置</item>
+        <item>更改日期</item>
+        <item>设置书签</item>
+        <item>删除书签</item>
+        <item>增加探访</item>
+        <item>编辑探访</item>
+        <item>编排范围</item>
+        <item>空房</item>
+        <item>加入名称</item>
+        <item>其他语言</item>
+        <item>不在家</item>
+        <item>谢绝探访</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>编辑</item>
+        <item>删除</item>
+        <item>显示卡片</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>不感兴趣</item>
+        <item>没有时间</item>
+        <item>信件</item>
+        <item>空置</item>
+        <item>其他语言</item>
+        <item>不在家</item>
+        <item>谢绝探访</item>
+        <item>不得擅入</item>
+        <item>大门深锁</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>基本报告</item>
+        <item>简化报告</item>
+        <item>详细报告</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>删除</item>
+    </string-array>
+</resources>

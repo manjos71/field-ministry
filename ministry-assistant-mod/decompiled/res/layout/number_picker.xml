@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageButton android:id="@id/np_increment" android:layout_width="fill_parent" android:layout_height="wrap_content" android:contentDescription="@string/np_number_picker_increment_button" style="?numberPickerUpButtonStyle" />
+    <view android:id="@id/np_numberpicker_input" android:layout_width="fill_parent" android:layout_height="wrap_content" class="net.simonvt.widget.NumberPicker$CustomEditText" style="?numberPickerInputTextStyle" />
+    <ImageButton android:id="@id/np_decrement" android:layout_width="fill_parent" android:layout_height="wrap_content" android:contentDescription="@string/np_number_picker_decrement_button" style="?numberPickerDownButtonStyle" />
+</merge>

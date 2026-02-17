@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<objectAnimator android:interpolator="@android:anim/decelerate_interpolator" android:duration="@integer/ms_default_error_tab_animation_duration" android:valueFrom="@string/ms_warning_path" android:valueTo="@string/ms_circle_path" android:valueType="pathType" android:propertyName="pathData"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt" />

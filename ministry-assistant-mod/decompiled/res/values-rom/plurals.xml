@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="alp_pmsg_connect_x_dots">
+        <item quantity="other">Povrzin naj hari %1$d točka/ hem Probin pak...</item>
+        <item quantity="one">Povrzin naj hari %1$d točka/ hem Probin pak...</item>
+    </plurals>
+</resources>

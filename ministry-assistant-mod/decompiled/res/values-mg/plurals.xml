@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="alp_pmsg_connect_x_dots">
+        <item quantity="other">"Mampifandraisa teboka %1$d fara fahakeliny.
+Avereno…"</item>
+        <item quantity="one">"Mampifandraisa teboka %1$d fara fahakeliny.
+Avereno…"</item>
+    </plurals>
+</resources>

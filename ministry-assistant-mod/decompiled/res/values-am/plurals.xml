@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="alp_pmsg_connect_x_dots">
+        <item quantity="other">ቢያንስ %1$d ነጥቦችን አገናኝ።እንደገና ሞክር…</item>
+        <item quantity="one">ቢያንስ %1$d ነጥብ አገናኝ።እንደገና ሞክር…</item>
+    </plurals>
+    <plurals name="mtrl_badge_content_description">
+        <item quantity="other">%d አዲስ ማሳወቂያዎች</item>
+        <item quantity="one">%d አዲስ ማሳወቂያዎች</item>
+    </plurals>
+</resources>

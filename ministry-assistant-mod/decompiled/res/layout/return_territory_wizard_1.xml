@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <ImageView android:layout_width="fill_parent" android:layout_height="wrap_content" android:scaleType="fitXY" app:srcCompat="@drawable/returnterritory" />
+            <TextView android:textAppearance="?android:textAppearanceLarge" android:textColor="@color/white" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="24.0dip" android:text="@string/territoryOptions" android:layout_alignParentLeft="true" android:layout_centerVertical="true" android:layout_marginStart="24.0dip" android:layout_alignParentStart="true" />
+        </RelativeLayout>
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="8.0dip" android:layout_marginTop="24.0dip" android:text="@string/deleteTerritory" android:layout_marginStart="8.0dip" />
+        <CheckBox android:textAppearance="?android:textAppearanceMedium" android:id="@id/checkDeleteTerritory" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="24.0dip" android:text="@string/delete_and_keep" android:layout_marginStart="24.0dip" />
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/labelReturnTerritory" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="8.0dip" android:layout_marginTop="24.0dip" android:text="@string/return_the_territory" android:layout_marginStart="8.0dip" />
+        <RadioGroup android:id="@id/rdGroupReturn" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="24.0dip" android:layout_marginStart="24.0dip">
+            <RadioButton android:textAppearance="?android:textAppearanceMedium" android:id="@id/rdDontUpdateTh" android:layout_width="fill_parent" android:layout_height="wrap_content" android:checked="true" android:text="@string/dont_update_th" />
+            <RadioButton android:textAppearance="?android:textAppearanceMedium" android:id="@id/rdReturnWorked" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/return_as_worked" />
+            <RadioButton android:textAppearance="?android:textAppearanceMedium" android:id="@id/rdReturnUnworked" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/return_as_unworked" />
+        </RadioGroup>
+        <EditText android:id="@id/comment" android:layout_width="fill_parent" android:layout_height="100.0dip" android:layout_marginLeft="24.0dip" android:layout_marginRight="24.0dip" android:hint="@string/comment" android:ems="10" android:inputType="textMultiLine" android:layout_marginStart="24.0dip" android:layout_marginEnd="24.0dip" />
+    </LinearLayout>
+</ScrollView>

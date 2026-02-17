@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<changelog bulletedList="true">
+    <changelogversion versionName="3.7.2" changeDate="September 2, 2025">
+        <changelogtext>More Android 16 layout fixes</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.7.1" changeDate="August 21, 2025">
+        <changelogtext>Fix issue with Android 16</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.7.0" changeDate="June 20, 2025">
+        <changelogtext>Fix visual bug with custom hours in the report</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.6.9" changeDate="May 11, 2025">
+        <changelogtext>Fix more issue when trying to connect to Territory Helper</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.6.8" changeDate="February 26, 2025">
+        <changelogtext>Fix issue when returning a territory to Territory Helper</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.6.7" changeDate="January 3, 2025">
+        <changelogtext>Fix a crash when editing a territory</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.6.6" changeDate="December 20, 2024">
+        <changelogtext>Updated som translations</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.6.5" changeDate="September 10, 2024">
+        <changelogtext>Fix bug with the ministry schedule</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.6.4" changeDate="September 1, 2024">
+        <changelogtext>Fix bug that the old month report was shown</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.6.3" changeDate="July 22, 2024">
+        <changelogtext>Updated schedule for planning ministry</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.6.2" changeDate="April 20, 2024">
+        <changelogtext>Fix bug when returning campaign territories to Territory Helper</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.6.1" changeDate="March 29, 2024">
+    <changelogtext>Updated Dutch translation</changelogtext>
+    <changelogtext>Fix stability issues</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.6.0" changeDate="January 10, 2024">
+        <changelogtext>Updated Greek translation</changelogtext>
+        <changelogtext>Fix bug when return a territory to Territory Helper</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.5.9" changeDate="December 26, 2023">
+        <changelogtext>Added support to send "Shared in ministry" to NW Publisher app</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.5.8" changeDate="December 10, 2023">
+        <changelogtext>Fixed bug when importing houses from Territory Helper</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.5.7" changeDate="November 10, 2023">
+        <changelogtext>Updated a lot of translations</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.5.6" changeDate="November 1, 2023">
+        <changelogtext>New language: Amharic</changelogtext>
+        <changelogtext>[b]Help with translation needed:[/b] I had to do some automatic translations due to limited time. Please get back to me if a translation needs to be updated!</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.5.5" changeDate="October 29, 2023">
+        <changelogtext>Updated some translations</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.5.4" changeDate="October 23, 2023">
+        <changelogtext>Updated report to only show hours/shared in ministry</changelogtext>
+        <changelogtext>Automated translations for many languages due to limited time. Please get back to me if a translation needs to be updated!!</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.5.3" changeDate="August 26, 2023">
+        <changelogtext>Fix bug permissions on Android 13</changelogtext>
+    </changelogversion>
+    <changelogversion versionName="3.5.2" changeDate="July 19, 2023">
+        <changelogtext>Fix bug with the ministry cards on the home page</changelogtext>
+    </changelogversion>
+</changelog>

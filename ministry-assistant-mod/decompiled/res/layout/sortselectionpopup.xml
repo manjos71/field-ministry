@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:background="@drawable/popup_background" android:padding="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxWidth="400.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxWidth="400.0dip">
+        <ImageView android:id="@id/imageClose" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/close" android:layout_alignParentRight="true" android:layout_alignParentEnd="true" />
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="@android:color/white" android:id="@id/textView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strHowToSort" android:layout_toLeftOf="@id/imageClose" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" android:layout_toStartOf="@id/imageClose" android:layout_alignParentStart="true" />
+        <RadioGroup android:id="@id/radioGroupSort" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/textView">
+            <RadioButton android:textColor="@android:color/white" android:id="@id/rdSortAddress" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strByAddress" />
+            <RadioButton android:textColor="@android:color/white" android:id="@id/rdSortDate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strByDate" />
+            <RadioButton android:textColor="@android:color/white" android:id="@id/rdSortName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/strByName" />
+        </RadioGroup>
+        <CheckBox android:textColor="@android:color/white" android:id="@id/checkDecreasing" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strSortDecreasing" android:layout_below="@id/radioGroupSort" />
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="@android:color/white" android:id="@id/textGroup" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5.0dip" android:text="@string/strSelectHowToGroup" android:layout_below="@id/checkDecreasing" android:layout_alignParentLeft="true" android:layout_alignParentStart="true" />
+        <RadioGroup android:id="@id/radioGroupGroup" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/textGroup">
+            <RadioButton android:textColor="@android:color/white" android:id="@id/rdGroupNeighborhood" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/strByNeighbourhood" />
+            <RadioButton android:textColor="@android:color/white" android:id="@id/rdGroupCity" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strByCity" />
+            <RadioButton android:textColor="@android:color/white" android:id="@id/rdGroupPriority" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strByPriority" />
+            <RadioButton android:textColor="@android:color/white" android:id="@id/rdGroupVisitTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strByTimeForVisit" />
+            <RadioButton android:textColor="@android:color/white" android:id="@id/rdGroupBestTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strByBestTime" />
+        </RadioGroup>
+    </RelativeLayout>
+</ScrollView>

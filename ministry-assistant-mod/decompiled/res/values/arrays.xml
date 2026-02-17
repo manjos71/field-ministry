@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Date</item>
+        <item>Householder</item>
+        <item>Dialog</item>
+    </string-array>
+    <string-array name="default_color_choice_values">
+        <item>\#33b5e5</item>
+        <item>\#aa66cc</item>
+        <item>\#99cc00</item>
+        <item>\#ffbb33</item>
+        <item>\#ff4444</item>
+        <item>\#d8c0d8</item>
+        <item>\#5b4c39</item>
+        <item>\#c2ab89</item>
+        <item>\#ebeb00</item>
+        <item>\#f2babb</item>
+        <item>\#007f00</item>
+        <item>\#F3F3F3</item>
+        <item>\#cccccc</item>
+        <item>\#888888</item>
+        <item>\#333333</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Man</item>
+        <item>Woman</item>
+        <item>Child</item>
+    </string-array>
+    <string-array name="homescreen_color_choice_values">
+        <item>\#ffffff</item>
+        <item>\#000000</item>
+    </string-array>
+    <string-array name="listFloors">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="listLangVals">
+        <item>ja</item>
+        <item>ko</item>
+        <item>zh-TW</item>
+        <item>zh-CN</item>
+        <item>am</item>
+        <item>ka</item>
+        <item>bg</item>
+        <item>ar</item>
+        <item>my</item>
+        <item>ca</item>
+        <item>cs</item>
+        <item>sr</item>
+        <item>cy</item>
+        <item>da</item>
+        <item>de</item>
+        <item>et</item>
+        <item>en</item>
+        <item>es</item>
+        <item>el</item>
+        <item>fr</item>
+        <item>hr</item>
+        <item>rw</item>
+        <item>in</item>
+        <item>it</item>
+        <item>ht</item>
+        <item>lt</item>
+        <item>ln</item>
+        <item>hu</item>
+        <item>mk</item>
+        <item>mg</item>
+        <item>nl</item>
+        <item>no</item>
+        <item>th</item>
+        <item>fa</item>
+        <item>pl</item>
+        <item>pt</item>
+        <item>ru</item>
+        <item>ro</item>
+        <item>rom</item>
+        <item>sq</item>
+        <item>rmo</item>
+        <item>sk</item>
+        <item>sl</item>
+        <item>fi</item>
+        <item>sv</item>
+        <item>sw</item>
+        <item>tr</item>
+        <item>uk</item>
+    </string-array>
+    <string-array name="listLanguages">
+        <item>日本語</item>
+        <item>한국어</item>
+        <item>繁體中文</item>
+        <item>简体中文</item>
+        <item>አማርኛ</item>
+        <item>ქართული</item>
+        <item>български език</item>
+        <item>العربية</item>
+        <item>မြန်မာ</item>
+        <item>Català</item>
+        <item>Čeština</item>
+        <item>Српски</item>
+        <item>Cymraeg</item>
+        <item>Dansk</item>
+        <item>Deutsch</item>
+        <item>Eesti</item>
+        <item>English</item>
+        <item>Español</item>
+        <item>Ελληνικά</item>
+        <item>Français</item>
+        <item>Hrvatski</item>
+        <item>Ikinyarwanda</item>
+        <item>Indonesia</item>
+        <item>Italiano</item>
+        <item>Kreyòl ayisyen</item>
+        <item>Lietuvių</item>
+        <item>Lingála</item>
+        <item>Magyar</item>
+        <item>Mакедонски</item>
+        <item>Malagasy</item>
+        <item>Nederlands</item>
+        <item>Norsk</item>
+        <item>ภาษาไทย</item>
+        <item>فارسی</item>
+        <item>Polski</item>
+        <item>Português</item>
+        <item>Pусский</item>
+        <item>Română</item>
+        <item>Romani</item>
+        <item>Shqip</item>
+        <item>Sinte Romani</item>
+        <item>Slovensky</item>
+        <item>Slovenski jezik</item>
+        <item>Suomi</item>
+        <item>Svenska</item>
+        <item>Swahili</item>
+        <item>Türkçe</item>
+        <item>Українська</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Time behind</item>
+        <item>Time ahead</item>
+        <item>Time planned</item>
+        <item>Monthly report</item>
+        <item>Old visits</item>
+        <item>Latest territory</item>
+        <item>Pinned visits</item>
+        <item>Scheduled visits</item>
+        <item>Ministry statistics</item>
+        <item>Ministry tips</item>
+        <item>Time of visits</item>
+    </string-array>
+    <string-array name="listNowCard_defaults">
+        <item>1</item>
+        <item>11</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+    <string-array name="listNowCard_values">
+        <item>1</item>
+        <item>11</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+    <string-array name="listRBCVals">
+        <item>always</item>
+        <item>pioneer</item>
+        <item>never</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Always show mileage field</item>
+        <item>Only if special pioneer</item>
+        <item>Never show mileage field</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Always show LDC field</item>
+        <item>Only if regular pioneer</item>
+        <item>Never show LDC field</item>
+    </string-array>
+    <string-array name="listSyncOptionValues">
+        <item>manual</item>
+        <item>auto</item>
+        <item>disabled</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Manual syncing</item>
+        <item>Automatic syncing</item>
+        <item>Disable syncing</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Light theme</item>
+        <item>Dark theme</item>
+    </string-array>
+    <string-array name="listThemesVales">
+        <item>light</item>
+        <item>dark</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Hours and minutes (hh.mm)</item>
+        <item>Hours and decimals (hh.d)</item>
+    </string-array>
+    <string-array name="listTimeValues">
+        <item>hhmm</item>
+        <item>hhd</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Send as text message</item>
+        <item>Send as e-mail</item>
+        <item>Delete</item>
+        <item>Add bookmark</item>
+        <item>Remove bookmark</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Not interested</item>
+        <item>No time</item>
+        <item>Add as return visit</item>
+        <item>Peephole</item>
+        <item>Remove</item>
+        <item>Letter</item>
+        <item>Edit name</item>
+        <item>Reset</item>
+        <item>Change date</item>
+        <item>Set bookmark</item>
+        <item>Remove bookmark</item>
+        <item>Add visit</item>
+        <item>Edit visit</item>
+        <item>Rearrange area</item>
+        <item>Vacant</item>
+        <item>Add name</item>
+        <item>Other language</item>
+        <item>Not at home</item>
+        <item>Do not call</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Edit</item>
+        <item>Delete</item>
+        <item>Display card</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Not interested</item>
+        <item>No time</item>
+        <item>Letter</item>
+        <item>Empty</item>
+        <item>Other language</item>
+        <item>Not at home</item>
+        <item>Do not call</item>
+        <item>No trespassing</item>
+        <item>Locked door</item>
+    </string-array>
+    <string-array name="report_density">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Basic report</item>
+        <item>Simplified report</item>
+        <item>Detailed report</item>
+    </string-array>
+    <array name="snp_key_ids">
+        <item>@id/key_0</item>
+        <item>@id/key_1</item>
+        <item>@id/key_2</item>
+        <item>@id/key_3</item>
+        <item>@id/key_4</item>
+        <item>@id/key_5</item>
+        <item>@id/key_6</item>
+        <item>@id/key_7</item>
+        <item>@id/key_8</item>
+        <item>@id/key_9</item>
+    </array>
+    <string-array name="suburbsMenu">
+        <item>Delete</item>
+    </string-array>
+</resources>

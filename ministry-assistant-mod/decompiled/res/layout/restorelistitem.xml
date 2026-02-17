@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:padding="5.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textAppearance="?android:textAppearanceMedium" android:textStyle="bold" android:id="@id/txtDate" android:paddingLeft="7.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toRightOf="@id/imgType" android:layout_alignParentTop="true" android:paddingStart="7.0dip" android:layout_toEndOf="@id/imgType" fontPath="fonts/OpenSans-Bold.ttf" />
+    <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/txtName" android:paddingLeft="7.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" android:layout_toRightOf="@id/imgType" android:layout_below="@id/txtDate" android:paddingStart="7.0dip" android:layout_toEndOf="@id/imgType" />
+    <ImageView android:id="@id/imgType" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/sdcard" android:layout_alignParentLeft="true" android:layout_centerVertical="true" android:layout_alignParentStart="true" />
+</RelativeLayout>

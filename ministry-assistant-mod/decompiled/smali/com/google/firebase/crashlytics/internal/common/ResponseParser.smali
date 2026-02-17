@@ -1,0 +1,48 @@
+.class public abstract Lcom/google/firebase/crashlytics/internal/common/ResponseParser;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# direct methods
+.method public static parse(I)I
+    .locals 3
+
+    const/16 v0, 0xc8
+
+    const/4 v1, 0x0
+
+    if-lt p0, v0, :cond_0
+
+    const/16 v0, 0x12b
+
+    if-gt p0, v0, :cond_0
+
+    return v1
+
+    :cond_0
+    const/16 v0, 0x12c
+
+    const/4 v2, 0x1
+
+    if-lt p0, v0, :cond_1
+
+    const/16 v0, 0x18f
+
+    if-gt p0, v0, :cond_1
+
+    return v2
+
+    :cond_1
+    const/16 v0, 0x190
+
+    if-lt p0, v0, :cond_2
+
+    const/16 v0, 0x1f3
+
+    if-gt p0, v0, :cond_2
+
+    return v1
+
+    :cond_2
+    return v2
+.end method

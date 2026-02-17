@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Датум</item>
+        <item>Станар</item>
+        <item>Разговор</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Маж</item>
+        <item>Жена</item>
+        <item>Дете</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Време кое недостасува</item>
+        <item>Време понапред</item>
+        <item>Планирано време</item>
+        <item>Месечен извештај</item>
+        <item>Стари посети</item>
+        <item>Последно подрачје</item>
+        <item>Означени посети</item>
+        <item>Планирани посети</item>
+        <item>Статистика од службата</item>
+        <item>Совети</item>
+        <item>Време на посети</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Секогаш прикажувај ја листата со километража</item>
+        <item>Само за специјален пионер</item>
+        <item>Никогаш не покажувај листа со километража</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Секогаш прикажи го полето со волонтерски часови</item>
+        <item>Само ако е општ пионер</item>
+        <item>Никогаш не го прикажувај полето со волонтерски часови</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Мануелно синхронизирање</item>
+        <item>Автоматско синхронизирање</item>
+        <item>Оневозможи синхронизирање</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Светла тема</item>
+        <item>Темна тема</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Часови и минути (hh.mm)</item>
+        <item>Часови и десетинки (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Испрати преку SMS</item>
+        <item>Испрати преку e-mail</item>
+        <item>Избриши</item>
+        <item>Додај ознака</item>
+        <item>Избриши ознака</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Не е заинтересиран</item>
+        <item>Нема време</item>
+        <item>Додај како повторна посета</item>
+        <item>Шпиунка на врата</item>
+        <item>Избриши</item>
+        <item>Писмо</item>
+        <item>Измени име</item>
+        <item>Повторно постави</item>
+        <item>Смени го датумот</item>
+        <item>Постави ознака</item>
+        <item>Избриши ознака</item>
+        <item>Додај посета</item>
+        <item>Измени посета</item>
+        <item>Измени подрачје</item>
+        <item>Празно</item>
+        <item>Додај име</item>
+        <item>Странски јазик</item>
+        <item>Не е дома</item>
+        <item>Не доаѓај</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Измени</item>
+        <item>Избриши</item>
+        <item>Прикажи картица</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Не е заинтересиран</item>
+        <item>Нема време</item>
+        <item>Писмо</item>
+        <item>Празно</item>
+        <item>Странски Јазик</item>
+        <item>Не е дома</item>
+        <item>Не доаѓај</item>
+        <item>Забранет пристап</item>
+        <item>Заклучена врата</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Основен извештај</item>
+        <item>Поедноставен извештај</item>
+        <item>Детален извештај</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Избриши</item>
+    </string-array>
+</resources>

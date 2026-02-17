@@ -1,0 +1,8 @@
+.class public interface abstract Lio/github/inflationx/viewpump/internal/-ViewPumpActivityFactory;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# virtual methods
+.method public abstract onActivityCreateView(Landroid/view/View;Landroid/view/View;Ljava/lang/String;Landroid/content/Context;Landroid/util/AttributeSet;)Landroid/view/View;
+.end method

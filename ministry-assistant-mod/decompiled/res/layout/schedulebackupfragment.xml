@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:paddingTop="10.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:paddingLeft="5.0dip" android:paddingRight="5.0dip" android:paddingBottom="10.0dip" android:clipToPadding="false" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="10.0dip" android:paddingStart="5.0dip" android:paddingEnd="5.0dip">
+        <RelativeLayout android:id="@id/layoutLabel" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/txtScheduleBackup" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5.0dip" android:text="@string/lblScheduleBackup" android:layout_toLeftOf="@id/chScheduleBackup" android:layout_alignParentLeft="true" android:layout_centerVertical="true" android:layout_marginStart="5.0dip" android:layout_toStartOf="@id/chScheduleBackup" android:layout_alignParentStart="true" />
+            <androidx.appcompat.widget.SwitchCompat android:id="@id/chScheduleBackup" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_centerVertical="true" android:layout_alignParentEnd="true" />
+        </RelativeLayout>
+        <TextView android:textAppearance="?android:textAppearanceSmall" android:id="@id/txtLastBackupTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5.0dip" android:text="@string/txtLastBackup" android:layout_below="@id/layoutLabel" android:layout_alignParentLeft="true" android:layout_marginStart="5.0dip" android:layout_alignParentStart="true" />
+        <RelativeLayout android:id="@id/relativeLayout1" android:paddingTop="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_marginRight="10.0dip" android:layout_below="@id/txtLastBackupTime" android:layout_marginStart="10.0dip" android:layout_marginEnd="10.0dip">
+            <include android:id="@id/content" layout="@layout/schedulebackupdlgfragment" />
+            <LinearLayout android:orientation="horizontal" android:id="@id/layoutBtns" android:paddingTop="19.0dip" android:paddingBottom="10.0dip" android:clipToPadding="false" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="10.0dip" android:layout_below="@id/content">
+                <Button android:textSize="14.0sp" android:id="@id/btnOK" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/strSaveChanges" android:layout_weight="1.0" android:fontFamily="@string/font_fontFamily_medium" style="@style/TintButtonRound" />
+            </LinearLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+</ScrollView>

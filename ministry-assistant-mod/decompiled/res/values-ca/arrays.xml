@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Data</item>
+        <item>Mestre de casa</item>
+        <item>Conversa</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Home</item>
+        <item>Dona</item>
+        <item>Nen</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Hores sota la meta</item>
+        <item>Hores sobre la meta</item>
+        <item>Horari programat</item>
+        <item>Informe mensual</item>
+        <item>Visites antigues</item>
+        <item>Darrer territori</item>
+        <item>Visites prioritàries</item>
+        <item>Visites programades</item>
+        <item>Estadístiques predicació</item>
+        <item>Informació i consells</item>
+        <item>Moment per fer revisites</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>"Mostra'l sempre"</item>
+        <item>Només per als pioners especials</item>
+        <item>No el mostris mai</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Mostra-les sempre</item>
+        <item>Només per als pioners regulars</item>
+        <item>No les mostris mai</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Sincronització manual</item>
+        <item>Sincronització automàtica</item>
+        <item>No sincronitzis</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Colors clars</item>
+        <item>Colors foscs</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Hores i minuts (hh.mm)</item>
+        <item>Hores i decimals (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Envia per SMS</item>
+        <item>Envia per correu</item>
+        <item>Suprimeix</item>
+        <item>Afegeix als destacats</item>
+        <item>Treu dels destacats</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>No té interès</item>
+        <item>No té temps</item>
+        <item>Afegeix com a revisita</item>
+        <item>Espiera</item>
+        <item>Suprimeix</item>
+        <item>Carta</item>
+        <item>Edita el nom</item>
+        <item>"Inicialitza l'estat"</item>
+        <item>Canvia la data</item>
+        <item>Destaca</item>
+        <item>No destaquis</item>
+        <item>Afegeix una visita</item>
+        <item>Edita la visita</item>
+        <item>Ordena la zona rural</item>
+        <item>Casa deshabitada</item>
+        <item>Afegeix un nom</item>
+        <item>Un altre idioma</item>
+        <item>No hi ha ningú</item>
+        <item>No vol que truqueu</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Edita</item>
+        <item>Suprimeix</item>
+        <item>Mostra la targeta</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>No té interès</item>
+        <item>No té temps</item>
+        <item>Carta</item>
+        <item>Casa deshabitada</item>
+        <item>Un altre idioma</item>
+        <item>No hi ha ningú</item>
+        <item>No vol que truqueu</item>
+        <item>Senyal «No passeu»</item>
+        <item>Portal tancat</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Informe bàsic</item>
+        <item>Informe simplificat</item>
+        <item>Informe detallat</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Suprimeix</item>
+    </string-array>
+</resources>

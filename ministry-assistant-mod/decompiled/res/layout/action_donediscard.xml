@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:background="@null" android:layout_width="fill_parent" android:layout_height="wrap_content" android:baselineAligned="false" android:divider="?android:dividerVertical" android:layout_alignParentLeft="true" android:layout_alignParentBottom="true" android:showDividers="middle" android:dividerPadding="12.0dip" android:layout_alignParentStart="true"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/btnDiscard" android:paddingTop="2.0dip" android:paddingBottom="2.0dip" android:layout_width="fill_parent" android:layout_height="48.0dip" android:layout_weight="1.0" style="@style/ImageWithSelectBackground">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="#ffffffff" android:gravity="center_vertical" android:id="@id/textView1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/btnDiscard" android:drawableLeft="@drawable/ic_action_discard" android:drawablePadding="5.0dip" android:layout_centerInParent="true" android:drawableStart="@drawable/ic_action_discard" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/btnDone" android:paddingTop="2.0dip" android:paddingBottom="2.0dip" android:layout_width="fill_parent" android:layout_height="48.0dip" android:layout_weight="1.0" style="@style/ImageWithSelectBackground">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="#ffffffff" android:gravity="center_vertical" android:id="@id/textView2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/btnDone" android:drawableLeft="@drawable/ic_action_done" android:drawablePadding="5.0dip" android:layout_centerInParent="true" android:drawableStart="@drawable/ic_action_done" />
+    </RelativeLayout>
+</LinearLayout>

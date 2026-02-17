@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>تاریخ</item>
+        <item>خانه‌دار</item>
+        <item>گفتگو</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>مرد</item>
+        <item>زن</item>
+        <item>کودک</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>زمان پر شده</item>
+        <item>زمان باقیمانده</item>
+        <item>زمان برنامه ریزی شده</item>
+        <item>گزارش ماهانه</item>
+        <item>ملاقاتهای قدیمی‌</item>
+        <item>آخرین محدوده</item>
+        <item>ملاقاتهای پین شده</item>
+        <item>ملاقاتهای برنامه ریزی شده</item>
+        <item>آمارهای خدمت موعظه</item>
+        <item>نکات خدمت موعظه</item>
+        <item>زمان ملاقاتها</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>همیشه مسافت پیموده شده را نشان دهید</item>
+        <item>فقط اگر پیشگام ویژه بود</item>
+        <item>هرگز مسافت پیموده شده را نشان ندهید</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>همیشه قسمت LDC را نمایش بده</item>
+        <item>فقط اگر پیشگام بود</item>
+        <item>هرگز قسمت LDC را نشان نده</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>همگام سازی دستی</item>
+        <item>همگام سازی خودکار</item>
+        <item>توقف همگام سازی</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>تم روشن</item>
+        <item>تم تاریک</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>ساعت و دقیقه (hh.mm)</item>
+        <item>ساعت و اعشار (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>ارسال به صورت پیامک</item>
+        <item>ارسال به صورت ایمیل</item>
+        <item>حذف</item>
+        <item>اضافه کردن بوکمارک</item>
+        <item>حذف بوکمارک</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>علاقه ندارد</item>
+        <item>وقت ندارد</item>
+        <item>به عنوان بازدید ثبت شود</item>
+        <item>سوراخ چشمی</item>
+        <item>جابجا شده</item>
+        <item>نامه</item>
+        <item>تغییر نام</item>
+        <item>تنظیم مجدد</item>
+        <item>تغییر تاریخ</item>
+        <item>ثبت بوکمارک</item>
+        <item>حذف بوکمارک</item>
+        <item>اضافه کردن ملاقات</item>
+        <item>تغییر ملاقات</item>
+        <item>تنظیم مجدد منطقه</item>
+        <item>خالی</item>
+        <item>اضافه کردن نام</item>
+        <item>زبان دیگر</item>
+        <item>خانه نبود</item>
+        <item>تماس نگیرید</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>تغییر</item>
+        <item>حذف</item>
+        <item>نمایش کارت</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>علاقه ندارد</item>
+        <item>وقت ندارد</item>
+        <item>نامه</item>
+        <item>خالی</item>
+        <item>زبان دیگر</item>
+        <item>خانه نیست</item>
+        <item>تماس نگیرید</item>
+        <item>مزاحم نشوید</item>
+        <item>در قفل است</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>گزارش اطلاعات پایه ای</item>
+        <item>گزارش خلاصه</item>
+        <item>گزارش کامل</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>حذف</item>
+    </string-array>
+</resources>

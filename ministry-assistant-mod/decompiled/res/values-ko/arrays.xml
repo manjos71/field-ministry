@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>날짜</item>
+        <item>세대주</item>
+        <item>대화내용</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>남자</item>
+        <item>여자</item>
+        <item>어린이</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>미달 시간</item>
+        <item>시간 초과</item>
+        <item>오늘의 목표 시간</item>
+        <item>월 봉사 보고</item>
+        <item>오래된 재방</item>
+        <item>최근 구역</item>
+        <item>고정된 재방문</item>
+        <item>오늘 계획된 재방문</item>
+        <item>Ministry 통계</item>
+        <item>Ministry 도움말</item>
+        <item>만날 수 있는 시간대</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>항상 마일리지 필드를 표시합니다</item>
+        <item>특별 파이오니아일 때만</item>
+        <item>마일리지 필드를 표시 안함</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>항상 LDC 필드를 표시하기</item>
+        <item>정규 파이오니아일 경우만r</item>
+        <item>LDC 필드를 표시하지 않기</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>수동 동기화</item>
+        <item>자동 동기화</item>
+        <item>동기화를 사용하지 않음</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>밝은 테마</item>
+        <item>어두운 테마</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>시간과 분 (hh.mm)</item>
+        <item>시간과 소수점 (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>SMS 보내기</item>
+        <item>e-mail 보내기</item>
+        <item>삭제</item>
+        <item>북마크 추가</item>
+        <item>북마크 제거</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>관심없음</item>
+        <item>바쁨</item>
+        <item>재방해야 함</item>
+        <item>문구멍</item>
+        <item>제거</item>
+        <item>편지</item>
+        <item>이름고치가</item>
+        <item>재설정</item>
+        <item>날짜변경</item>
+        <item>북마크 설정</item>
+        <item>북마크 제거</item>
+        <item>방문 추가</item>
+        <item>방문 수정</item>
+        <item>구역 정리</item>
+        <item>빈집</item>
+        <item>이름 추가</item>
+        <item>외국어</item>
+        <item>부재</item>
+        <item>방문사절</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>수정하기</item>
+        <item>삭제</item>
+        <item>카드 진열</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>관심없음</item>
+        <item>바쁨</item>
+        <item>편지</item>
+        <item>빈집</item>
+        <item>외국어</item>
+        <item>부재</item>
+        <item>방문사절</item>
+        <item>출입금지</item>
+        <item>문잠김</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>지우기</item>
+    </string-array>
+</resources>

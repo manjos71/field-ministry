@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider android:minWidth="@dimen/appwidget_4x1_min_width" android:minHeight="@dimen/appwidget_4x1_min_height" android:updatePeriodMillis="86400000" android:initialLayout="@layout/monthreport4x1_widget" android:configure="com.lostpixels.fieldservice.WidgetSettings" android:previewImage="@drawable/widget4x1preview" android:resizeMode="horizontal|vertical" android:widgetCategory="home_screen|keyguard" android:widgetFeatures="reconfigurable"
+  xmlns:android="http://schemas.android.com/apk/res/android" />

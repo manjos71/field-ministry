@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/layoutTop" android:padding="5.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:id="@id/imgSmallTerritory" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/territorymap" />
+    <TextView android:ellipsize="marquee" android:id="@id/lblTerritoryName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" android:layout_toLeftOf="@id/lblTerritoryLastDate" android:layout_toRightOf="@id/imgSmallTerritory" android:layout_alignParentTop="true" android:layout_toStartOf="@id/lblTerritoryLastDate" android:layout_toEndOf="@id/imgSmallTerritory" style="@style/TextAppearanceInverseMedium" />
+    <TextView android:textStyle="bold" android:id="@id/lblTerritoryLastDate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentRight="true" android:layout_alignParentEnd="true" fontPath="fonts/OpenSans-Bold.ttf" style="@style/TextAppearanceInverseSmall" />
+    <TextView android:ellipsize="end" android:id="@id/lblTerritoryStreets" android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxLines="2" android:layout_toRightOf="@id/imgSmallTerritory" android:layout_below="@id/lblTerritoryName" android:layout_toEndOf="@id/imgSmallTerritory" style="@style/TextAppearanceInverse" />
+</RelativeLayout>

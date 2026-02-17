@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Datum</item>
+        <item>Huisbewoner</item>
+        <item>Onderwerp</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Man</item>
+        <item>Vrouw</item>
+        <item>Kind</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Tijd tekort</item>
+        <item>Tijd vooruit</item>
+        <item>Geplande tijd</item>
+        <item>Maandelijks bericht</item>
+        <item>Bezoeken van lang geleden</item>
+        <item>Laatste gebied</item>
+        <item>Vastgepinde bezoeken</item>
+        <item>Ingeplande bezoeken</item>
+        <item>Statistieken</item>
+        <item>Tips</item>
+        <item>Tijd van bezoek</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Laat het reiskostenveld altijd zien</item>
+        <item>Alleen als speciale pionier</item>
+        <item>Laat het reiskostenveld nooit zien</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Toon altijd PBA veld</item>
+        <item>Alleen als gewone pionier</item>
+        <item>Toon nooit PBA veld</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Handmatig synchroniseren</item>
+        <item>Automatisch synchroniseren</item>
+        <item>Beëindig synchroniseren</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Licht thema</item>
+        <item>Donker thema</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Uren en minuten (hh.mm)</item>
+        <item>Uren en decimalen (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Verstuurd als SMS</item>
+        <item>Verstuurd als E-mail</item>
+        <item>Wissen</item>
+        <item>Bladwijzer toevoegen</item>
+        <item>Bladwijzer verwijderen</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Niet geïnteresseerd</item>
+        <item>Geen tijd</item>
+        <item>Als nabezoek toevoegen</item>
+        <item>Spionnetje / kijkgat</item>
+        <item>Verwijder</item>
+        <item>Traktaat / tijdschrift</item>
+        <item>Wijzig naam</item>
+        <item>Reset</item>
+        <item>Wijzig datum</item>
+        <item>Zet bladwijzer</item>
+        <item>Verwijder bladwijzer</item>
+        <item>Bezoek toevoegen</item>
+        <item>Wijzig bezoek</item>
+        <item>Het regelen van gebied</item>
+        <item>Leeg</item>
+        <item>Naam toevoegen</item>
+        <item>Andere taal</item>
+        <item>Niet thuis</item>
+        <item>Niet meer bezoeken</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Wijzig</item>
+        <item>Wissen</item>
+        <item>Kaart tonen</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Niet geïnteresseerd</item>
+        <item>Geen tijd</item>
+        <item>Traktaat / tijdschrift</item>
+        <item>Leeg</item>
+        <item>Andere taal</item>
+        <item>Niet thuis</item>
+        <item>Niet meer bezoeken</item>
+        <item>Verboden toegang</item>
+        <item>Gesloten deur</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Standaardrapport</item>
+        <item>Vereenvoudigd rapport</item>
+        <item>Gedetailleerd rapport</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Wissen</item>
+    </string-array>
+</resources>

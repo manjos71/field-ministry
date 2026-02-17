@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Fecha</item>
+        <item>Hogar</item>
+        <item>Conversación</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Hombre</item>
+        <item>Mujer</item>
+        <item>Niño</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Tiempo restante</item>
+        <item>Tiempo estimado</item>
+        <item>Tiempo planeado para hoy</item>
+        <item>Informe mensual</item>
+        <item>Visitas antiguas</item>
+        <item>Último Territorio</item>
+        <item>Visitas marcadas</item>
+        <item>Visitas programadas</item>
+        <item>Estadísticas de servio</item>
+        <item>Tips para el ministerio</item>
+        <item>Tiempo en visitas</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Mostrar siempre campo de recorrido</item>
+        <item>Sólo si es precursor especial</item>
+        <item>Nunca mostrar campo de recorrido</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Siempre mostrar el campo de LDC</item>
+        <item>Solo si se es precursor regular</item>
+        <item>Nunca mostrar el campo LDC</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Sincronización manual</item>
+        <item>Sincronización automática</item>
+        <item>Desactivar sincronización</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Tema claro</item>
+        <item>Tema oscuro</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Hours and minutes (hh.mm)</item>
+        <item>Hours and decimals (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Enviar por SMS</item>
+        <item>Enviar por e-mail</item>
+        <item>Eliminar</item>
+        <item>Añadir destacado</item>
+        <item>Eliminar destacado</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>No interesado</item>
+        <item>Ocupado</item>
+        <item>Añadir como revisita</item>
+        <item>Mirilla</item>
+        <item>Eliminar</item>
+        <item>Carta</item>
+        <item>Editar nombre</item>
+        <item>Reiniciar</item>
+        <item>Cambiar Fecha</item>
+        <item>Marcar como destacado</item>
+        <item>Eliminar destacado</item>
+        <item>Añadir visita</item>
+        <item>Editar visita</item>
+        <item>Gestionar área</item>
+        <item>Vacío</item>
+        <item>Añadir nombre</item>
+        <item>Otro idioma</item>
+        <item>Nadie en casa</item>
+        <item>No quiere visita</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Editar</item>
+        <item>Eliminar</item>
+        <item>Mostrar tarjeta</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>No interesado</item>
+        <item>Ocupado</item>
+        <item>Carta</item>
+        <item>Deshabitado</item>
+        <item>Otro idioma</item>
+        <item>Nadie en casa</item>
+        <item>No quiere visita</item>
+        <item>No pasar</item>
+        <item>Puerta cerrada</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Informe básico</item>
+        <item>Informe simplificado</item>
+        <item>Reporte detallado</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Eliminar</item>
+    </string-array>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:icon="@drawable/ic_title_share_default" android:id="@id/share" android:title="@string/lblShare" />
+    <item android:icon="@drawable/mnu_chart" android:id="@id/statistics" android:title="@string/lblStatistics" />
+    <item android:icon="@drawable/mnu_addaddress" android:id="@id/add_address" android:title="@string/lblAddAddress" />
+</menu>

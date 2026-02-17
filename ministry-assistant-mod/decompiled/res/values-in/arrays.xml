@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Tanggal</item>
+        <item>Pemilik rumah</item>
+        <item>Percakapan</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Pria</item>
+        <item>Wanita</item>
+        <item>Anak-anak</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Sisa waktu</item>
+        <item>Waktu lebih</item>
+        <item>Waktu yang direncanakan</item>
+        <item>Laporan bulanan</item>
+        <item>Kunjungan lama</item>
+        <item>Daerah terbaru</item>
+        <item>Kunjungan disematkan</item>
+        <item>Kunjungan terjadwal</item>
+        <item>Statistik pelayanan</item>
+        <item>Tips pelayanan</item>
+        <item>Waktu kunjungan</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Selalu tunjukkan jarak tempuh lapangan</item>
+        <item>Hanya jika perintis istimewa</item>
+        <item>Jangan pernah menunjukkan jarak tempuh</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Selalu tampilkan kolom RBS</item>
+        <item>Hanya jika perintis biasa</item>
+        <item>Jangan pernah menunjukkan bidang RBS</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Sinkronisasi manual</item>
+        <item>Sinkronisasi otomatis</item>
+        <item>Nonaktifkan sinkronisasi</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Tema terang</item>
+        <item>Tema gelap</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Jam dan menit (hh.mm)</item>
+        <item>Jam dan desimal (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Kirim sebagai pesan sms</item>
+        <item>Kirim sebagai pesan e-mail</item>
+        <item>Hapus</item>
+        <item>Tambah bookmark</item>
+        <item>Hapus bookmark</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Tidak berminat</item>
+        <item>Tidak ada waktu</item>
+        <item>Tambah sebagai KK</item>
+        <item>Lubang intip</item>
+        <item>Hapus</item>
+        <item>Huruf</item>
+        <item>Edit nama</item>
+        <item>Setel ulang</item>
+        <item>Ganti tanggal</item>
+        <item>Setel bookmark</item>
+        <item>Hapus bookmark</item>
+        <item>Tambahkan kunjungan</item>
+        <item>Edit kunjungan</item>
+        <item>Susun ulang area</item>
+        <item>Kosong</item>
+        <item>Tambahkan nama</item>
+        <item>Bahasa lain</item>
+        <item>Tidak dirumah</item>
+        <item>Jangan panggil</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Edit</item>
+        <item>Hapus</item>
+        <item>Kartu tampilan</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Tidak berminat</item>
+        <item>Tidak ada waktu</item>
+        <item>Huruf</item>
+        <item>Kosong</item>
+        <item>Bahasa lainnya</item>
+        <item>Tidak di rumah</item>
+        <item>Jangan panggil</item>
+        <item>Dilarang melintas</item>
+        <item>Pintu terkunci</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Laporan dasar</item>
+        <item>Laporan sederhana</item>
+        <item>Laporan rinci</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Hapus</item>
+    </string-array>
+</resources>

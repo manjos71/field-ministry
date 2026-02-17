@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/prefGeneral">
+        <ListPreference android:entries="@array/listLanguages" android:title="@string/prefLanguageTitle" android:key="langPref" android:summary="@string/prefSelectLang" android:defaultValue="@string/prefLanguageDefault" android:entryValues="@array/listLangVals" />
+        <CheckBoxPreference android:title="@string/strServiceTimerShort" android:key="checkShowTimer" android:summary="@string/show_timer_card" android:defaultValue="false" />
+        <CheckBoxPreference android:title="@string/prefFirstWeekDay" android:key="checkFirstDayOfWeek" android:summary="@string/prefFirstWeekDayDesc" android:defaultValue="false" />
+        <CheckBoxPreference android:title="@string/prefNumBeforeName" android:key="checkNumberBeforeStreet" android:summary="@string/prefNumBeforeNameDesc" android:defaultValue="false" />
+        <CheckBoxPreference android:title="@string/strVideoPhone" android:key="checkShowVideoPhone" android:defaultValue="false" android:summaryOn="@string/prefVideoPhoneOn" android:summaryOff="@string/prefVideoPhoneOff" />
+        <CheckBoxPreference android:title="@string/prefShowComment" android:key="checkCommentWhenNI" android:summary="@string/prefShowCommentDesc" android:defaultValue="false" />
+        <com.lostpixels.fieldservice.ui.IntListPreference android:entries="@array/listFloors" android:title="@string/prefsFirstFloor" android:key="defaultFloor" android:summary="@string/prefsFirstFloorDesc" android:defaultValue="0" android:entryValues="@array/listFloors" />
+        <CheckBoxPreference android:title="@string/strStartHighestFloor" android:key="reverseBuildings" android:summary="@string/strStartHighestFloorDesc" android:defaultValue="false" />
+        <CheckBoxPreference android:title="@string/gps_format" android:key="checkGpsAsMinutes" android:summary="@string/gps_format_desc" android:defaultValue="false" />
+        <CheckBoxPreference android:title="@string/prefUseOSM" android:key="useOSM" android:summary="@string/prefUseOSMDesc" android:defaultValue="false" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/prefMinistryCardsTitle">
+        <com.lostpixels.fieldservice.ui.MultiSelectListPreference android:entries="@array/listNowCard" android:title="@string/prefMinistryCardsTitle" android:key="prefCardsToDisplayInternal" android:summary="@string/prefMinistryCardsDesc" android:defaultValue="@array/listNowCard_defaults" android:entryValues="@array/listNowCard_values" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/prefNotifications">
+        <CheckBoxPreference android:title="@string/prefNotificationsVisitsDescGeneral" android:key="notificationVisits" android:summary="@string/prefNotificationsVisitsDesc" android:defaultValue="true" />
+        <CheckBoxPreference android:title="@string/prefNotificationsScheduleDescGeneral" android:key="notificationSchedule" android:summary="@string/prefNotificationsScheduleDesc" android:defaultValue="false" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/prefsSyncing" />
+    <PreferenceScreen android:title="@string/prefsSyncing" android:summary="@string/prefsSyncSummary">
+        <ListPreference android:entries="@array/listSyncOptions" android:title="@string/prefSyncDevices" android:key="syncMode" android:summary="@string/prefSyncDevicesDesc" android:defaultValue="manual" android:entryValues="@array/listSyncOptionValues" />
+        <com.lostpixels.fieldservice.ui.SyncTimePreference android:title="@string/prefSyncFreq" android:key="syncTime" android:summary="@string/prefSyncFreqDesc" android:defaultValue="3" />
+        <CheckBoxPreference android:title="@string/prefOnlySyncWifi" android:key="checkOnlySyncWifi" android:summary="@string/prefOnlySyncWifiDesc" android:defaultValue="false" />
+    </PreferenceScreen>
+    <PreferenceCategory android:title="@string/prefServiceReport" />
+    <PreferenceScreen android:title="@string/prefServiceReport" android:summary="@string/prefServiceReportDesc">
+        <ListPreference android:entries="@array/listTimeFormats" android:title="@string/prefTimeFormat" android:key="inputMode" android:summary="@string/prefTimeFormatDesc" android:defaultValue="hhmm" android:entryValues="@array/listTimeValues" />
+        <CheckBoxPreference android:title="@string/prefReportReminder" android:key="reportReminder" android:summary="@string/prefReportReminderDesc" android:defaultValue="true" />
+        <CheckBoxPreference android:title="@string/prefAddToReport" android:key="checkAddReport" android:summary="@string/prefAddToReportDesc" android:defaultValue="true" />
+        <com.lostpixels.fieldservice.ui.IntListPreference android:entries="@array/report_density_list" android:title="@string/report_details" android:key="ReportDensity" android:summary="@string/pref_report_details" android:defaultValue="0" android:entryValues="@array/report_density" />
+        <CheckBoxPreference android:title="@string/prefShowVideo" android:key="showVideo" android:summary="@string/prefShowVideoDesc" android:defaultValue="false" />
+        <CheckBoxPreference android:title="@string/prefCountStudies" android:key="checkCountVisitedStudies" android:summary="@string/prefCountStudiesDesc" android:defaultValue="true" />
+        <CheckBoxPreference android:title="@string/prefAutoCountStudies" android:key="checkAutoCountStudies" android:summary="@string/prefAutoCountStudiesDesc" android:defaultValue="true" />
+        <PreferenceCategory android:title="@string/prefsMileagePrefs" />
+        <ListPreference android:entries="@array/listShowMileage" android:title="@string/prefMileageInReport" android:key="whenShowMilage" android:summary="@string/prefMileageInReportDesc" android:defaultValue="pioneer" android:entryValues="@array/listRBCVals" />
+        <CheckBoxPreference android:title="@string/prefsUseKilometers" android:key="mileageKM" android:summary="@string/prefsUseKilometersDesc" android:defaultValue="true" />
+        <CheckBoxPreference android:title="@string/prefsSendMileage" android:key="mileageInReport" android:summary="@string/prefsSendMileageDesc" android:defaultValue="true" />
+        <PreferenceCategory android:title="@string/prefCustomReportItems" />
+        <CheckBoxPreference android:title="@string/prefCustomOne" android:key="showCustom1" android:summary="@string/prefCustomOneDesc" android:defaultValue="false" />
+        <CheckBoxPreference android:title="@string/prefCustomTwo" android:key="showCustom2" android:summary="@string/prefCustomTwoDesc" android:defaultValue="false" />
+        <CheckBoxPreference android:title="@string/prefCustomThree" android:key="showCustom3" android:summary="@string/prefCustomThreeDesc" android:defaultValue="false" />
+    </PreferenceScreen>
+    <PreferenceCategory android:title="@string/prefEmailNumbers" />
+    <PreferenceScreen android:title="@string/prefEmailNumbers" android:key="EMailPrefScreen" android:summary="@string/prefSetupEmailSMS">
+        <EditTextPreference android:name="@string/prefBackupAddress" android:title="@string/prefBackupAddress" android:key="backupAddr" android:summary="@string/prefBackupAddressDesc" android:defaultValue="" android:inputType="textEmailAddress" />
+        <EditTextPreference android:name="@string/prefReportAddress" android:title="@string/prefReportAddressTitle" android:key="reportAddr" android:summary="@string/prefReportAddressDesc" android:defaultValue="" android:inputType="textEmailAddress" />
+        <EditTextPreference android:name="@string/prefReportNumber" android:title="@string/prefReportNumberTitle" android:key="reportNumber" android:summary="@string/prefReportNumberDesc" android:defaultValue="" android:inputType="phone" />
+        <EditTextPreference android:name="@string/prefPublisherName" android:title="@string/prefPublisherName" android:key="reportName" android:summary="@string/prefPublisherNameDesc" android:defaultValue="" android:inputType="text" />
+        <EditTextPreference android:name="@string/prefSubjectPrefix" android:title="@string/prefSubjectPrefix" android:key="reportPrefix" android:summary="@string/prefSubjectPrefixDesc" android:defaultValue="" android:inputType="text" />
+    </PreferenceScreen>
+    <PreferenceCategory android:title="@string/prefPasswordProtectHeader">
+        <CheckBoxPreference android:title="@string/prefPasswordProtectHeader" android:key="checkUsePassword" android:summary="@string/prefPasswordProtectDesc" android:defaultValue="false" />
+        <com.lostpixels.fieldservice.ui.TimeoutPreference android:title="@string/prefLockTimeout" android:key="pwLockoutTime" android:summary="@string/prefLockTimeoutDesc" android:defaultValue="30" />
+        <CheckBoxPreference android:title="@string/prefUseHapticFeedback" android:key="checkUseHapticFeedback" android:summary="@string/prefUseHapticFeedbackDesc" android:defaultValue="true" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/prefBackupHistory" android:key="prefGroupLast">
+        <CheckBoxPreference android:title="@string/prefsDisableIntent" android:key="checkDisableBackupIntent" android:defaultValue="false" android:summaryOn="@string/prefDisableIntentDesc" android:summaryOff="@string/prefDisableIntentDescOff" />
+        <com.lostpixels.fieldservice.ui.DynamicPreference android:title="@string/prefExternalLocation" android:key="externalLocation" android:summary="@string/prefExternalLocationDesc" />
+        <Preference android:title="@string/prefResetAccount" android:key="clearGoogleAccount" android:summary="@string/prefResetAccountDesc" />
+        <Preference android:title="Territory Helper" android:key="clearTerritoryHelper" android:summary="@string/logout_territory_helper" />
+        <Preference android:title="@string/prefRemoveBackup" android:key="cleanDir" android:summary="@string/prefRemoveBackupDesc" />
+        <Preference android:title="@string/prefClearHistory" android:key="cleanSearchHistory" android:summary="@string/prefClearHistoryDesc" />
+        <Preference android:title="@string/prefResetDlgsTitle" android:key="resetDialogs" android:summary="@string/prefResetDlgs" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/prefDebugging">
+        <CheckBoxPreference android:title="@string/prefAnonymousData" android:key="sendUsage" android:summary="@string/prefAnonymousDataDesc" android:defaultValue="true" />
+        <Preference android:title="@string/prefSendErrorLogs" android:key="sendErrorLogs" android:summary="@string/prefSendErrorLogsDesc" />
+    </PreferenceCategory>
+</PreferenceScreen>

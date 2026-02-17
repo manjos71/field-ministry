@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="layout" name="abc_search_dropdown_item_icons_2line">@layout/my_suggestion_row</item>
+</resources>

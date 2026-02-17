@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.squareup.timessquare.CalendarRowView android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include android:layout_weight="1.0" layout="@layout/cell" />
+    <include android:layout_weight="1.0" layout="@layout/cell" />
+    <include android:layout_weight="1.0" layout="@layout/cell" />
+    <include android:layout_weight="1.0" layout="@layout/cell" />
+    <include android:layout_weight="1.0" layout="@layout/cell" />
+    <include android:layout_weight="1.0" layout="@layout/cell" />
+    <include android:layout_weight="1.0" layout="@layout/cell" />
+</com.squareup.timessquare.CalendarRowView>

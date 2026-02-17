@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:id="@id/scrollView" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:paddingLeft="16.0dip" android:paddingRight="16.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:paddingStart="16.0dip" android:paddingEnd="16.0dip">
+        <TextView android:id="@id/lblStreet" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strStreet" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" android:layout_alignParentStart="true" />
+        <com.lostpixels.fieldservice.ui.ClearableAutoCompleteTextView android:textSize="18.0sp" android:id="@id/edtStreet" android:layout_width="wrap_content" android:layout_height="wrap_content" android:hint="@string/hintNameOfStreet" android:singleLine="true" android:capitalize="words" android:layout_toLeftOf="@id/btnStreetFromPos" android:layout_below="@id/lblStreet" android:layout_alignLeft="@id/lblStreet" android:imeOptions="actionNext" android:layout_toStartOf="@id/btnStreetFromPos" android:layout_alignStart="@id/lblStreet" />
+        <ImageButton android:id="@id/btnStreetFromPos" android:layout_width="48.0dip" android:layout_height="wrap_content" android:src="@drawable/mappin" android:layout_below="@id/lblStreet" android:layout_alignParentRight="true" android:layout_alignParentEnd="true" />
+        <LinearLayout android:orientation="horizontal" android:id="@id/llNumbers" android:layout_width="fill_parent" android:layout_height="wrap_content" android:baselineAligned="false" android:layout_below="@id/edtStreet" android:layout_alignLeft="@id/edtStreet" android:layout_alignRight="@id/edtStreet" android:layout_alignStart="@id/edtStreet" android:layout_alignEnd="@id/edtStreet">
+            <RelativeLayout android:gravity="center" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1.0">
+                <TextView android:id="@id/lblNumberFrom" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/lblFrom" />
+                <EditText android:textSize="18.0sp" android:id="@id/edtNumberFrom" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="" android:hint="@string/hintLetterOrNumber" android:singleLine="true" android:maxLength="8" android:capitalize="sentences" android:layout_below="@id/lblNumberFrom" android:imeOptions="actionNext" />
+            </RelativeLayout>
+            <RelativeLayout android:gravity="center" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1.0">
+                <TextView android:id="@id/lblNumberTo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/lblTo" android:layout_alignLeft="@id/edtNumberTo" android:layout_alignStart="@id/edtNumberTo" />
+                <EditText android:textSize="18.0sp" android:id="@id/edtNumberTo" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="" android:hint="@string/hintLetterOrNumber" android:singleLine="true" android:maxLength="8" android:capitalize="sentences" android:layout_below="@id/lblNumberTo" android:imeOptions="actionDone" />
+            </RelativeLayout>
+        </LinearLayout>
+        <ImageButton android:id="@id/btnAddStreet" android:layout_width="48.0dip" android:layout_height="wrap_content" android:src="@drawable/addhouse" android:layout_alignBottom="@id/llNumbers" android:layout_alignParentRight="true" android:layout_alignParentEnd="true" />
+        <CheckBox android:id="@id/checkNotAllLetters" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strDontGenerateLetters" android:layout_below="@id/llNumbers" />
+        <TextView android:id="@id/txtTemplateHelp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txtTemplateHelp" android:layout_below="@id/checkNotAllLetters" android:layout_alignLeft="@id/llNumbers" android:layout_alignStart="@id/llNumbers" />
+        <include android:paddingTop="20.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/txtTemplateHelp" layout="@layout/action_createcancel" />
+    </RelativeLayout>
+</ScrollView>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Datum</item>
+        <item>Majitel</item>
+        <item>Rozhovor</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Muž</item>
+        <item>Žena</item>
+        <item>Dítě</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Chybějící čas</item>
+        <item>Čas navíc</item>
+        <item>Plánovaný čas</item>
+        <item>Měsíční zpráva</item>
+        <item>Staré opětovné návštěvy</item>
+        <item>Poslední obvod</item>
+        <item>Připnuté opětovné návštěvy</item>
+        <item>Naplánované opětovné návštěvy</item>
+        <item>Statistika služby</item>
+        <item>Tipy zvěstovatelům</item>
+        <item>Čas návštěv</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Vždy zobrazovat pole vzdálenosti</item>
+        <item>Pouze pro zvláštní průkopníky</item>
+        <item>Nikdy nezobrazovat pole vzdálenosti</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Vždy zobrazovat pole s kreditem</item>
+        <item>Pouze v případě pravidelného průkopníka</item>
+        <item>Nikdy nezobrazovat pole s kreditem</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Manuální synchronizace</item>
+        <item>Automatická synchronizace</item>
+        <item>Zakázat synchronizaci</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Světlé téma</item>
+        <item>Tmavé téma</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Hodiny a minuty (hh.mm)</item>
+        <item>Hodiny a počet desetinných míst (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Poslat jako SMS</item>
+        <item>Poslat e-mailem</item>
+        <item>Smazat</item>
+        <item>Přidat do záložek</item>
+        <item>Smazat ze záložek</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Nemá zájem</item>
+        <item>Nemá čas</item>
+        <item>Přidat opětovnou návštěvu</item>
+        <item>Kukátko</item>
+        <item>Odstranit</item>
+        <item>Dopis</item>
+        <item>Upravit jméno</item>
+        <item>Reset</item>
+        <item>Změnit datum</item>
+        <item>Nastavit záložku</item>
+        <item>Vybrat ze záložky</item>
+        <item>Přidat návštěvu</item>
+        <item>Upravit návštěvu</item>
+        <item>Uspořádat oblast</item>
+        <item>Prázdný</item>
+        <item>Přidat jméno</item>
+        <item>Cizí jazyk</item>
+        <item>Není doma</item>
+        <item>Nezvonit!!!</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Upravit</item>
+        <item>Smazat</item>
+        <item>Zobrazit kartu</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Nemá zájem</item>
+        <item>Nemá čas</item>
+        <item>Dopis</item>
+        <item>Prázdný</item>
+        <item>Cizí jazyk</item>
+        <item>Není doma</item>
+        <item>Nezvonit!!!</item>
+        <item>Zákaz vstupu</item>
+        <item>Zamčeno</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Základní zpráva</item>
+        <item>Zjednodušená zpráva</item>
+        <item>Podrobná zpráva</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Smazat</item>
+    </string-array>
+</resources>

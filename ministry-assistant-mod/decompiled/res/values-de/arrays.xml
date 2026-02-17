@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Datum</item>
+        <item>Wohnungsinhaber</item>
+        <item>Gespräch</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Mann</item>
+        <item>Frau</item>
+        <item>Kind</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Zeitrückstand</item>
+        <item>Zeitvorsprung</item>
+        <item>Geplante Zeit</item>
+        <item>Monatlicher Bericht</item>
+        <item>Überfällige Besuche</item>
+        <item>Neuestes Gebiet</item>
+        <item>Vorgemerkte Besuche</item>
+        <item>Geplante Besuche</item>
+        <item>Ministry-Statistik</item>
+        <item>Ministry-Tipps</item>
+        <item>Ideale Besuchszeit</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Kilometer immer anzeigen</item>
+        <item>Nur bei Sonderpionieren</item>
+        <item>Kilometer nie anzeigen</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>LDC immer anzeigen</item>
+        <item>Nur bei allgemeinem Pionier</item>
+        <item>LDC nie anzeigen</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Manuelle Synchronisierung</item>
+        <item>Automatische Synchronisierung</item>
+        <item>Synchronisierung deaktivieren</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Helle Oberfläche</item>
+        <item>Dunkle Oberfläche</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Stunden und Minuten (hh.mm)</item>
+        <item>Stunden und Dezimal (hh.d)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Als SMS senden</item>
+        <item>Als E-Mail senden</item>
+        <item>Löschen</item>
+        <item>Lesezeichen hinzufügen</item>
+        <item>Lesezeichen entfernen</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Kein Interesse</item>
+        <item>Keine Zeit</item>
+        <item>Als Rückbesuch hinzufügen</item>
+        <item>Kamera/Guckloch</item>
+        <item>Entfernen</item>
+        <item>Zeugnisbrief</item>
+        <item>Name bearbeiten</item>
+        <item>Zurücksetzen</item>
+        <item>Datum ändern</item>
+        <item>Lesezeichen festlegen</item>
+        <item>Lesezeichen entfernen</item>
+        <item>Besuch hinzufügen</item>
+        <item>Besuch bearbeiten</item>
+        <item>Gegend neu anordnen</item>
+        <item>Unbewohnt</item>
+        <item>Name hinzufügen</item>
+        <item>Andere Sprache</item>
+        <item>Nicht zu Hause</item>
+        <item>Nicht besuchen</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Bearbeiten</item>
+        <item>Löschen</item>
+        <item>Karte anzeigen</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Kein Interesse</item>
+        <item>Keine Zeit</item>
+        <item>Zeugnisbrief</item>
+        <item>Unbewohnt</item>
+        <item>Fremdsprachig</item>
+        <item>Nicht zu Hause</item>
+        <item>Nicht besuchen</item>
+        <item>Betreten verboten</item>
+        <item>Kein Zugang</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Basisbericht</item>
+        <item>Vereinfachter Bericht</item>
+        <item>Ausführlicher Bericht</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Löschen</item>
+    </string-array>
+</resources>

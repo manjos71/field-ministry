@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="NumberPickerSmall">
+        <item name="android:maxHeight">150.0dip</item>
+    </style>
+    <style name="WidgetPaddingStyle">
+        <item name="android:paddingTop">2.0dip</item>
+    </style>
+    <style name="WidgetTextPaddingStyle">
+        <item name="android:paddingTop">4.0dip</item>
+    </style>
+    <style name="WidgetTextStyle">
+        <item name="android:drawablePadding">-5.0dip</item>
+    </style>
+</resources>

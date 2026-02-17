@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:icon="@drawable/add_house" android:id="@id/menu_houses" android:title="@string/strHouses" />
+    <item android:icon="@drawable/add_building" android:id="@id/menu_building" android:title="@string/strBuilding" />
+    <item android:icon="@drawable/add_rural" android:id="@id/menu_rural" android:title="@string/lblArea" />
+    <item android:icon="@drawable/add_phone" android:id="@id/menu_phone" android:title="@string/lblPhoneTerritory" />
+</menu>

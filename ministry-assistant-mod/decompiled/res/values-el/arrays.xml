@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrSendInfo">
+        <item>Ημερομηνία</item>
+        <item>Ιδιοκτήτης</item>
+        <item>Διάλογος</item>
+    </string-array>
+    <string-array name="genderList">
+        <item>Άνδρας</item>
+        <item>Γυναίκα</item>
+        <item>Παιδί</item>
+    </string-array>
+    <string-array name="listNowCard">
+        <item>Χρόνος που έμεινες πίσω</item>
+        <item>Χρόνος μπροστά</item>
+        <item>Προγραμματισμένος χρόνος</item>
+        <item>Μηνιαία έκθεση</item>
+        <item>Παλιές επισκέψεις</item>
+        <item>Τελευταίος τομέας</item>
+        <item>Καρφιτσωμένες επισκέψεις</item>
+        <item>Προγραμματισμένες επισκέψεις</item>
+        <item>Στατιστικά υπηρεσίας</item>
+        <item>Συμβουλές υπηρεσίας</item>
+        <item>Ώρα επισκέψεων</item>
+    </string-array>
+    <string-array name="listShowMileage">
+        <item>Να εμφανίζεται πάντα το πεδίο απόστασης</item>
+        <item>Μόνο για Ειδικό Σκαπανέα</item>
+        <item>Μην εμφανίζεις ποτέ το πεδίο αποστάσεων</item>
+    </string-array>
+    <string-array name="listShowRBC">
+        <item>Εμφάνιση πάντα του πεδίου ΠΕΡΕΠΟ</item>
+        <item>Μόνο για τακτικό σκαπανέα</item>
+        <item>Μην εμφανίζεις ποτέ το πεδίο ΠΕΡΕΠΟ</item>
+    </string-array>
+    <string-array name="listSyncOptions">
+        <item>Χειροκίνητος συγχρονισμός</item>
+        <item>Αυτόματος συγχρονισμός</item>
+        <item>Απενεργοποίηση συγχρονισμού</item>
+    </string-array>
+    <string-array name="listThemes">
+        <item>Φωτεινό θέμα</item>
+        <item>Σκοτεινό θέμα</item>
+    </string-array>
+    <string-array name="listTimeFormats">
+        <item>Ώρες και λεπτά (ωω.λλ)</item>
+        <item>Ώρες και δεκαδικά (ωω.δ)</item>
+    </string-array>
+    <string-array name="menuReturnVisitList">
+        <item>Αποστολή σαν μήνυμα κειμένου</item>
+        <item>Αποστολή σαν e-mail</item>
+        <item>Διαγραφή</item>
+        <item>Προσθήκη σελιδοδείκτη</item>
+        <item>Απομάκρυνση σελιδοδείκτη</item>
+    </string-array>
+    <string-array name="menuTerritoryList">
+        <item>Δεν Ενδιαφέρεται</item>
+        <item>Δεν έχει χρόνο</item>
+        <item>Προσθήκη σαν επανεπίσκεψη</item>
+        <item>Ματάκι</item>
+        <item>Απομάκρυνση</item>
+        <item>Επιστολή</item>
+        <item>Επεξεργασία ονόματος</item>
+        <item>Επαναφορά</item>
+        <item>Αλλαγή ημερομηνίας</item>
+        <item>Ορισμός σελιδοδείκτη</item>
+        <item>Απομάκρυνση σελιδοδείκτη</item>
+        <item>Προσθήκη επίσκεψης</item>
+        <item>Επεξεργασία επίσκεψης</item>
+        <item>Τακτοποίηση περιοχής</item>
+        <item>Άδειο/Ακατοίκητο</item>
+        <item>Προσθήκη ονόματος</item>
+        <item>Άλλη γλώσσα</item>
+        <item>Απών</item>
+        <item>Μην επισκέπτεστε</item>
+    </string-array>
+    <string-array name="menuTerritoryTab">
+        <item>Επεξεργασία</item>
+        <item>Διαγραφή</item>
+        <item>Εμφάνιση κάρτας</item>
+    </string-array>
+    <string-array name="notesList">
+        <item>Δεν ενδιαφέρεται</item>
+        <item>Δεν έχει χρόνο</item>
+        <item>Επιστολή</item>
+        <item>Άδειο</item>
+        <item>Άλλη γλώσσα</item>
+        <item>Απών</item>
+        <item>Μην επισκέπτεστε</item>
+        <item>Απαγορεύεται η είσοδος</item>
+        <item>Κλειδωμένη πόρτα</item>
+    </string-array>
+    <string-array name="report_density_list">
+        <item>Βασικό δελτίο</item>
+        <item>Απλοποιημένο δελτίο</item>
+        <item>Αναλυτικό δελτίο</item>
+    </string-array>
+    <string-array name="suburbsMenu">
+        <item>Διαγραφή</item>
+    </string-array>
+</resources>

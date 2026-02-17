@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:paddingLeft="5.0dip" android:paddingRight="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="5.0dip" android:paddingEnd="5.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/txtInsertPublication" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txtInsertPublication" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" android:layout_alignParentStart="true" />
+        <CheckBox android:id="@id/chkWatchTower" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/lblWatchtower" android:layout_below="@id/txtInsertPublication" android:layout_alignParentLeft="true" android:layout_alignParentStart="true" />
+        <CheckBox android:id="@id/chkAwake" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/lblAwake" android:layout_toRightOf="@id/chkWatchTower" android:layout_alignBottom="@id/chkWatchTower" android:layout_toEndOf="@id/chkWatchTower" />
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/txtInsertPublication">
+            <RadioButton android:ellipsize="end" android:id="@id/rdPublicMagazine" android:layout_width="0.0dip" android:layout_height="wrap_content" android:checked="true" android:text="@string/strPublicMagazine" android:lines="1" android:layout_weight="1.0" />
+            <RadioButton android:ellipsize="end" android:id="@id/rdStudyEdition" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/strStudyEdition" android:lines="1" android:layout_weight="1.0" />
+        </LinearLayout>
+        <Button android:id="@id/btnDate" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/txtSelectPublication" android:layout_below="@id/chkWatchTower" android:layout_alignParentLeft="true" android:layout_alignParentStart="true" />
+        <EditText android:textSize="18.0sp" android:id="@id/aliasText" android:focusable="true" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/lblMagAlias" android:singleLine="true" android:capitalize="sentences" android:layout_below="@id/btnDate" android:layout_alignParentLeft="true" android:inputType="textAutoCorrect|textCapSentences" android:imeOptions="actionDone" android:layout_alignParentStart="true" />
+        <CheckBox android:id="@id/chkAddToReport" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txtAddPubToReport" android:layout_below="@id/aliasText" android:layout_alignParentLeft="true" android:layout_alignParentStart="true" />
+        <include android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/chkAddToReport" layout="@layout/action_addcancel" />
+    </RelativeLayout>
+</ScrollView>
