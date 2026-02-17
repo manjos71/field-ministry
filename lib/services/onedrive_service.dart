@@ -6,9 +6,12 @@ import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import '../config/oauth_config.dart';
 import 'backup_service.dart';
+import 'database_service.dart';
 
 class OneDriveService implements BackupService {
   static const String backupFolder = 'Field Ministry Backups';
+  static const String _refreshTokenKey = 'onedrive_refresh_token';
+  static const String _userDataKey = 'onedrive_user_data';
   
   final FlutterAppAuth _appAuth = const FlutterAppAuth();
   String? _accessToken;
@@ -16,7 +19,83 @@ class OneDriveService implements BackupService {
   DateTime? _tokenExpiry;
   BackupUser? _currentUser;
   bool _isSigningIn = false;
+  bool _isInitialized = false;
+
+  /// Initialize the service by loading saved credentials
+  Future<void> _initialize() async {
+    if (_isInitialized) return;
+    _isInitialized = true;
+    
+    try {
+      final db = await DatabaseService.getInstance();
+      
+      // Load saved refresh token
+      _refreshToken = db.getSetting<String>(_refreshTokenKey);
+      
+      // Load saved user data
+      final userDataJson = db.getSetting<String>(_userDataKey);
+      if (userDataJson != null) {
+        final userData = jsonDecode(userDataJson) as Map<String, dynamic>;
+        _currentUser = BackupUser(
+          id: userData['id'] as String,
+          email: userData['email'] as String,
+          displayName: userData['displayName'] as String?,
+          photoUrl: userData['photoUrl'] as String?,
+        );
+      }
+      
+      // If we have a refresh token, try to get a new access token
+      if (_refreshToken != null && _currentUser != null) {
+        debugPrint('Found saved OneDrive credentials, refreshing token...');
+        await _refreshAccessToken();
+      }
+    } catch (e) {
+      debugPrint('Error initializing OneDrive service: $e');
+      // Clear invalid credentials
+      _refreshToken = null;
+      _currentUser = null;
+    }
+  }
+
+  /// Save credentials to persistent storage
+  Future<void> _saveCredentials() async {
+    try {
+      final db = await DatabaseService.getInstance();
+      
+      if (_refreshToken != null) {
+        await db.saveSetting(_refreshTokenKey, _refreshToken);
+      }
+      
+      if (_currentUser != null) {
+        final userData = jsonEncode({
+          'id': _currentUser!.id,
+          'email': _currentUser!.email,
+          'displayName': _currentUser!.displayName,
+          'photoUrl': _currentUser!.photoUrl,
+        });
+        await db.saveSetting(_userDataKey, userData);
+      }
+    } catch (e) {
+      debugPrint('Error saving OneDrive credentials: $e');
+    }
+  }
+
+  /// Clear saved credentials
+  Future<void> _clearCredentials() async {
+    try {
+      final db = await DatabaseService.getInstance();
+      await db.saveSetting(_refreshTokenKey, null);
+      await db.saveSetting(_userDataKey, null);
+    } catch (e) {
+      debugPrint('Error clearing OneDrive credentials: $e');
+    }
+  }
   
+  @override
+  Future<void> initialize() async {
+    await _initialize();
+  }
+
   @override
   Future<BackupUser?> signIn() async {
     if (_isSigningIn) {
@@ -63,6 +142,9 @@ class OneDriveService implements BackupService {
         throw Exception('Não foi possível obter o perfil do usuário OneDrive.');
       }
 
+      // Save credentials for next app start
+      await _saveCredentials();
+
       debugPrint('OneDrive sign-in successful');
       return _currentUser;
       
@@ -100,6 +182,9 @@ class OneDriveService implements BackupService {
       _refreshToken = null;
       _tokenExpiry = null;
       _currentUser = null;
+      
+      // Clear saved credentials
+      await _clearCredentials();
       
       debugPrint('Signed out from OneDrive');
     } catch (e) {
@@ -286,7 +371,12 @@ class OneDriveService implements BackupService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         _accessToken = data['access_token'] as String?;
-        _refreshToken = data['refresh_token'] as String? ?? _refreshToken;
+        final newRefreshToken = data['refresh_token'] as String?;
+        if (newRefreshToken != null) {
+          _refreshToken = newRefreshToken;
+          // Save the new refresh token to persistent storage
+          await _saveCredentials();
+        }
         
         // Update token expiry
         final expiresIn = data['expires_in'] as int?;

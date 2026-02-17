@@ -67,7 +67,13 @@ class BackupNotifier extends StateNotifier<BackupState> {
 
   BackupNotifier(this._backupService, this._dbService, this._ref)
       : super(BackupState()) {
-    _checkSignIn();
+    _initializeAndCheckSignIn();
+  }
+
+  Future<void> _initializeAndCheckSignIn() async {
+    // Initialize the backup service (loads saved credentials)
+    await _backupService.initialize();
+    await _checkSignIn();
   }
 
   Future<void> _checkSignIn() async {

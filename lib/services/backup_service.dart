@@ -15,6 +15,9 @@ class BackupUser {
 /// Abstract interface for backup services
 /// Provides a common contract for different cloud storage providers
 abstract class BackupService {
+  /// Initialize the service (load saved credentials)
+  Future<void> initialize();
+  
   /// Sign in to the backup service
   Future<BackupUser?> signIn();
   

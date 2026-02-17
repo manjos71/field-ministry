@@ -33,6 +33,28 @@ class GoogleDriveService implements BackupService {
   drive.DriveApi? _driveApi;
 
   @override
+  Future<void> initialize() async {
+    // Try to silently sign in with cached credentials
+    try {
+      _googleUser = await _googleSignIn.signInSilently();
+      if (_googleUser != null) {
+        final authHeaders = await _googleUser!.authHeaders;
+        final authenticateClient = GoogleAuthClient(authHeaders);
+        _driveApi = drive.DriveApi(authenticateClient);
+        _currentUser = BackupUser(
+          id: _googleUser!.id,
+          email: _googleUser!.email,
+          displayName: _googleUser!.displayName,
+          photoUrl: _googleUser!.photoUrl,
+        );
+        debugPrint('Google Drive: restored session for ${_currentUser!.email}');
+      }
+    } catch (e) {
+      debugPrint('Google Drive silent sign-in failed: $e');
+    }
+  }
+
+  @override
   Future<BackupUser?> signIn() async {
     try {
       _googleUser = await _googleSignIn.signIn();

@@ -14,6 +14,11 @@ class DropboxService implements BackupService {
   // - Dropbox API v2 endpoints for file operations
 
   @override
+  Future<void> initialize() async {
+    // Dropbox not yet implemented
+  }
+
+  @override
   Future<BackupUser?> signIn() async {
     try {
       // NOTE: This is a placeholder implementation
