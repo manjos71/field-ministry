@@ -650,6 +650,16 @@ class AppLocalizations {
     AppLanguage.ru: 'Удалить карту',
   });
 
+  String get removePhoto => _t({
+    AppLanguage.pt: 'Remover foto',
+    AppLanguage.en: 'Remove photo',
+    AppLanguage.es: 'Eliminar foto',
+    AppLanguage.de: 'Foto entfernen',
+    AppLanguage.fr: 'Supprimer la photo',
+    AppLanguage.it: 'Rimuovi foto',
+    AppLanguage.ru: 'Удалить фото',
+  });
+
   String get viewFullscreen => _t({
     AppLanguage.pt: 'Ver em tela cheia',
     AppLanguage.en: 'View fullscreen',

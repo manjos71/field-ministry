@@ -66,6 +66,81 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     }
   }
 
+  Future<void> _takePhoto() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      final db = await ref.read(databaseServiceProvider.future);
+      await db.saveSetting('user_image_path', pickedFile.path);
+      setState(() {
+        _userImagePath = pickedFile.path;
+      });
+    }
+  }
+
+  void _showImageOptions(BuildContext context, AppLocalizations l10n) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: Text(l10n.chooseFromGallery),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: Text(l10n.takePhoto),
+              onTap: () {
+                Navigator.pop(context);
+                _takePhoto();
+              },
+            ),
+            if (_userImagePath != null)
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: Text(l10n.removePhoto, style: const TextStyle(color: Colors.red)),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final db = await ref.read(databaseServiceProvider.future);
+                  await db.saveSetting('user_image_path', null);
+                  setState(() {
+                    _userImagePath = null;
+                  });
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFullScreenImage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            iconTheme: const IconThemeData(color: Colors.white),
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              child: Image.file(File(_userImagePath!)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -92,13 +167,18 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   children: [
                     InkWell(
                       onTap: () {
+                        if (_userImagePath != null && !kIsWeb) {
+                          _showFullScreenImage(context);
+                        }
+                      },
+                      onLongPress: () {
                         if (kIsWeb) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text(l10n.photoEditUnavailable)),
                           );
                           return;
                         }
-                        _pickImage();
+                        _showImageOptions(context, l10n);
                       },
                       borderRadius: BorderRadius.circular(40),
                       child: CircleAvatar(

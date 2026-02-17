@@ -511,22 +511,22 @@ class _TerritoryMapHeader extends ConsumerWidget {
     return GestureDetector(
       onTap: () => _showImageOptions(context, ref),
       child: Container(
-        margin: const EdgeInsets.all(8),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.grey.shade300),
         ),
-        clipBehavior: Clip.antiAlias,
-        child: territory.imagePath != null
-            ? AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Image.file(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(11), // Slightly smaller to fit inside border
+          child: territory.imagePath != null
+              ? Image.file(
                   File(territory.imagePath!),
-                  fit: BoxFit.contain,
+                  width: double.infinity,
+                  fit: BoxFit.fitWidth,
                   errorBuilder: (_, __, ___) => _buildPlaceholder(context),
-                ),
-              )
-            : _buildPlaceholder(context),
+                )
+              : _buildPlaceholder(context),
+        ),
       ),
     );
   }
