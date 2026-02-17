@@ -242,6 +242,7 @@ class _TerritoryCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final progress = territory.progress;
     
     // Calculate statistics
@@ -314,7 +315,7 @@ class _TerritoryCard extends ConsumerWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${territory.streetCount} ${territory.streetCount == 1 ? 'rua' : 'ruas'}',
+                          l10n.streetsCount(territory.streetCount),
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSecondaryContainer,
                             fontSize: 12,
@@ -333,7 +334,7 @@ class _TerritoryCard extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _StatItem(
-                    label: 'Total',
+                    label: l10n.total,
                     value: totalAddresses.toString(),
                     icon: Icons.home,
                     color: Colors.blue,
@@ -344,7 +345,7 @@ class _TerritoryCard extends ConsumerWidget {
                     color: Colors.grey.shade300,
                   ),
                   _StatItem(
-                    label: 'Restante',
+                    label: l10n.remaining,
                     value: remainingAddresses.toString(),
                     icon: Icons.pending_outlined,
                     color: Colors.orange,
@@ -355,7 +356,7 @@ class _TerritoryCard extends ConsumerWidget {
                     color: Colors.grey.shade300,
                   ),
                   _StatItem(
-                    label: 'Interessados',
+                    label: l10n.interestedCount,
                     value: interestedCount.toString(),
                     icon: Icons.star,
                     color: Colors.green,
@@ -368,9 +369,9 @@ class _TerritoryCard extends ConsumerWidget {
               // Progress bar with percentage
               Row(
                 children: [
-                  const Text(
-                    'Progresso',
-                    style: TextStyle(
+                  Text(
+                    l10n.progress,
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),

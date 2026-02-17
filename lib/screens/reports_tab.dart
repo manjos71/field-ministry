@@ -158,6 +158,7 @@ class _ServiceTimerCard extends ConsumerWidget {
   }
 
   Future<void> _generateReport(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final session = ref.read(serviceTimerProvider);
     final elapsed = session.duration;
     
@@ -176,10 +177,17 @@ class _ServiceTimerCard extends ConsumerWidget {
       notHomeCount: report.notHomeCount,
       interestedCount: report.interestedCount,
       otherStatusCount: report.otherStatusCount,
+      fieldServiceReportLabel: l10n.fieldServiceReport,
+      timeWorkedLabel: l10n.timeWorked,
+      totalVisitsLabel: l10n.totalVisits,
+      breakdownLabel: l10n.breakdown,
+      notHomeLabel: l10n.notHome,
+      interestedLabel: l10n.interested,
+      othersLabel: l10n.others,
+      generatedAtLabel: l10n.generatedAt(DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())),
     );
 
     if (context.mounted) {
-      final l10n = AppLocalizations.of(context);
       showDialog(
         context: context,
         builder: (context) => AlertDialog(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/app_localizations.dart';
 
 /// Card de estatística reutilizável
 class StatCard extends StatelessWidget {
@@ -60,6 +61,7 @@ class StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -70,25 +72,25 @@ class StatsGrid extends StatelessWidget {
       children: [
         StatCard(
           icon: Icons.map,
-          title: 'Territórios',
+          title: l10n.territoriesCount,
           value: territoriesCount.toString(),
           color: Colors.blue,
         ),
         StatCard(
           icon: Icons.star,
-          title: 'Interessados',
+          title: l10n.interestedCount,
           value: interestedCount.toString(),
           color: Colors.amber,
         ),
         StatCard(
           icon: Icons.history,
-          title: 'Visitas',
+          title: l10n.visitsCount,
           value: visitsCount.toString(),
           color: Colors.green,
         ),
         StatCard(
           icon: Icons.calendar_today,
-          title: 'Hoje',
+          title: l10n.today,
           value: DateTime.now().day.toString(),
           color: Colors.purple,
         ),

@@ -1228,6 +1228,46 @@ class AppLocalizations {
     AppLanguage.ru: 'Провайдер резервного копирования',
   });
 
+  String get cloudBackupSubtitle => _t({
+    AppLanguage.pt: 'Nuvem para salvar seus dados',
+    AppLanguage.en: 'Cloud storage for your data',
+    AppLanguage.es: 'Nube para guardar tus datos',
+    AppLanguage.de: 'Cloud-Speicher für Ihre Daten',
+    AppLanguage.fr: 'Cloud pour sauvegarder vos données',
+    AppLanguage.it: 'Cloud per salvare i tuoi dati',
+    AppLanguage.ru: 'Облако для хранения данных',
+  });
+
+  String get configureColumns => _t({
+    AppLanguage.pt: 'Configurar colunas',
+    AppLanguage.en: 'Configure columns',
+    AppLanguage.es: 'Configurar columnas',
+    AppLanguage.de: 'Spalten konfigurieren',
+    AppLanguage.fr: 'Configurer les colonnes',
+    AppLanguage.it: 'Configura colonne',
+    AppLanguage.ru: 'Настроить столбцы',
+  });
+
+  String get addressNumber => _t({
+    AppLanguage.pt: 'Número',
+    AppLanguage.en: 'Number',
+    AppLanguage.es: 'Número',
+    AppLanguage.de: 'Nummer',
+    AppLanguage.fr: 'Numéro',
+    AppLanguage.it: 'Numero',
+    AppLanguage.ru: 'Номер',
+  });
+
+  String get date => _t({
+    AppLanguage.pt: 'Data',
+    AppLanguage.en: 'Date',
+    AppLanguage.es: 'Fecha',
+    AppLanguage.de: 'Datum',
+    AppLanguage.fr: 'Date',
+    AppLanguage.it: 'Data',
+    AppLanguage.ru: 'Дата',
+  });
+
   String get backup => _t({
     AppLanguage.pt: 'Fazer Backup',
     AppLanguage.en: 'Backup',
@@ -1479,12 +1519,12 @@ class AppLocalizations {
   });
 
   String get notHome => _t({
-    AppLanguage.pt: 'Ausente',
+    AppLanguage.pt: 'Ninguém em casa',
     AppLanguage.en: 'Not Home',
-    AppLanguage.es: 'Ausente',
+    AppLanguage.es: 'Nadie en casa',
     AppLanguage.de: 'Nicht Zuhause',
     AppLanguage.fr: 'Absent',
-    AppLanguage.it: 'Assente',
+    AppLanguage.it: 'Nessuno a casa',
     AppLanguage.ru: 'Нет дома',
   });
 
@@ -1506,6 +1546,76 @@ class AppLocalizations {
     AppLanguage.fr: 'Pas Intéressé',
     AppLanguage.it: 'Non Interessato',
     AppLanguage.ru: 'Не интересуется',
+  });
+
+  String get notAnswered => _t({
+    AppLanguage.pt: 'Não atendeu',
+    AppLanguage.en: 'Did not answer',
+    AppLanguage.es: 'No contestó',
+    AppLanguage.de: 'Nicht geantwortet',
+    AppLanguage.fr: 'N\'a pas répondu',
+    AppLanguage.it: 'Non ha risposto',
+    AppLanguage.ru: 'Не ответил',
+  });
+
+  String get noTime => _t({
+    AppLanguage.pt: 'Sem tempo',
+    AppLanguage.en: 'No time',
+    AppLanguage.es: 'Sin tiempo',
+    AppLanguage.de: 'Keine Zeit',
+    AppLanguage.fr: 'Pas de temps',
+    AppLanguage.it: 'Nessun tempo',
+    AppLanguage.ru: 'Нет времени',
+  });
+
+  String get doNotCall => _t({
+    AppLanguage.pt: 'Não visitar',
+    AppLanguage.en: 'Do not call',
+    AppLanguage.es: 'No visitar',
+    AppLanguage.de: 'Nicht besuchen',
+    AppLanguage.fr: 'Ne pas visiter',
+    AppLanguage.it: 'Non visitare',
+    AppLanguage.ru: 'Не посещать',
+  });
+
+  String get emptyHouse => _t({
+    AppLanguage.pt: 'Casa vazia',
+    AppLanguage.en: 'Empty house',
+    AppLanguage.es: 'Casa vacía',
+    AppLanguage.de: 'Leeres Haus',
+    AppLanguage.fr: 'Maison vide',
+    AppLanguage.it: 'Casa vuota',
+    AppLanguage.ru: 'Пустой дом',
+  });
+
+  String get answered => _t({
+    AppLanguage.pt: 'Atendeu',
+    AppLanguage.en: 'Answered',
+    AppLanguage.es: 'Atendió',
+    AppLanguage.de: 'Hat geantwortet',
+    AppLanguage.fr: 'A répondu',
+    AppLanguage.it: 'Ha risposto',
+    AppLanguage.ru: 'Ответил',
+  });
+
+  String get letterLeft => _t({
+    AppLanguage.pt: 'Deixou publicação',
+    AppLanguage.en: 'Left publication',
+    AppLanguage.es: 'Dejó publicación',
+    AppLanguage.de: 'Publikation hinterlassen',
+    AppLanguage.fr: 'Publication laissée',
+    AppLanguage.it: 'Pubblicazione lasciata',
+    AppLanguage.ru: 'Оставлена публикация',
+  });
+
+  String get otherLanguage => _t({
+    AppLanguage.pt: 'Outro idioma',
+    AppLanguage.en: 'Other language',
+    AppLanguage.es: 'Otro idioma',
+    AppLanguage.de: 'Andere Sprache',
+    AppLanguage.fr: 'Autre langue',
+    AppLanguage.it: 'Altra lingua',
+    AppLanguage.ru: 'Другой язык',
   });
 
   // ==================== HORAS ====================
@@ -2029,6 +2139,225 @@ class AppLocalizations {
       AppLanguage.ru: 'Ошибка сохранения контакта: $error',
     });
   }
+
+  // ==================== SETTINGS I18N ====================
+  String get language => _t({
+    AppLanguage.pt: 'Idioma',
+    AppLanguage.en: 'Language',
+    AppLanguage.es: 'Idioma',
+    AppLanguage.de: 'Sprache',
+    AppLanguage.fr: 'Langue',
+    AppLanguage.it: 'Lingua',
+    AppLanguage.ru: 'Язык',
+  });
+
+  String get selectLanguage => _t({
+    AppLanguage.pt: 'Selecionar Idioma',
+    AppLanguage.en: 'Select Language',
+    AppLanguage.es: 'Seleccionar Idioma',
+    AppLanguage.de: 'Sprache auswählen',
+    AppLanguage.fr: 'Sélectionner la langue',
+    AppLanguage.it: 'Seleziona Lingua',
+    AppLanguage.ru: 'Выбрать язык',
+  });
+
+  String get system => _t({
+    AppLanguage.pt: 'Sistema',
+    AppLanguage.en: 'System',
+    AppLanguage.es: 'Sistema',
+    AppLanguage.de: 'System',
+    AppLanguage.fr: 'Système',
+    AppLanguage.it: 'Sistema',
+    AppLanguage.ru: 'Система',
+  });
+
+  String get light => _t({
+    AppLanguage.pt: 'Claro',
+    AppLanguage.en: 'Light',
+    AppLanguage.es: 'Claro',
+    AppLanguage.de: 'Hell',
+    AppLanguage.fr: 'Clair',
+    AppLanguage.it: 'Chiaro',
+    AppLanguage.ru: 'Светлый',
+  });
+
+  String get dark => _t({
+    AppLanguage.pt: 'Escuro',
+    AppLanguage.en: 'Dark',
+    AppLanguage.es: 'Oscuro',
+    AppLanguage.de: 'Dunkel',
+    AppLanguage.fr: 'Sombre',
+    AppLanguage.it: 'Scuro',
+    AppLanguage.ru: 'Тёмный',
+  });
+
+  String get total => _t({
+    AppLanguage.pt: 'Total',
+    AppLanguage.en: 'Total',
+    AppLanguage.es: 'Total',
+    AppLanguage.de: 'Gesamt',
+    AppLanguage.fr: 'Total',
+    AppLanguage.it: 'Totale',
+    AppLanguage.ru: 'Всего',
+  });
+
+  String get remaining => _t({
+    AppLanguage.pt: 'Restante',
+    AppLanguage.en: 'Remaining',
+    AppLanguage.es: 'Restante',
+    AppLanguage.de: 'Verbleibend',
+    AppLanguage.fr: 'Restant',
+    AppLanguage.it: 'Rimanente',
+    AppLanguage.ru: 'Осталось',
+  });
+
+  String get progress => _t({
+    AppLanguage.pt: 'Progresso',
+    AppLanguage.en: 'Progress',
+    AppLanguage.es: 'Progreso',
+    AppLanguage.de: 'Fortschritt',
+    AppLanguage.fr: 'Progrès',
+    AppLanguage.it: 'Progresso',
+    AppLanguage.ru: 'Прогресс',
+  });
+
+  String streetsCount(int count) {
+    return _t({
+      AppLanguage.pt: '$count ${count == 1 ? 'rua' : 'ruas'}',
+      AppLanguage.en: '$count ${count == 1 ? 'street' : 'streets'}',
+      AppLanguage.es: '$count ${count == 1 ? 'calle' : 'calles'}',
+      AppLanguage.de: '$count ${count == 1 ? 'Straße' : 'Straßen'}',
+      AppLanguage.fr: '$count ${count == 1 ? 'rue' : 'rues'}',
+      AppLanguage.it: '$count ${count == 1 ? 'via' : 'vie'}',
+      AppLanguage.ru: '$count ${count == 1 ? 'улица' : 'улиц'}',
+    });
+  }
+
+  String daysCount(int count) {
+    return _t({
+      AppLanguage.pt: '$count ${count == 1 ? 'dia' : 'dias'}',
+      AppLanguage.en: '$count ${count == 1 ? 'day' : 'days'}',
+      AppLanguage.es: '$count ${count == 1 ? 'día' : 'días'}',
+      AppLanguage.de: '$count ${count == 1 ? 'Tag' : 'Tage'}',
+      AppLanguage.fr: '$count ${count == 1 ? 'jour' : 'jours'}',
+      AppLanguage.it: '$count ${count == 1 ? 'giorno' : 'giorni'}',
+      AppLanguage.ru: '$count ${count == 1 ? 'день' : 'дней'}',
+    });
+  }
+
+  String get editMonthlyTime => _t({
+    AppLanguage.pt: 'Editar Tempo do Mês',
+    AppLanguage.en: 'Edit Monthly Time',
+    AppLanguage.es: 'Editar Tiempo del Mes',
+    AppLanguage.de: 'Monatszeit bearbeiten',
+    AppLanguage.fr: 'Modifier le temps mensuel',
+    AppLanguage.it: 'Modifica Tempo Mensile',
+    AppLanguage.ru: 'Редактировать время',
+  });
+
+  String get monthlyTimeUpdated => _t({
+    AppLanguage.pt: 'Tempo do mês atualizado!',
+    AppLanguage.en: 'Monthly time updated!',
+    AppLanguage.es: '¡Tiempo del mes actualizado!',
+    AppLanguage.de: 'Monatszeit aktualisiert!',
+    AppLanguage.fr: 'Temps mensuel mis à jour!',
+    AppLanguage.it: 'Tempo mensile aggiornato!',
+    AppLanguage.ru: 'Время за месяц обновлено!',
+  });
+
+  // ==================== RELATÓRIO DE SERVIÇO ====================
+  String get fieldServiceReport => _t({
+    AppLanguage.pt: 'Relatório de Serviço de Campo',
+    AppLanguage.en: 'Field Service Report',
+    AppLanguage.es: 'Informe de Servicio del Campo',
+    AppLanguage.de: 'Felddienst-Bericht',
+    AppLanguage.fr: 'Rapport de Service',
+    AppLanguage.it: 'Rapporto di Servizio',
+    AppLanguage.ru: 'Отчет о полевом служении',
+  });
+
+  String get timeWorked => _t({
+    AppLanguage.pt: 'Tempo trabalhado',
+    AppLanguage.en: 'Time worked',
+    AppLanguage.es: 'Tiempo trabajado',
+    AppLanguage.de: 'Gearbeitete Zeit',
+    AppLanguage.fr: 'Temps travaillé',
+    AppLanguage.it: 'Tempo lavorato',
+    AppLanguage.ru: 'Отработанное время',
+  });
+
+  String get totalVisits => _t({
+    AppLanguage.pt: 'Total de visitas',
+    AppLanguage.en: 'Total visits',
+    AppLanguage.es: 'Total de visitas',
+    AppLanguage.de: 'Besuche insgesamt',
+    AppLanguage.fr: 'Total des visites',
+    AppLanguage.it: 'Visite totali',
+    AppLanguage.ru: 'Всего посещений',
+  });
+
+  String get breakdown => _t({
+    AppLanguage.pt: 'Detalhamento',
+    AppLanguage.en: 'Breakdown',
+    AppLanguage.es: 'Desglose',
+    AppLanguage.de: 'Aufschlüsselung',
+    AppLanguage.fr: 'Détail',
+    AppLanguage.it: 'Dettaglio',
+    AppLanguage.ru: 'Детализация',
+  });
+
+  String get others => _t({
+    AppLanguage.pt: 'Outros',
+    AppLanguage.en: 'Others',
+    AppLanguage.es: 'Otros',
+    AppLanguage.de: 'Sonstige',
+    AppLanguage.fr: 'Autres',
+    AppLanguage.it: 'Altri',
+    AppLanguage.ru: 'Другие',
+  });
+
+  String generatedAt(String dateTime) {
+    return _t({
+      AppLanguage.pt: 'Gerado em $dateTime',
+      AppLanguage.en: 'Generated at $dateTime',
+      AppLanguage.es: 'Generado el $dateTime',
+      AppLanguage.de: 'Erstellt am $dateTime',
+      AppLanguage.fr: 'Généré le $dateTime',
+      AppLanguage.it: 'Generato il $dateTime',
+      AppLanguage.ru: 'Создано $dateTime',
+    });
+  }
+
+  // ==================== PUBLISHER TYPE NAMES ====================
+  String get publisherTypeName => _t({
+    AppLanguage.pt: 'Publicador',
+    AppLanguage.en: 'Publisher',
+    AppLanguage.es: 'Publicador',
+    AppLanguage.de: 'Verkündiger',
+    AppLanguage.fr: 'Proclamateur',
+    AppLanguage.it: 'Proclamatore',
+    AppLanguage.ru: 'Возвещатель',
+  });
+
+  String get auxiliaryPioneerTypeName => _t({
+    AppLanguage.pt: 'Pioneiro Auxiliar',
+    AppLanguage.en: 'Auxiliary Pioneer',
+    AppLanguage.es: 'Precursor Auxiliar',
+    AppLanguage.de: 'Hilfspionier',
+    AppLanguage.fr: 'Pionnier Auxiliaire',
+    AppLanguage.it: 'Pioniere Ausiliario',
+    AppLanguage.ru: 'Подсобный пионер',
+  });
+
+  String get regularPioneerTypeName => _t({
+    AppLanguage.pt: 'Pioneiro Regular',
+    AppLanguage.en: 'Regular Pioneer',
+    AppLanguage.es: 'Precursor Regular',
+    AppLanguage.de: 'Allgemeiner Pionier',
+    AppLanguage.fr: 'Pionnier Permanent',
+    AppLanguage.it: 'Pioniere Regolare',
+    AppLanguage.ru: 'Общий пионер',
+  });
 
   /// Helper para tradução baseada no idioma
   String _t(Map<AppLanguage, String> translations) {

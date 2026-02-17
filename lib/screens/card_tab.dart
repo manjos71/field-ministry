@@ -163,6 +163,7 @@ class _InterestedStackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final days = DateTime.now().difference(item.lastVisit.date).inDays;
     final catIconPath = item.lastVisit.personCategory?.getIconPath(item.lastVisit.gender);
@@ -246,7 +247,7 @@ class _InterestedStackCard extends StatelessWidget {
                              Icon(Icons.access_time, size: 14, color: _getUrgencyColor(days)),
                              const SizedBox(width: 4),
                              Text(
-                               '$days dias',
+                               l10n.daysCount(days),
                                style: TextStyle(
                                  fontSize: 12,
                                  fontWeight: FontWeight.bold,

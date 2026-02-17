@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../config/theme.dart';
+import '../config/app_localizations.dart';
 
 /// Widget para selecionar o status de uma visita
 /// Mostra todos os status disponíveis em um grid
@@ -14,8 +15,36 @@ class StatusSelector extends StatelessWidget {
     required this.onStatusSelected,
   });
 
+  String _getStatusLabel(VisitStatus status, AppLocalizations l10n) {
+    switch (status) {
+      case VisitStatus.unvisited:
+        return l10n.notVisited;
+      case VisitStatus.notHome:
+        return l10n.notHome;
+      case VisitStatus.notAnswered:
+        return l10n.notAnswered;
+      case VisitStatus.noTime:
+        return l10n.noTime;
+      case VisitStatus.doNotCall:
+        return l10n.doNotCall;
+      case VisitStatus.emptyHouse:
+        return l10n.emptyHouse;
+      case VisitStatus.answered:
+        return l10n.answered;
+      case VisitStatus.letterLeft:
+        return l10n.letterLeft;
+      case VisitStatus.returnVisit:
+        return l10n.returnVisit;
+      case VisitStatus.interested:
+        return l10n.interested;
+      case VisitStatus.otherLanguage:
+        return l10n.otherLanguage;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final sortedStatus = [
       VisitStatus.unvisited,
       VisitStatus.notHome,
@@ -57,7 +86,7 @@ class StatusSelector extends StatelessWidget {
                 Text(status.icon, style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 6),
                 Text(
-                  status.label,
+                  _getStatusLabel(status, l10n),
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

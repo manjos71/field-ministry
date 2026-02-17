@@ -8,6 +8,7 @@ import '../providers/territory_provider.dart';
 import '../providers/service_timer_provider.dart';
 import '../providers/publisher_profile_provider.dart';
 import '../models/publisher_profile.dart';
+import '../config/app_localizations.dart';
 
 class SettingsTab extends ConsumerWidget {
   const SettingsTab({super.key});
@@ -33,36 +34,38 @@ class SettingsTab extends ConsumerWidget {
       }
     });
 
+    final l10n = AppLocalizations.of(context);
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Configurações'),
+        title: Text(l10n.settings),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _SectionHeader(title: 'Aparência'),
+          _SectionHeader(title: l10n.appearance),
           Card(
             child: Column(
               children: [
                 ListTile(
                   leading: const Icon(Icons.brightness_6),
-                  title: const Text('Tema'),
-                  subtitle: Text(_getThemeModeLabel(themeMode)),
+                  title: Text(l10n.theme),
+                  subtitle: Text(_getThemeModeLabel(context, themeMode)),
                   trailing: DropdownButton<ThemeMode>(
                     value: themeMode,
                     underline: Container(),
-                    items: const [
+                    items: [
                       DropdownMenuItem(
                         value: ThemeMode.system,
-                        child: Text('Sistema'),
+                        child: Text(l10n.system),
                       ),
                       DropdownMenuItem(
                         value: ThemeMode.light,
-                        child: Text('Claro'),
+                        child: Text(l10n.light),
                       ),
                       DropdownMenuItem(
                         value: ThemeMode.dark,
-                        child: Text('Escuro'),
+                        child: Text(l10n.dark),
                       ),
                     ],
                     onChanged: (mode) {
@@ -78,9 +81,9 @@ class SettingsTab extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Cor Principal',
-                        style: TextStyle(fontWeight: FontWeight.w500),
+                      Text(
+                        l10n.primaryColor,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(height: 12),
                       _ThemeColorPicker(),
@@ -93,10 +96,10 @@ class SettingsTab extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          _SectionHeader(title: 'Perfil'),
+          _SectionHeader(title: l10n.profile),
           const _PublisherProfileSettings(),
           const SizedBox(height: 24),
-          _SectionHeader(title: 'Serviço'),
+          _SectionHeader(title: l10n.service),
           Card(
             child: Column(
               children: [
@@ -105,7 +108,7 @@ class SettingsTab extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          _SectionHeader(title: 'Dados'),
+          _SectionHeader(title: l10n.data),
           Card(
             child: Column(
               children: [
@@ -113,8 +116,8 @@ class SettingsTab extends ConsumerWidget {
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.cloud_queue),
-                  title: const Text('Provedor de Backup'),
-                  subtitle: const Text('Nuvem para salvar seus dados'),
+                  title: Text(l10n.backupProvider),
+                  subtitle: Text(l10n.cloudBackupSubtitle),
                   trailing: DropdownButton<String>(
                     value: ref.watch(selectedBackupServiceProvider),
                     underline: Container(),
@@ -179,12 +182,12 @@ class SettingsTab extends ConsumerWidget {
                 else
                   ListTile(
                     leading: const Icon(Icons.cloud_off),
-                    title: const Text('Não conectado'),
-                    subtitle: const Text('Faça login para salvar seus dados'),
+                    title: Text(l10n.notConnected),
+                    subtitle: Text(l10n.loginToBackup),
                     trailing: FilledButton.icon(
                       onPressed: () => backupNotifier.signIn(),
                       icon: const Icon(Icons.login),
-                      label: const Text('Login'),
+                      label: Text(l10n.login),
                     ),
                   ),
                 
@@ -221,14 +224,15 @@ class SettingsTab extends ConsumerWidget {
     );
   }
 
-  String _getThemeModeLabel(ThemeMode mode) {
+  String _getThemeModeLabel(BuildContext context, ThemeMode mode) {
+    final l10n = AppLocalizations.of(context);
     switch (mode) {
       case ThemeMode.system:
-        return 'Padrão do Sistema';
+        return l10n.systemDefault;
       case ThemeMode.light:
-        return 'Modo Claro';
+        return l10n.lightMode;
       case ThemeMode.dark:
-        return 'Modo Escuro';
+        return l10n.darkMode;
     }
   }
 
@@ -454,16 +458,32 @@ class _ColorButton extends StatelessWidget {
 class _LanguageSelector extends ConsumerWidget {
   const _LanguageSelector();
 
-  static const _languages = [
-    (code: null, label: 'Sistema (Padrão)', flag: '🌐'),
-    (code: 'pt', label: 'Português', flag: '🇧🇷'),
-    (code: 'en', label: 'English', flag: '🇺🇸'),
-    (code: 'es', label: 'Español', flag: '🇪🇸'),
-    (code: 'de', label: 'Deutsch', flag: '🇩🇪'),
-    (code: 'fr', label: 'Français', flag: '🇫🇷'),
-    (code: 'it', label: 'Italiano', flag: '🇮🇹'),
-    (code: 'ru', label: 'Русский', flag: '🇷🇺'),
+  static const _languageCodes = [
+    (code: null, flag: '🌐'),
+    (code: 'pt', flag: '🇧🇷'),
+    (code: 'en', flag: '🇺🇸'),
+    (code: 'es', flag: '🇪🇸'),
+    (code: 'de', flag: '🇩🇪'),
+    (code: 'fr', flag: '🇫🇷'),
+    (code: 'it', flag: '🇮🇹'),
+    (code: 'ru', flag: '🇷🇺'),
   ];
+
+  static const _languageLabels = {
+    null: 'systemDefault', // Will be replaced with l10n
+    'pt': 'Português',
+    'en': 'English',
+    'es': 'Español',
+    'de': 'Deutsch',
+    'fr': 'Français',
+    'it': 'Italiano',
+    'ru': 'Русский',
+  };
+
+  String _getLangLabel(String? code, AppLocalizations l10n) {
+    if (code == null) return l10n.systemDefault;
+    return _languageLabels[code] ?? code;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -471,38 +491,40 @@ class _LanguageSelector extends ConsumerWidget {
     final languageNotifier = ref.read(languageProvider.notifier);
     
     // Find current selection
-    final currentIndex = _languages.indexWhere(
+    final currentIndex = _languageCodes.indexWhere(
       (lang) => lang.code == selectedLanguage?.languageCode
     );
-    final current = currentIndex >= 0 ? _languages[currentIndex] : _languages[0];
+    final current = currentIndex >= 0 ? _languageCodes[currentIndex] : _languageCodes[0];
 
+    final l10n = AppLocalizations.of(context);
+    
     return ListTile(
       leading: const Icon(Icons.language),
-      title: const Text('Idioma'),
-      subtitle: Text('${current.flag} ${current.label}'),
+      title: Text(l10n.language),
+      subtitle: Text('${current.flag} ${_getLangLabel(current.code, l10n)}'),
       trailing: const Icon(Icons.chevron_right),
-      onTap: () => _showLanguageDialog(context, selectedLanguage, languageNotifier),
+      onTap: () => _showLanguageDialog(context, selectedLanguage, languageNotifier, l10n),
     );
   }
 
-  void _showLanguageDialog(BuildContext context, Locale? current, LanguageNotifier notifier) {
+  void _showLanguageDialog(BuildContext context, Locale? current, LanguageNotifier notifier, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Selecionar Idioma'),
+        title: Text(l10n.selectLanguage),
         content: SizedBox(
           width: double.maxFinite,
           child: ListView.builder(
             shrinkWrap: true,
-            itemCount: _languages.length,
+            itemCount: _languageCodes.length,
             itemBuilder: (context, index) {
-              final lang = _languages[index];
+              final lang = _languageCodes[index];
               final isSelected = current?.languageCode == lang.code || 
                                  (current == null && lang.code == null);
               
               return ListTile(
                 leading: Text(lang.flag, style: const TextStyle(fontSize: 24)),
-                title: Text(lang.label),
+                title: Text(_getLangLabel(lang.code, l10n)),
                 trailing: isSelected 
                     ? Icon(Icons.check, color: Theme.of(context).primaryColor)
                     : null,
@@ -517,7 +539,7 @@ class _LanguageSelector extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -577,15 +599,16 @@ class _CsvSettingsCardState extends ConsumerState<_CsvSettingsCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Theme(
       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
         leading: const Icon(Icons.table_chart),
-        title: const Text('Exportação CSV'),
-        subtitle: const Text('Configurar colunas'),
+        title: Text(l10n.exportCsv),
+        subtitle: Text(l10n.configureColumns),
         children: _fields.keys.map((key) {
            return CheckboxListTile(
-            title: Text(_labelFor(key)),
+            title: Text(_labelFor(key, l10n)),
             value: _fields[key],
             onChanged: (val) {
               setState(() => _fields[key] = val ?? false);
@@ -597,14 +620,14 @@ class _CsvSettingsCardState extends ConsumerState<_CsvSettingsCard> {
     );
   }
 
-  String _labelFor(String key) {
+  String _labelFor(String key, AppLocalizations l10n) {
     switch (key) {
-      case 'territory': return 'Território';
-      case 'street': return 'Rua';
-      case 'number': return 'Número';
-      case 'date': return 'Data';
-      case 'time': return 'Hora';
-      case 'notes': return 'Notas';
+      case 'territory': return l10n.territory;
+      case 'street': return l10n.street;
+      case 'number': return l10n.addressNumber;
+      case 'date': return l10n.date;
+      case 'time': return l10n.hour;
+      case 'notes': return l10n.notes;
       default: return key;
     }
   }
@@ -613,13 +636,14 @@ class _CsvSettingsCardState extends ConsumerState<_CsvSettingsCard> {
 class _MonthlyTimeEditor extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final monthlyTime = ref.watch(monthlyServiceTimeProvider);
     final monthlyNotifier = ref.read(monthlyServiceTimeProvider.notifier);
 
     return ListTile(
       leading: const Icon(Icons.timer),
-      title: const Text('Tempo do Mês'),
-      subtitle: Text('Total: ${monthlyTime.formattedTime}'),
+      title: Text(l10n.monthlyTime),
+      subtitle: Text('${l10n.total}: ${monthlyTime.formattedTime}'),
       trailing: IconButton(
         icon: const Icon(Icons.edit),
         onPressed: () => _showEditTimeDialog(context, monthlyTime, monthlyNotifier),
@@ -628,18 +652,19 @@ class _MonthlyTimeEditor extends ConsumerWidget {
   }
 
   void _showEditTimeDialog(BuildContext context, MonthlyServiceTime currentTime, MonthlyServiceTimeNotifier notifier) {
+    final l10n = AppLocalizations.of(context);
     final hoursController = TextEditingController(text: (currentTime.totalMinutes ~/ 60).toString());
     final minutesController = TextEditingController(text: (currentTime.totalMinutes % 60).toString());
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Editar Tempo do Mês'),
+        title: Text(l10n.editMonthlyTime),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              _getMonthName(currentTime.month),
+              l10n.getMonthName(currentTime.month),
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -649,9 +674,9 @@ class _MonthlyTimeEditor extends ConsumerWidget {
                   child: TextField(
                     controller: hoursController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Horas',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.hours,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ),
@@ -660,9 +685,9 @@ class _MonthlyTimeEditor extends ConsumerWidget {
                   child: TextField(
                     controller: minutesController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Minutos',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.minutes,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ),
@@ -673,7 +698,7 @@ class _MonthlyTimeEditor extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -683,34 +708,38 @@ class _MonthlyTimeEditor extends ConsumerWidget {
               notifier.setTime(totalMinutes);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Tempo do mês atualizado!'),
+                SnackBar(
+                  content: Text(l10n.monthlyTimeUpdated),
                   backgroundColor: Colors.green,
                 ),
               );
             },
-            child: const Text('Salvar'),
+            child: Text(l10n.save),
           ),
         ],
       ),
     );
-  }
-
-  String _getMonthName(int month) {
-    const months = [
-      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-    ];
-    return months[month - 1];
   }
 }
 
 class _PublisherProfileSettings extends ConsumerWidget {
   const _PublisherProfileSettings();
 
+  String _getTypeDisplayName(PublisherType type, AppLocalizations l10n) {
+    switch (type) {
+      case PublisherType.publisher:
+        return l10n.publisherTypeName;
+      case PublisherType.auxiliaryPioneer:
+        return l10n.auxiliaryPioneerTypeName;
+      case PublisherType.regularPioneer:
+        return l10n.regularPioneerTypeName;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(publisherProfileProvider);
+    final l10n = AppLocalizations.of(context);
     final notifier = ref.read(publisherProfileProvider.notifier);
 
     return Card(
@@ -718,23 +747,23 @@ class _PublisherProfileSettings extends ConsumerWidget {
         children: [
           ListTile(
             leading: const Icon(Icons.person),
-            title: const Text('Tipo de Publicador'),
-            subtitle: Text(profile.typeName),
+            title: Text(l10n.publisherType),
+            subtitle: Text(_getTypeDisplayName(profile.type, l10n)),
             trailing: DropdownButton<PublisherType>(
               value: profile.type,
               underline: Container(),
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: PublisherType.publisher,
-                  child: Text('Publicador'),
+                  child: Text(l10n.publisher),
                 ),
                 DropdownMenuItem(
                   value: PublisherType.auxiliaryPioneer,
-                  child: Text('Pioneiro Auxiliar'),
+                  child: Text(l10n.auxiliaryPioneer),
                 ),
                 DropdownMenuItem(
                   value: PublisherType.regularPioneer,
-                  child: Text('Pioneiro Regular'),
+                  child: Text(l10n.regularPioneer),
                 ),
               ],
               onChanged: (type) {
@@ -769,10 +798,11 @@ class _PublisherHoursEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListTile(
       leading: const Icon(Icons.timer_outlined),
-      title: const Text('Meta de Horas'),
-      subtitle: Text('${profile.customTargetHours ?? 0} horas/mês'),
+      title: Text(l10n.hourGoal),
+      subtitle: Text('${profile.customTargetHours ?? 0} ${l10n.hoursPerMonth}'),
       trailing: IconButton(
         icon: const Icon(Icons.edit),
         onPressed: () => _showEditHoursDialog(context),
@@ -781,6 +811,7 @@ class _PublisherHoursEditor extends StatelessWidget {
   }
 
   void _showEditHoursDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(
       text: (profile.customTargetHours ?? 0).toString(),
     );
@@ -788,19 +819,19 @@ class _PublisherHoursEditor extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Meta de Horas'),
+        title: Text(l10n.hourGoal),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            labelText: 'Horas por mês',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: l10n.hoursPerMonth,
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -808,7 +839,7 @@ class _PublisherHoursEditor extends StatelessWidget {
               notifier.setCustomTargetHours(hours);
               Navigator.pop(context);
             },
-            child: const Text('Salvar'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -827,21 +858,22 @@ class _AuxiliaryPioneerSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListTile(
       leading: const Icon(Icons.timer_outlined),
-      title: const Text('Meta de Horas'),
-      subtitle: Text('${profile.monthlyTargetHours} horas/mês'),
+      title: Text(l10n.hourGoal),
+      subtitle: Text('${profile.monthlyTargetHours} ${l10n.hoursPerMonth}'),
       trailing: DropdownButton<AuxiliaryPioneerTarget>(
         value: profile.auxiliaryTarget ?? AuxiliaryPioneerTarget.hours15,
         underline: Container(),
-        items: const [
+        items: [
           DropdownMenuItem(
             value: AuxiliaryPioneerTarget.hours15,
-            child: Text('15 horas'),
+            child: Text('15 ${l10n.hours}'),
           ),
           DropdownMenuItem(
             value: AuxiliaryPioneerTarget.hours30,
-            child: Text('30 horas'),
+            child: Text('30 ${l10n.hours}'),
           ),
         ],
         onChanged: (target) {

@@ -155,9 +155,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             
             // Calendário de Planejamento
             const SizedBox(height: 16),
-            const Text(
-              'Planejamento do Mês',
-              style: TextStyle(
+            Text(
+              l10n.monthlyPlanning,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -177,6 +177,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     ProgressStatus progressStatus,
     PublisherProfile profile,
   ) {
+    final l10n = AppLocalizations.of(context);
     // Determinar cor e emoji baseado no progresso
     final bool hasTarget = profile.effectiveTargetHours > 0;
     final bool isOnTrack = progressStatus.isOnTrack;
@@ -218,7 +219,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               Row(
                 children: [
                   Text(
-                    'Tempo do Mês',
+                    l10n.monthlyTime,
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey.shade600,
@@ -233,7 +234,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        isOnTrack ? 'Em dia' : 'Atrasado',
+                        isOnTrack ? l10n.onTrack : l10n.behind,
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -255,7 +256,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               ),
               if (hasTarget)
                 Text(
-                  'Meta: ${profile.effectiveTargetHours}h • Esperado: ${progressStatus.expectedHours.toStringAsFixed(1)}h',
+                  '${l10n.target}: ${profile.effectiveTargetHours}h • ${l10n.expected}: ${progressStatus.expectedHours.toStringAsFixed(1)}h',
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.grey.shade600,

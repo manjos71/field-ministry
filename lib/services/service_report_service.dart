@@ -13,22 +13,31 @@ class ServiceReportService {
     required int notHomeCount,
     required int interestedCount,
     required int otherStatusCount,
+    // Localized strings
+    required String fieldServiceReportLabel,
+    required String timeWorkedLabel,
+    required String totalVisitsLabel,
+    required String breakdownLabel,
+    required String notHomeLabel,
+    required String interestedLabel,
+    required String othersLabel,
+    required String generatedAtLabel,
   }) {
     final hours = workTime.inHours;
     final minutes = workTime.inMinutes.remainder(60);
     
     final buffer = StringBuffer();
-    buffer.writeln('📊 *Relatório de Serviço de Campo*');
+    buffer.writeln('📊 *$fieldServiceReportLabel*');
     buffer.writeln('');
-    buffer.writeln('⏱️ *Tempo trabalhado:* ${hours}h ${minutes}min');
-    buffer.writeln('🏠 *Total de visitas:* $totalVisits');
+    buffer.writeln('⏱️ *$timeWorkedLabel:* ${hours}h ${minutes}min');
+    buffer.writeln('🏠 *$totalVisitsLabel:* $totalVisits');
     buffer.writeln('');
-    buffer.writeln('📈 *Detalhamento:*');
-    buffer.writeln('  • Ninguém em casa: $notHomeCount');
-    buffer.writeln('  • Interessados: $interestedCount');
-    buffer.writeln('  • Outros: $otherStatusCount');
+    buffer.writeln('📈 *$breakdownLabel:*');
+    buffer.writeln('  • $notHomeLabel: $notHomeCount');
+    buffer.writeln('  • $interestedLabel: $interestedCount');
+    buffer.writeln('  • $othersLabel: $otherStatusCount');
     buffer.writeln('');
-    buffer.writeln('_Gerado em ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())}_');
+    buffer.writeln('_${generatedAtLabel}_');
     
     return buffer.toString();
   }
