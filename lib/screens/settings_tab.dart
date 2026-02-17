@@ -171,8 +171,8 @@ class SettingsTab extends ConsumerWidget {
                     ),
                     title: Text(backupState.currentUser!.email),
                     subtitle: Text(backupState.lastBackupDate != null 
-                         ? 'Último backup: ${DateFormat('dd/MM HH:mm').format(backupState.lastBackupDate!)}' 
-                         : 'Nenhum backup encontrado'
+                         ? l10n.lastBackupAt(DateFormat('dd/MM HH:mm').format(backupState.lastBackupDate!)) 
+                         : l10n.noBackupFound
                     ),
                     trailing: IconButton(
                        icon: const Icon(Icons.logout),
@@ -204,12 +204,12 @@ class SettingsTab extends ConsumerWidget {
                            ElevatedButton.icon(
                              onPressed: () => backupNotifier.backup(),
                              icon: const Icon(Icons.cloud_upload),
-                             label: const Text('Fazer Backup'),
+                             label: Text(l10n.backup),
                            ),
                            OutlinedButton.icon(
                              onPressed: () => _showRestoreConfirmDialog(context, backupNotifier),
                              icon: const Icon(Icons.cloud_download),
-                             label: const Text('Restaurar'),
+                             label: Text(l10n.restore),
                            ),
                         ],
                       ],
@@ -237,18 +237,16 @@ class SettingsTab extends ConsumerWidget {
   }
 
   void _showRestoreConfirmDialog(BuildContext context, BackupNotifier notifier) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Restaurar Backup?'),
-        content: const Text(
-          'Atenção: Restaurar um backup substituirá TODOS os dados atuais do aplicativo. '
-          'Certifique-se de que o backup na nuvem é mais recente que seus dados locais.'
-        ),
+        title: Text(l10n.restoreBackupTitle),
+        content: Text(l10n.restoreWarning),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -256,7 +254,7 @@ class SettingsTab extends ConsumerWidget {
               Navigator.pop(context);
               notifier.restore();
             },
-            child: const Text('Restaurar Agora'),
+            child: Text(l10n.restoreNow),
           ),
         ],
       ),
@@ -886,7 +884,7 @@ class _AuxiliaryPioneerSettings extends StatelessWidget {
   }
 }
 
-class _RegularPioneerSettings extends StatelessWidget {
+class _RegularPioneerSettings extends ConsumerWidget {
   final PublisherProfile profile;
   final PublisherProfileNotifier notifier;
 
@@ -895,14 +893,20 @@ class _RegularPioneerSettings extends StatelessWidget {
     required this.notifier,
   });
 
+  void addCreditToMonth(WidgetRef ref, int hours) {
+    final monthlyNotifier = ref.read(monthlyServiceTimeProvider.notifier);
+    monthlyNotifier.addTime(Duration(hours: hours));
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         ListTile(
           leading: const Icon(Icons.timer_outlined),
-          title: const Text('Meta de Horas'),
-          subtitle: const Text('50 horas/mês'),
+          title: Text(l10n.hourGoal),
+          subtitle: Text('50 ${l10n.hoursPerMonth}'),
           trailing: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
@@ -921,14 +925,32 @@ class _RegularPioneerSettings extends StatelessWidget {
         const Divider(),
         ListTile(
           leading: const Icon(Icons.volunteer_activism),
-          title: const Text('Crédito de Horas'),
+          title: Text(l10n.creditHours),
           subtitle: Text(
-            '${profile.creditHours} horas de trabalho voluntário',
+            '${profile.creditHours} ${l10n.volunteerWorkHours}',
             style: const TextStyle(fontSize: 12),
           ),
-          trailing: IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => _showEditCreditDialog(context),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.add_circle, color: Colors.green),
+                tooltip: l10n.addCreditHours,
+                onPressed: profile.creditHours > 0 ? () {
+                  addCreditToMonth(ref, profile.creditHours);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.creditHoursAdded(profile.creditHours)),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } : null,
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () => _showEditCreditDialog(context),
+              ),
+            ],
           ),
         ),
       ],
@@ -936,6 +958,7 @@ class _RegularPioneerSettings extends StatelessWidget {
   }
 
   void _showEditCreditDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(
       text: profile.creditHours.toString(),
     );
@@ -943,22 +966,22 @@ class _RegularPioneerSettings extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Crédito de Horas'),
+        title: Text(l10n.creditHours),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Horas de outros trabalhos voluntários que contam para sua meta:',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+            Text(
+              l10n.volunteerWorkHoursDescription,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: controller,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Horas de crédito',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.creditHoursLabel,
+                border: const OutlineInputBorder(),
               ),
             ),
           ],
@@ -966,7 +989,7 @@ class _RegularPioneerSettings extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -974,7 +997,7 @@ class _RegularPioneerSettings extends StatelessWidget {
               notifier.setCreditHours(hours);
               Navigator.pop(context);
             },
-            child: const Text('Salvar'),
+            child: Text(l10n.save),
           ),
         ],
       ),

@@ -1328,6 +1328,56 @@ class AppLocalizations {
     AppLanguage.ru: 'Выйти',
   });
 
+  String lastBackupAt(String dateTime) => _t({
+    AppLanguage.pt: 'Último backup: $dateTime',
+    AppLanguage.en: 'Last backup: $dateTime',
+    AppLanguage.es: 'Última copia: $dateTime',
+    AppLanguage.de: 'Letztes Backup: $dateTime',
+    AppLanguage.fr: 'Dernière sauvegarde: $dateTime',
+    AppLanguage.it: 'Ultimo backup: $dateTime',
+    AppLanguage.ru: 'Последняя копия: $dateTime',
+  });
+
+  String get noBackupFound => _t({
+    AppLanguage.pt: 'Nenhum backup encontrado',
+    AppLanguage.en: 'No backup found',
+    AppLanguage.es: 'No se encontró copia de seguridad',
+    AppLanguage.de: 'Kein Backup gefunden',
+    AppLanguage.fr: 'Aucune sauvegarde trouvée',
+    AppLanguage.it: 'Nessun backup trovato',
+    AppLanguage.ru: 'Резервная копия не найдена',
+  });
+
+  String get restoreBackupTitle => _t({
+    AppLanguage.pt: 'Restaurar Backup?',
+    AppLanguage.en: 'Restore Backup?',
+    AppLanguage.es: '¿Restaurar Copia?',
+    AppLanguage.de: 'Backup wiederherstellen?',
+    AppLanguage.fr: 'Restaurer la sauvegarde?',
+    AppLanguage.it: 'Ripristinare il backup?',
+    AppLanguage.ru: 'Восстановить резервную копию?',
+  });
+
+  String get restoreWarning => _t({
+    AppLanguage.pt: 'Atenção: Restaurar um backup substituirá TODOS os dados atuais do aplicativo. Certifique-se de que o backup na nuvem é mais recente que seus dados locais.',
+    AppLanguage.en: 'Warning: Restoring a backup will replace ALL current app data. Make sure the cloud backup is more recent than your local data.',
+    AppLanguage.es: 'Advertencia: Restaurar una copia de seguridad reemplazará TODOS los datos actuales de la aplicación. Asegúrese de que la copia en la nube sea más reciente que sus datos locales.',
+    AppLanguage.de: 'Achtung: Das Wiederherstellen eines Backups ersetzt ALLE aktuellen App-Daten. Stellen Sie sicher, dass das Cloud-Backup aktueller ist als Ihre lokalen Daten.',
+    AppLanguage.fr: 'Attention: La restauration d\'une sauvegarde remplacera TOUTES les données actuelles de l\'application. Assurez-vous que la sauvegarde cloud est plus récente que vos données locales.',
+    AppLanguage.it: 'Attenzione: Il ripristino di un backup sostituirà TUTTI i dati attuali dell\'app. Assicurati che il backup cloud sia più recente dei tuoi dati locali.',
+    AppLanguage.ru: 'Внимание: Восстановление резервной копии заменит ВСЕ текущие данные приложения. Убедитесь, что облачная копия новее ваших локальных данных.',
+  });
+
+  String get restoreNow => _t({
+    AppLanguage.pt: 'Restaurar Agora',
+    AppLanguage.en: 'Restore Now',
+    AppLanguage.es: 'Restaurar Ahora',
+    AppLanguage.de: 'Jetzt wiederherstellen',
+    AppLanguage.fr: 'Restaurer maintenant',
+    AppLanguage.it: 'Ripristina ora',
+    AppLanguage.ru: 'Восстановить сейчас',
+  });
+
   // ==================== PERFIL DO PUBLICADOR ====================
   String get publisherType => _t({
     AppLanguage.pt: 'Tipo de Publicador',
@@ -1407,6 +1457,66 @@ class AppLocalizations {
     AppLanguage.fr: 'heures de travail bénévole',
     AppLanguage.it: 'ore di lavoro volontario',
     AppLanguage.ru: 'часов добровольной работы',
+  });
+
+  String get volunteerWorkHoursDescription => _t({
+    AppLanguage.pt: 'Horas de outros trabalhos voluntários que contam para sua meta:',
+    AppLanguage.en: 'Hours from other volunteer work that count toward your goal:',
+    AppLanguage.es: 'Horas de otros trabajos voluntarios que cuentan para tu meta:',
+    AppLanguage.de: 'Stunden aus anderen freiwilligen Arbeiten, die für Ihr Ziel zählen:',
+    AppLanguage.fr: "Heures d'autres travaux bénévoles qui comptent pour votre objectif:",
+    AppLanguage.it: 'Ore di altri lavori volontari che contano per il tuo obiettivo:',
+    AppLanguage.ru: 'Часы другой добровольной работы, которые засчитываются в вашу цель:',
+  });
+
+  String get creditHoursLabel => _t({
+    AppLanguage.pt: 'Horas de crédito',
+    AppLanguage.en: 'Credit hours',
+    AppLanguage.es: 'Horas de crédito',
+    AppLanguage.de: 'Guthabenstunden',
+    AppLanguage.fr: 'Heures de crédit',
+    AppLanguage.it: 'Ore di credito',
+    AppLanguage.ru: 'Зачётные часы',
+  });
+
+  String get addCreditHours => _t({
+    AppLanguage.pt: 'Adicionar Crédito',
+    AppLanguage.en: 'Add Credit',
+    AppLanguage.es: 'Agregar Crédito',
+    AppLanguage.de: 'Guthaben hinzufügen',
+    AppLanguage.fr: 'Ajouter Crédit',
+    AppLanguage.it: 'Aggiungi Credito',
+    AppLanguage.ru: 'Добавить кредит',
+  });
+
+  String get addCreditHoursDescription => _t({
+    AppLanguage.pt: 'Adicionar horas de trabalho voluntário ao tempo do mês:',
+    AppLanguage.en: 'Add volunteer work hours to monthly time:',
+    AppLanguage.es: 'Agregar horas de trabajo voluntario al tiempo mensual:',
+    AppLanguage.de: 'Freiwilligenstunden zur Monatszeit hinzufügen:',
+    AppLanguage.fr: 'Ajouter des heures de bénévolat au temps mensuel:',
+    AppLanguage.it: 'Aggiungi ore di volontariato al tempo mensile:',
+    AppLanguage.ru: 'Добавить часы волонтёрства к ежемесячному времени:',
+  });
+
+  String get hoursToAdd => _t({
+    AppLanguage.pt: 'Horas a adicionar',
+    AppLanguage.en: 'Hours to add',
+    AppLanguage.es: 'Horas a agregar',
+    AppLanguage.de: 'Stunden hinzuzufügen',
+    AppLanguage.fr: 'Heures à ajouter',
+    AppLanguage.it: 'Ore da aggiungere',
+    AppLanguage.ru: 'Часов для добавления',
+  });
+
+  String creditHoursAdded(int hours) => _t({
+    AppLanguage.pt: '$hours horas de crédito adicionadas',
+    AppLanguage.en: '$hours credit hours added',
+    AppLanguage.es: '$hours horas de crédito agregadas',
+    AppLanguage.de: '$hours Guthabenstunden hinzugefügt',
+    AppLanguage.fr: '$hours heures de crédit ajoutées',
+    AppLanguage.it: '$hours ore di credito aggiunte',
+    AppLanguage.ru: 'Добавлено $hours зачётных часов',
   });
 
   // ==================== CALENDÁRIO ====================
@@ -2357,6 +2467,17 @@ class AppLocalizations {
     AppLanguage.fr: 'Pionnier Permanent',
     AppLanguage.it: 'Pioniere Regolare',
     AppLanguage.ru: 'Общий пионер',
+  });
+
+  // ==================== GRÁFICO DE ESTATÍSTICAS ====================
+  String get last3Months => _t({
+    AppLanguage.pt: 'Últimos 3 Meses',
+    AppLanguage.en: 'Last 3 Months',
+    AppLanguage.es: 'Últimos 3 Meses',
+    AppLanguage.de: 'Letzte 3 Monate',
+    AppLanguage.fr: 'Les 3 derniers mois',
+    AppLanguage.it: 'Ultimi 3 Mesi',
+    AppLanguage.ru: 'Последние 3 месяца',
   });
 
   /// Helper para tradução baseada no idioma

@@ -8,6 +8,7 @@ import '../providers/service_timer_provider.dart';
 import 'package:field_ministry/services/service_report_service.dart';
 import 'package:share_plus/share_plus.dart';
 import '../config/app_localizations.dart';
+import '../widgets/monthly_stats_chart.dart';
 
 class ReportsTab extends ConsumerWidget {
   const ReportsTab({super.key});
@@ -19,9 +20,15 @@ class ReportsTab extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.reports),
       ),
-      body: const Padding(
+      body: const SingleChildScrollView(
         padding: EdgeInsets.all(16),
-        child: _ServiceTimerCard(),
+        child: Column(
+          children: [
+            _ServiceTimerCard(),
+            SizedBox(height: 16),
+            MonthlyStatsChart(),
+          ],
+        ),
       ),
     );
   }
