@@ -9,26 +9,34 @@ class MonthlyPlanState {
   final int year;
   final int month;
   final Map<int, double> dailyPlans; // dia do mês -> horas planejadas
+  final Map<int, double> dailyActual; // dia do mês -> horas realizadas
 
   const MonthlyPlanState({
     required this.year,
     required this.month,
     this.dailyPlans = const {},
+    this.dailyActual = const {},
   });
 
   double get totalPlannedHours {
     return dailyPlans.values.fold(0.0, (sum, hours) => sum + hours);
   }
 
+  double get totalActualHours {
+    return dailyActual.values.fold(0.0, (sum, hours) => sum + hours);
+  }
+
   MonthlyPlanState copyWith({
     int? year,
     int? month,
     Map<int, double>? dailyPlans,
+    Map<int, double>? dailyActual,
   }) {
     return MonthlyPlanState(
       year: year ?? this.year,
       month: month ?? this.month,
       dailyPlans: dailyPlans ?? this.dailyPlans,
+      dailyActual: dailyActual ?? this.dailyActual,
     );
   }
 }
@@ -83,7 +91,9 @@ class PublisherProfileNotifier extends StateNotifier<PublisherProfile> {
 
 /// Notifier para o planejamento mensal
 class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
-  MonthlyPlanNotifier() : super(MonthlyPlanState(
+  final Ref _ref;
+  
+  MonthlyPlanNotifier(this._ref) : super(MonthlyPlanState(
     year: DateTime.now().year,
     month: DateTime.now().month,
   )) {
@@ -94,25 +104,43 @@ class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
     return 'monthly_plan_${year}_$month';
   }
 
+  String _getActualStorageKey(int year, int month) {
+    return 'monthly_actual_${year}_$month';
+  }
+
   Future<void> _loadPlan() async {
     try {
       final now = DateTime.now();
       final db = await DatabaseService.getInstance();
-      final key = _getStorageKey(now.year, now.month);
-      final json = db.getSetting<String>(key);
       
-      if (json != null) {
-        final Map<String, dynamic> data = jsonDecode(json);
-        final Map<int, double> plans = {};
+      // Carregar planejamento
+      final planKey = _getStorageKey(now.year, now.month);
+      final planJson = db.getSetting<String>(planKey);
+      Map<int, double> plans = {};
+      if (planJson != null) {
+        final Map<String, dynamic> data = jsonDecode(planJson);
         data.forEach((key, value) {
           plans[int.parse(key)] = (value as num).toDouble();
         });
-        state = MonthlyPlanState(
-          year: now.year,
-          month: now.month,
-          dailyPlans: plans,
-        );
       }
+      
+      // Carregar horas realizadas
+      final actualKey = _getActualStorageKey(now.year, now.month);
+      final actualJson = db.getSetting<String>(actualKey);
+      Map<int, double> actual = {};
+      if (actualJson != null) {
+        final Map<String, dynamic> data = jsonDecode(actualJson);
+        data.forEach((key, value) {
+          actual[int.parse(key)] = (value as num).toDouble();
+        });
+      }
+      
+      state = MonthlyPlanState(
+        year: now.year,
+        month: now.month,
+        dailyPlans: plans,
+        dailyActual: actual,
+      );
     } catch (_) {
       // Mantém o padrão
     }
@@ -129,11 +157,50 @@ class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
     await _savePlan();
   }
 
+  Future<void> setActualForDay(int day, double hours, {bool updateMonthlyTotal = false}) async {
+    final oldHours = state.dailyActual[day] ?? 0;
+    final newActual = Map<int, double>.from(state.dailyActual);
+    if (hours > 0) {
+      newActual[day] = hours;
+    } else {
+      newActual.remove(day);
+    }
+    state = state.copyWith(dailyActual: newActual);
+    await _saveActual();
+    
+    // Se solicitado, atualizar o total mensal com a diferença
+    if (updateMonthlyTotal) {
+      final difference = hours - oldHours;
+      if (difference != 0) {
+        final monthlyNotifier = _ref.read(monthlyServiceTimeProvider.notifier);
+        final currentMonthly = _ref.read(monthlyServiceTimeProvider);
+        final newMinutes = currentMonthly.totalMinutes + (difference * 60).round();
+        await monthlyNotifier.setTime(newMinutes > 0 ? newMinutes : 0);
+      }
+    }
+  }
+
   Future<void> removePlanForDay(int day) async {
     final newPlans = Map<int, double>.from(state.dailyPlans);
     newPlans.remove(day);
     state = state.copyWith(dailyPlans: newPlans);
     await _savePlan();
+  }
+
+  Future<void> removeActualForDay(int day, {bool updateMonthlyTotal = false}) async {
+    final oldHours = state.dailyActual[day] ?? 0;
+    final newActual = Map<int, double>.from(state.dailyActual);
+    newActual.remove(day);
+    state = state.copyWith(dailyActual: newActual);
+    await _saveActual();
+    
+    // Se solicitado, remover do total mensal
+    if (updateMonthlyTotal && oldHours > 0) {
+      final monthlyNotifier = _ref.read(monthlyServiceTimeProvider.notifier);
+      final currentMonthly = _ref.read(monthlyServiceTimeProvider);
+      final newMinutes = currentMonthly.totalMinutes - (oldHours * 60).round();
+      await monthlyNotifier.setTime(newMinutes > 0 ? newMinutes : 0);
+    }
   }
 
   Future<void> _savePlan() async {
@@ -142,6 +209,20 @@ class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
       final key = _getStorageKey(state.year, state.month);
       final Map<String, dynamic> data = {};
       state.dailyPlans.forEach((key, value) {
+        data[key.toString()] = value;
+      });
+      await db.saveSetting(key, jsonEncode(data));
+    } catch (_) {
+      // Ignora erros de salvamento
+    }
+  }
+
+  Future<void> _saveActual() async {
+    try {
+      final db = await DatabaseService.getInstance();
+      final key = _getActualStorageKey(state.year, state.month);
+      final Map<String, dynamic> data = {};
+      state.dailyActual.forEach((key, value) {
         data[key.toString()] = value;
       });
       await db.saveSetting(key, jsonEncode(data));
@@ -164,7 +245,7 @@ final publisherProfileProvider = StateNotifierProvider<PublisherProfileNotifier,
 });
 
 final monthlyPlanProvider = StateNotifierProvider<MonthlyPlanNotifier, MonthlyPlanState>((ref) {
-  return MonthlyPlanNotifier();
+  return MonthlyPlanNotifier(ref);
 });
 
 /// Provider para calcular o status de progresso

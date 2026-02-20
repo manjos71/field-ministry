@@ -49,11 +49,11 @@ class PublisherProfile {
   String get typeName {
     switch (type) {
       case PublisherType.publisher:
-        return 'Publicador';
+        return '@Publicador';
       case PublisherType.auxiliaryPioneer:
-        return 'Pioneiro Auxiliar';
+        return '@Pioneiro Auxiliar';
       case PublisherType.regularPioneer:
-        return 'Pioneiro Regular';
+        return '@Pioneiro Regular';
     }
   }
 

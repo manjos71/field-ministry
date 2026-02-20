@@ -82,29 +82,36 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
             ),
             const SizedBox(height: 8),
             
-            // Summary row with planned hours and target colors adaptados para melhor contraste
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildSummaryItem(
-                    l10n.planned,
-                    '${plan.totalPlannedHours.toStringAsFixed(1)}h',
-                    Icons.event_note,
+            // Summary row with planned hours and target - transparencia + contorno no tema escuro
+            Builder(
+              builder: (context) {
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                final primaryColor = ref.watch(themeColorProvider);
+                return Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(isDark ? 0.5 : 1.0),
+                    borderRadius: BorderRadius.circular(8),
+                    border: isDark ? Border.all(color: primaryColor, width: 1.5) : null,
                   ),
-                  Container(width: 1, height: 30, color: Colors.grey.shade300),
-                  _buildSummaryItem(
-                    l10n.target,
-                    '${profile.effectiveTargetHours}h',
-                    Icons.flag,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildSummaryItem(
+                        l10n.planned,
+                        '${plan.totalPlannedHours.toStringAsFixed(1)}h',
+                        Icons.event_note,
+                      ),
+                      Container(width: 1, height: 30, color: isDark ? Colors.white54 : Colors.grey.shade300),
+                      _buildSummaryItem(
+                        l10n.target,
+                        '${profile.effectiveTargetHours}h',
+                        Icons.flag,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
             const SizedBox(height: 12),
 
@@ -143,15 +150,17 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
                 
                 final day = index - startOffset + 1;
                 final plannedHours = plan.dailyPlans[day] ?? 0;
+                final actualHours = plan.dailyActual[day] ?? 0;
                 final isToday = _isToday(day);
                 final isPast = _isPastDay(day);
                 
                 return _DayCell(
                   day: day,
                   plannedHours: plannedHours,
+                  actualHours: actualHours,
                   isToday: isToday,
                   isPast: isPast,
-                  onTap: () => _showPlanDialog(context, day, plannedHours),
+                  onTap: () => _showPlanDialog(context, day, plannedHours, actualHours, isPast),
                 );
               },
             ),
@@ -197,10 +206,13 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
     return date.isBefore(DateTime(now.year, now.month, now.day));
   }
 
-  void _showPlanDialog(BuildContext context, int day, double currentHours) {
+  void _showPlanDialog(BuildContext context, int day, double currentPlanned, double currentActual, bool isPast) {
     final l10n = AppLocalizations.of(context);
-    final controller = TextEditingController(
-      text: currentHours > 0 ? currentHours.toString() : '',
+    final plannedController = TextEditingController(
+      text: currentPlanned > 0 ? currentPlanned.toString() : '',
+    );
+    final actualController = TextEditingController(
+      text: currentActual > 0 ? currentActual.toString() : '',
     );
     final notifier = ref.read(monthlyPlanProvider.notifier);
 
@@ -208,22 +220,45 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.planningDay(day)),
-        content: TextField(
-          controller: controller,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          autofocus: true,
-          decoration: InputDecoration(
-            labelText: l10n.plannedHours,
-            hintText: 'Ex: 2.5',
-            border: const OutlineInputBorder(),
-            suffixText: l10n.hours.toLowerCase(),
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: plannedController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              autofocus: !isPast,
+              decoration: InputDecoration(
+                labelText: l10n.plannedHours,
+                hintText: 'Ex: 2.5',
+                border: const OutlineInputBorder(),
+                suffixText: l10n.hours.toLowerCase(),
+                prefixIcon: const Icon(Icons.event_note),
+              ),
+            ),
+            if (isPast || _isToday(day)) ...[
+              const SizedBox(height: 16),
+              TextField(
+                controller: actualController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                autofocus: isPast,
+                decoration: InputDecoration(
+                  labelText: l10n.actualHours,
+                  hintText: 'Ex: 2.0',
+                  border: const OutlineInputBorder(),
+                  suffixText: l10n.hours.toLowerCase(),
+                  prefixIcon: const Icon(Icons.check_circle_outline),
+                ),
+              ),
+            ],
+          ],
         ),
         actions: [
-          if (currentHours > 0)
+          if (currentPlanned > 0 || currentActual > 0)
             TextButton(
               onPressed: () {
                 notifier.removePlanForDay(day);
+                // Remover do total mensal quando remover horas realizadas
+                notifier.removeActualForDay(day, updateMonthlyTotal: true);
                 Navigator.pop(context);
               },
               child: Text(l10n.remove, style: const TextStyle(color: Colors.red)),
@@ -234,8 +269,13 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
           ),
           FilledButton(
             onPressed: () {
-              final hours = double.tryParse(controller.text) ?? 0;
-              notifier.setPlanForDay(day, hours);
+              final planned = double.tryParse(plannedController.text) ?? 0;
+              final actual = double.tryParse(actualController.text) ?? 0;
+              notifier.setPlanForDay(day, planned);
+              if (isPast || _isToday(day)) {
+                // Atualizar total mensal com a diferença quando editar manualmente
+                notifier.setActualForDay(day, actual, updateMonthlyTotal: true);
+              }
               Navigator.pop(context);
             },
             child: Text(l10n.save),
@@ -246,9 +286,10 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
   }
 }
 
-class _DayCell extends StatelessWidget {
+class _DayCell extends ConsumerWidget {
   final int day;
   final double plannedHours;
+  final double actualHours;
   final bool isToday;
   final bool isPast;
   final VoidCallback onTap;
@@ -256,29 +297,57 @@ class _DayCell extends StatelessWidget {
   const _DayCell({
     required this.day,
     required this.plannedHours,
+    required this.actualHours,
     required this.isToday,
     required this.isPast,
     required this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final hasPlanning = plannedHours > 0;
-    final primaryColor = Theme.of(context).primaryColor;
+    // Usar a cor selecionada diretamente do provider para garantir visibilidade no tema escuro
+    final primaryColor = ref.watch(themeColorProvider);
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     
-    // Cores com melhor contraste para o tema escuro
-    final planningBgColor = hasPlanning 
-        ? (isDarkMode ? primaryColor.withOpacity(0.4) : primaryColor.withOpacity(0.2))
-        : (isToday ? primaryColor.withOpacity(isDarkMode ? 0.3 : 0.1) : null);
+    // Determinar se o objetivo foi atingido (apenas para dias passados ou hoje com planejamento)
+    final bool canShowResult = (isPast || isToday) && hasPlanning;
+    final bool achievedGoal = canShowResult && actualHours >= plannedHours;
+    final bool missedGoal = canShowResult && actualHours < plannedHours && actualHours > 0;
+    final bool noActual = canShowResult && actualHours == 0;
     
-    final hoursTextColor = isDarkMode 
-        ? Colors.white 
-        : primaryColor;
+    // Cores com transparência suave - mais visível no tema escuro sem ser muito forte
+    final Color planningBgColor;
+    if (hasPlanning) {
+      // Opacidade moderada para dias planejados
+      planningBgColor = primaryColor.withOpacity(isDarkMode ? 0.5 : 0.25);
+    } else if (isToday) {
+      // Dia atual: transparência leve + contorno
+      planningBgColor = primaryColor.withOpacity(isDarkMode ? 0.25 : 0.1);
+    } else {
+      planningBgColor = Colors.transparent;
+    }
     
+    // Cor do texto das horas - baseado no resultado
+    Color hoursTextColor;
+    if (achievedGoal) {
+      // Verde para objetivo atingido
+      hoursTextColor = Colors.green.shade400;
+    } else if (missedGoal || noActual) {
+      // Vermelho apagado para objetivo não atingido
+      hoursTextColor = isDarkMode ? Colors.red.shade300 : Colors.red.shade400;
+    } else {
+      // Cor padrão para dias futuros
+      hoursTextColor = isDarkMode ? Colors.white : primaryColor;
+    }
+    
+    // Cor do texto do dia
     final dayTextColor = isPast && !isToday 
         ? Colors.grey 
         : (hasPlanning && isDarkMode ? Colors.white : null);
+    
+    // Mostrar borda no dia atual e nos dias com planejamento no tema escuro
+    final bool showBorder = isToday || (hasPlanning && isDarkMode);
     
     return InkWell(
       onTap: onTap,
@@ -288,8 +357,8 @@ class _DayCell extends StatelessWidget {
         decoration: BoxDecoration(
           color: planningBgColor,
           borderRadius: BorderRadius.circular(8),
-          border: isToday 
-              ? Border.all(color: primaryColor, width: 2)
+          border: showBorder 
+              ? Border.all(color: primaryColor, width: isToday ? 2 : 1.5)
               : null,
         ),
         child: Column(
@@ -305,7 +374,9 @@ class _DayCell extends StatelessWidget {
             ),
             if (hasPlanning)
               Text(
-                '${plannedHours}h',
+                canShowResult && actualHours > 0 
+                    ? '${actualHours}h' 
+                    : '${plannedHours}h',
                 style: TextStyle(
                   fontSize: 8,
                   color: hoursTextColor,

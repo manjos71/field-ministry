@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../providers/service_timer_provider.dart';
 import '../providers/publisher_profile_provider.dart';
+import '../providers/theme_provider.dart';
 import '../models/publisher_profile.dart';
 import '../widgets/service_planning_calendar.dart';
 import '../providers/territory_provider.dart';
@@ -148,6 +149,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final monthlyTime = ref.watch(monthlyServiceTimeProvider);
     final progressStatus = ref.watch(progressStatusProvider);
     final profile = ref.watch(publisherProfileProvider);
+    // Usar a cor selecionada diretamente para evitar que o tema escuro a ofusque
+    final selectedColor = ref.watch(themeColorProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -159,9 +162,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Welcome Card (Fixed Height roughly)
-            Card(
-              color: Theme.of(context).primaryColor,
-              child: Padding(
+            Builder(
+              builder: (context) {
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                return Card(
+                  color: selectedColor.withOpacity(isDark ? 0.5 : 1.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: isDark ? BorderSide(color: selectedColor, width: 1.5) : BorderSide.none,
+                  ),
+                  child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -228,6 +238,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   ],
                 ),
               ),
+            );
+              },
             ),
             // Monthly Time Display with Progress Indicator
             const SizedBox(height: 8),

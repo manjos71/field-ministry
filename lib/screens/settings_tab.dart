@@ -422,6 +422,11 @@ class _ColorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Usar branco no tema escuro e preto no tema claro para melhor contraste
+    final selectedBorderColor = isDark ? Colors.white : Colors.black;
+    final unselectedBorderColor = isDark ? Colors.grey.shade600 : Colors.grey.shade300;
+    
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
@@ -432,7 +437,7 @@ class _ColorButton extends StatelessWidget {
           color: color,
           shape: BoxShape.circle,
           border: Border.all(
-            color: isSelected ? Colors.black : Colors.grey.shade300,
+            color: isSelected ? selectedBorderColor : unselectedBorderColor,
             width: isSelected ? 3 : 1,
           ),
           boxShadow: isSelected

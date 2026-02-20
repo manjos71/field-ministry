@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/territory_provider.dart';
 import '../providers/service_timer_provider.dart';
+import '../providers/publisher_profile_provider.dart';
 import 'package:field_ministry/services/service_report_service.dart';
 import 'package:share_plus/share_plus.dart';
 import '../config/app_localizations.dart';
@@ -43,6 +44,7 @@ class _ServiceTimerCard extends ConsumerWidget {
     final session = ref.watch(serviceTimerProvider);
     final notifier = ref.read(serviceTimerProvider.notifier);
     final monthlyNotifier = ref.read(monthlyServiceTimeProvider.notifier);
+    final monthlyPlanNotifier = ref.read(monthlyPlanProvider.notifier);
 
     return Card(
       elevation: 4,
@@ -115,6 +117,14 @@ class _ServiceTimerCard extends ConsumerWidget {
                           ? () async {
                               // Add time to monthly total
                               await monthlyNotifier.addTime(session.duration);
+                              
+                              // Also add to daily actual for today
+                              final today = DateTime.now().day;
+                              final plan = ref.read(monthlyPlanProvider);
+                              final currentActual = plan.dailyActual[today] ?? 0;
+                              final hoursToAdd = session.duration.inMinutes / 60.0;
+                              await monthlyPlanNotifier.setActualForDay(today, currentActual + hoursToAdd);
+                              
                               // Reset session
                               await notifier.reset();
                               if (context.mounted) {

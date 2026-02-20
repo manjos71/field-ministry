@@ -1550,6 +1550,16 @@ class AppLocalizations {
     AppLanguage.ru: 'Запланированные часы',
   });
 
+  String get actualHours => _t({
+    AppLanguage.pt: 'Horas realizadas',
+    AppLanguage.en: 'Actual hours',
+    AppLanguage.es: 'Horas realizadas',
+    AppLanguage.de: 'Tatsächliche Stunden',
+    AppLanguage.fr: 'Heures réalisées',
+    AppLanguage.it: 'Ore effettive',
+    AppLanguage.ru: 'Фактические часы',
+  });
+
   String get planning => _t({
     AppLanguage.pt: 'Planejamento',
     AppLanguage.en: 'Planning',
