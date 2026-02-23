@@ -29,57 +29,75 @@ class StreetDetailScreen extends ConsumerStatefulWidget {
 }
 
 
-// Widget para agendamento de revisita
-class RecursiveRevisitScheduler extends StatefulWidget {
+// Widget para agendamento de revisitas — máximo 2 revisitas + Estudo Bíblico
+class RecursiveRevisitScheduler extends ConsumerStatefulWidget {
   final String personName;
   final String location;
-  final int depth;
-  /// Called when the top-level checkbox is toggled (only at depth==1)
   final void Function(bool)? onRevisitToggled;
+
   const RecursiveRevisitScheduler({
     Key? key,
     required this.personName,
     required this.location,
-    this.depth = 1,
     this.onRevisitToggled,
   }) : super(key: key);
 
   @override
-  State<RecursiveRevisitScheduler> createState() => _RecursiveRevisitSchedulerState();
+  ConsumerState<RecursiveRevisitScheduler> createState() =>
+      _RecursiveRevisitSchedulerState();
 }
 
-class _RecursiveRevisitSchedulerState extends State<RecursiveRevisitScheduler> {
-  bool _checked = false;
-  DateTime? _date;
-  final TextEditingController _noteCtrl = TextEditingController();
+class _RecursiveRevisitSchedulerState
+    extends ConsumerState<RecursiveRevisitScheduler> {
+  // Revisita 1
+  bool _revisit1Checked = false;
+  DateTime? _revisit1Date;
+  final _note1Ctrl = TextEditingController();
+
+  // Revisita 2 (visível apenas quando revisita 1 está marcada)
+  bool _revisit2Checked = false;
+  DateTime? _revisit2Date;
+  final _note2Ctrl = TextEditingController();
+
+  // Estudo Bíblico (visível apenas quando revisita 2 está marcada)
+  bool _bibleStudyChecked = false;
 
   @override
   void dispose() {
-    _noteCtrl.dispose();
+    _note1Ctrl.dispose();
+    _note2Ctrl.dispose();
     super.dispose();
   }
 
-  void _setChecked(bool v) {
-    setState(() => _checked = v);
-    if (widget.depth == 1) widget.onRevisitToggled?.call(v);
-  }
-
-  Future<void> _pickDateAndSchedule() async {
+  Future<void> _pickDate(int slot) async {
     final now = DateTime.now();
+    final initial = slot == 1
+        ? (_revisit1Date ?? now.add(const Duration(days: 7)))
+        : (_revisit2Date ?? now.add(const Duration(days: 14)));
     final picked = await showDatePicker(
       context: context,
-      initialDate: _date ?? now.add(const Duration(days: 7)),
+      initialDate: initial,
       firstDate: now,
       lastDate: now.add(const Duration(days: 730)),
     );
     if (picked == null) return;
-    _setChecked(true);
-    setState(() => _date = picked);
+    setState(() {
+      if (slot == 1) {
+        _revisit1Checked = true;
+        _revisit1Date = picked;
+        widget.onRevisitToggled?.call(true);
+      } else {
+        _revisit2Checked = true;
+        _revisit2Date = picked;
+      }
+    });
+    final noteCtrl = slot == 1 ? _note1Ctrl : _note2Ctrl;
+    final label = slot == 1 ? 'Revisita 1' : 'Revisita 2';
     final event = Event(
-      title: 'Revisita de ${widget.personName}',
-      description: _noteCtrl.text.isNotEmpty
-          ? _noteCtrl.text
-          : 'Revisita - ${widget.location}',
+      title: '$label de ${widget.personName}',
+      description: noteCtrl.text.isNotEmpty
+          ? noteCtrl.text
+          : '$label - ${widget.location}',
       location: widget.location,
       startDate: picked,
       endDate: picked.add(const Duration(hours: 1)),
@@ -89,49 +107,53 @@ class _RecursiveRevisitSchedulerState extends State<RecursiveRevisitScheduler> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Revisita ${picked.day}/${picked.month}/${picked.year} adicionada ao calendário!',
+            '$label agendada para ${picked.day}/${picked.month}/${picked.year}!',
           ),
         ),
       );
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final dateLabel = _date != null
-        ? '${_date!.day.toString().padLeft(2, '0')}/${_date!.month.toString().padLeft(2, '0')}/${_date!.year}'
-        : null;
+  String _dateLabel(DateTime? d) => d != null
+      ? '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}'
+      : '';
 
+  Widget _buildRevisitRow({
+    required int slot,
+    required bool checked,
+    required DateTime? date,
+    required TextEditingController noteCtrl,
+    required ValueChanged<bool> onChanged,
+  }) {
+    final label = _dateLabel(date);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Checkbox(
-              value: _checked,
-              onChanged: (v) => _setChecked(v ?? false),
+              value: checked,
+              onChanged: (v) => onChanged(v ?? false),
             ),
             Expanded(
               child: Text(
-                dateLabel != null ? 'Revisita: $dateLabel' : 'Revisita',
+                label.isNotEmpty ? 'Revisita $slot: $label' : 'Revisita $slot',
                 style: const TextStyle(fontSize: 15),
               ),
             ),
             IconButton(
-              icon: Icon(
-                Icons.calendar_month,
-                color: Theme.of(context).primaryColor,
-              ),
+              icon: Icon(Icons.calendar_month,
+                  color: Theme.of(context).primaryColor),
               tooltip: 'Agendar no calendário',
-              onPressed: _pickDateAndSchedule,
+              onPressed: () => _pickDate(slot),
             ),
           ],
         ),
-        if (_checked) ...[
+        if (checked)
           Padding(
             padding: const EdgeInsets.only(left: 12, right: 4, bottom: 8),
             child: TextField(
-              controller: _noteCtrl,
+              controller: noteCtrl,
               decoration: const InputDecoration(
                 labelText: 'Nota da revisita',
                 prefixIcon: Icon(Icons.notes),
@@ -141,17 +163,92 @@ class _RecursiveRevisitSchedulerState extends State<RecursiveRevisitScheduler> {
               maxLines: 2,
             ),
           ),
-          if (widget.depth < 5)
-            RecursiveRevisitScheduler(
-              personName: widget.personName,
-              location: widget.location,
-              depth: widget.depth + 1,
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ── Revisita 1 ────────────────────────────────────────
+        _buildRevisitRow(
+          slot: 1,
+          checked: _revisit1Checked,
+          date: _revisit1Date,
+          noteCtrl: _note1Ctrl,
+          onChanged: (v) {
+            setState(() {
+              _revisit1Checked = v;
+              if (!v) {
+                // Se desmarcou a 1a, limpa as demais
+                _revisit2Checked = false;
+                _revisit2Date = null;
+                _bibleStudyChecked = false;
+              }
+            });
+            widget.onRevisitToggled?.call(v);
+          },
+        ),
+
+        // ── Revisita 2 (visível apenas quando a 1a está marcada) ──
+        if (_revisit1Checked) ...[
+          _buildRevisitRow(
+            slot: 2,
+            checked: _revisit2Checked,
+            date: _revisit2Date,
+            noteCtrl: _note2Ctrl,
+            onChanged: (v) {
+              setState(() {
+                _revisit2Checked = v;
+                if (!v) {
+                  _revisit2Date = null;
+                  _bibleStudyChecked = false;
+                }
+              });
+            },
+          ),
+
+          // ── Estudo Bíblico (visível apenas quando a 2a está marcada) ──
+          if (_revisit2Checked)
+            Row(
+              children: [
+                Checkbox(
+                  value: _bibleStudyChecked,
+                  activeColor: const Color(0xFF673AB7),
+                  onChanged: (v) {
+                    final checked = v ?? false;
+                    setState(() => _bibleStudyChecked = checked);
+                    if (checked) {
+                      ref
+                          .read(monthlyServiceTimeProvider.notifier)
+                          .incrementBibleStudyCount();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('📖 Estudo Bíblico contabilizado no mês!'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const Text(
+                  '📖 Estudo Bíblico',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF673AB7),
+                  ),
+                ),
+              ],
             ),
         ],
       ],
     );
   }
 }
+
 
 class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
   bool _isGenerating = false;

@@ -39,22 +39,30 @@ class MonthlyServiceTime {
   final int year;
   final int month;
   final int totalMinutes;
+  final int revisitCount;
+  final int bibleStudyCount;
 
   MonthlyServiceTime({
     required this.year,
     required this.month,
     this.totalMinutes = 0,
+    this.revisitCount = 0,
+    this.bibleStudyCount = 0,
   });
 
   MonthlyServiceTime copyWith({
     int? year,
     int? month,
     int? totalMinutes,
+    int? revisitCount,
+    int? bibleStudyCount,
   }) {
     return MonthlyServiceTime(
       year: year ?? this.year,
       month: month ?? this.month,
       totalMinutes: totalMinutes ?? this.totalMinutes,
+      revisitCount: revisitCount ?? this.revisitCount,
+      bibleStudyCount: bibleStudyCount ?? this.bibleStudyCount,
     );
   }
 
@@ -80,17 +88,31 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
     return 'monthly_service_time_${year}_$month';
   }
 
+  String _getRevisitKey(int year, int month) {
+    return 'monthly_revisit_count_${year}_$month';
+  }
+
+  String _getBibleStudyKey(int year, int month) {
+    return 'monthly_bible_study_count_${year}_$month';
+  }
+
   Future<void> _loadMonthlyTime() async {
     try {
       final now = DateTime.now();
       final db = await DatabaseService.getInstance();
       final key = _getStorageKey(now.year, now.month);
       final savedMinutes = db.getSetting<int>(key) ?? 0;
+      final revisitKey = _getRevisitKey(now.year, now.month);
+      final savedRevisits = db.getSetting<int>(revisitKey) ?? 0;
+      final bibleStudyKey = _getBibleStudyKey(now.year, now.month);
+      final savedBibleStudies = db.getSetting<int>(bibleStudyKey) ?? 0;
 
       state = MonthlyServiceTime(
         year: now.year,
         month: now.month,
         totalMinutes: savedMinutes,
+        revisitCount: savedRevisits,
+        bibleStudyCount: savedBibleStudies,
       );
     } catch (_) {
       // Keep default
@@ -122,8 +144,40 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
       year: now.year,
       month: now.month,
       totalMinutes: minutes,
+      revisitCount: state.revisitCount,
     );
     await _saveMonthlyTime();
+  }
+
+  Future<void> incrementRevisitCount() async {
+    final now = DateTime.now();
+    // Reset if new month
+    if (state.year != now.year || state.month != now.month) {
+      await _loadMonthlyTime();
+    }
+    state = state.copyWith(revisitCount: state.revisitCount + 1);
+    try {
+      final db = await DatabaseService.getInstance();
+      await db.saveSetting(
+        _getRevisitKey(state.year, state.month),
+        state.revisitCount,
+      );
+    } catch (_) {}
+  }
+
+  Future<void> incrementBibleStudyCount() async {
+    final now = DateTime.now();
+    if (state.year != now.year || state.month != now.month) {
+      await _loadMonthlyTime();
+    }
+    state = state.copyWith(bibleStudyCount: state.bibleStudyCount + 1);
+    try {
+      final db = await DatabaseService.getInstance();
+      await db.saveSetting(
+        _getBibleStudyKey(state.year, state.month),
+        state.bibleStudyCount,
+      );
+    } catch (_) {}
   }
 
   Future<void> _saveMonthlyTime() async {
