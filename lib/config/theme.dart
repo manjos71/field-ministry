@@ -27,6 +27,7 @@ class AppColors {
   static const Color statusEmptyHouse = Color(0xFFE0E0E0);   // Cinza claro
   static const Color statusOtherLanguage = Color(0xFF9C27B0); // Roxo
   static const Color statusLetterLeft = Color(0xFF00BCD4);   // Ciano
+  static const Color statusBibleStudy = Color(0xFF673AB7);   // Roxo Escuro
   
   // Divisores e bordas
   static const Color divider = Color(0xFFE0E0E0);

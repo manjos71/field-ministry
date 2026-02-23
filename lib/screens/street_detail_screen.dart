@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:add_2_calendar/add_2_calendar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as contacts;
@@ -6,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../config/app_localizations.dart';
 import '../providers/territory_provider.dart';
 import '../models/models.dart';
+import '../providers/service_timer_provider.dart';
 import '../widgets/visit_history_accordion.dart';
 import '../widgets/status_selector.dart';
 
@@ -24,6 +26,131 @@ class StreetDetailScreen extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<StreetDetailScreen> createState() => _StreetDetailScreenState();
+}
+
+
+// Widget para agendamento de revisita
+class RecursiveRevisitScheduler extends StatefulWidget {
+  final String personName;
+  final String location;
+  final int depth;
+  /// Called when the top-level checkbox is toggled (only at depth==1)
+  final void Function(bool)? onRevisitToggled;
+  const RecursiveRevisitScheduler({
+    Key? key,
+    required this.personName,
+    required this.location,
+    this.depth = 1,
+    this.onRevisitToggled,
+  }) : super(key: key);
+
+  @override
+  State<RecursiveRevisitScheduler> createState() => _RecursiveRevisitSchedulerState();
+}
+
+class _RecursiveRevisitSchedulerState extends State<RecursiveRevisitScheduler> {
+  bool _checked = false;
+  DateTime? _date;
+  final TextEditingController _noteCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _noteCtrl.dispose();
+    super.dispose();
+  }
+
+  void _setChecked(bool v) {
+    setState(() => _checked = v);
+    if (widget.depth == 1) widget.onRevisitToggled?.call(v);
+  }
+
+  Future<void> _pickDateAndSchedule() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _date ?? now.add(const Duration(days: 7)),
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 730)),
+    );
+    if (picked == null) return;
+    _setChecked(true);
+    setState(() => _date = picked);
+    final event = Event(
+      title: 'Revisita de ${widget.personName}',
+      description: _noteCtrl.text.isNotEmpty
+          ? _noteCtrl.text
+          : 'Revisita - ${widget.location}',
+      location: widget.location,
+      startDate: picked,
+      endDate: picked.add(const Duration(hours: 1)),
+    );
+    await Add2Calendar.addEvent2Cal(event);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Revisita ${picked.day}/${picked.month}/${picked.year} adicionada ao calendário!',
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dateLabel = _date != null
+        ? '${_date!.day.toString().padLeft(2, '0')}/${_date!.month.toString().padLeft(2, '0')}/${_date!.year}'
+        : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Checkbox(
+              value: _checked,
+              onChanged: (v) => _setChecked(v ?? false),
+            ),
+            Expanded(
+              child: Text(
+                dateLabel != null ? 'Revisita: $dateLabel' : 'Revisita',
+                style: const TextStyle(fontSize: 15),
+              ),
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.calendar_month,
+                color: Theme.of(context).primaryColor,
+              ),
+              tooltip: 'Agendar no calendário',
+              onPressed: _pickDateAndSchedule,
+            ),
+          ],
+        ),
+        if (_checked) ...[
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 4, bottom: 8),
+            child: TextField(
+              controller: _noteCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Nota da revisita',
+                prefixIcon: Icon(Icons.notes),
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+              maxLines: 2,
+            ),
+          ),
+          if (widget.depth < 5)
+            RecursiveRevisitScheduler(
+              personName: widget.personName,
+              location: widget.location,
+              depth: widget.depth + 1,
+            ),
+        ],
+      ],
+    );
+  }
 }
 
 class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
@@ -501,6 +628,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
     PersonCategory? selectedCategory;
     SkinTone? selectedSkinTone;
     Gender? selectedGender;
+    bool revisitScheduled = false;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
 
@@ -600,8 +728,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                       ),
                     ),
                     
-                    if (selectedStatus == VisitStatus.interested || 
-                        selectedStatus == VisitStatus.returnVisit) ...[
+                    if (selectedStatus == VisitStatus.interested) ...[
                       const SizedBox(height: 12),
                       TextField(
                         controller: personNameController,
@@ -620,8 +747,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                            filled: true,
-                            fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                          filled: true,
+                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                         ),
                         textCapitalization: TextCapitalization.words,
                       ),
@@ -643,21 +770,21 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                            filled: true,
-                            fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                          filled: true,
+                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                           suffixIcon: IconButton(
-                             icon: const Icon(Icons.contacts),
-                             onPressed: () => _saveToContacts(
-                               context, 
-                               personNameController.text, 
-                               phoneController.text
-                             ),
-                             tooltip: l10n.saveToContacts,
+                            icon: const Icon(Icons.contacts),
+                            onPressed: () => _saveToContacts(
+                              context, 
+                              personNameController.text, 
+                              phoneController.text
+                            ),
+                            tooltip: l10n.saveToContacts,
                           ),
                         ),
                         keyboardType: TextInputType.phone,
                       ),
-                       if (phoneController.text.isNotEmpty)
+                      if (phoneController.text.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: OutlinedButton.icon(
@@ -668,7 +795,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         ),
                     ],
                     const SizedBox(height: 12),
-                      TextField(
+                    TextField(
                       controller: notesController,
                       decoration: InputDecoration(
                         labelText: l10n.notesOptional,
@@ -681,6 +808,13 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                       ),
                       maxLines: 2,
                     ),
+                    const SizedBox(height: 12),
+                    if (selectedStatus == VisitStatus.interested)
+                      RecursiveRevisitScheduler(
+                        personName: personNameController.text,
+                        location: '${street.name}, ${address.number} — ${territory.name}',
+                        onRevisitToggled: (v) => revisitScheduled = v,
+                      ),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -696,13 +830,29 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                               : () async {
                                   Navigator.pop(context);
 
+                                  VisitStatus finalStatus = selectedStatus!;
+                                  if (selectedStatus == VisitStatus.interested || selectedStatus == VisitStatus.returnVisit) {
+                                    int positiveCount = address.visits.where((v) => 
+                                      v.status == VisitStatus.interested || 
+                                      v.status == VisitStatus.returnVisit || 
+                                      v.status == VisitStatus.bibleStudy
+                                    ).length;
+                                    if (positiveCount >= 2) {
+                                      finalStatus = VisitStatus.bibleStudy;
+                                    }
+                                  }
+
+                                  if (revisitScheduled) {
+                                    ref.read(monthlyServiceTimeProvider.notifier).incrementRevisitCount();
+                                  }
+
                                   await ref
                                       .read(territoriesProvider.notifier)
                                       .addVisit(
                                         territoryId: territory.id,
                                         streetId: street.id,
                                         addressId: address.id,
-                                        status: selectedStatus!,
+                                        status: finalStatus,
                                         notes: notesController.text.trim().isEmpty
                                             ? null
                                             : notesController.text.trim(),
@@ -756,6 +906,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
     PersonCategory? selectedCategory = visit.personCategory;
     SkinTone? selectedSkinTone = visit.personSkinTone;
     Gender? selectedGender = visit.gender;
+    bool revisitScheduled = false;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
 
@@ -860,8 +1011,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                       ),
                     ),
                     
-                    if (selectedStatus == VisitStatus.interested || 
-                        selectedStatus == VisitStatus.returnVisit) ...[
+                    if (selectedStatus == VisitStatus.interested) ...[
                       const SizedBox(height: 12),
                       TextField(
                         controller: personNameController,
@@ -917,25 +1067,31 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         ),
                         keyboardType: TextInputType.phone,
                       ),
-                    ], // Spread list end
-                    if (phoneController.text.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: OutlinedButton.icon(
-                          onPressed: () => _openWhatsApp(phoneController.text),
-                          icon: const Icon(Icons.message, color: Colors.green),
-                          label: Text(l10n.openInWhatsApp, style: const TextStyle(color: Colors.green)),
+                      if (phoneController.text.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: OutlinedButton.icon(
+                            onPressed: () => _openWhatsApp(phoneController.text),
+                            icon: const Icon(Icons.message, color: Colors.green),
+                            label: Text(l10n.openInWhatsApp, style: const TextStyle(color: Colors.green)),
+                          ),
                         ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: notesController,
+                        decoration: InputDecoration(
+                          labelText: l10n.notes,
+                          prefixIcon: Icon(Icons.notes),
+                        ),
+                        maxLines: 2,
                       ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: notesController,
-                      decoration: InputDecoration(
-                        labelText: l10n.notes,
-                        prefixIcon: Icon(Icons.notes),
+                      const SizedBox(height: 12),
+                      RecursiveRevisitScheduler(
+                        personName: personNameController.text,
+                        location: '${street.name}, ${address.number} — ${territory.name}',
+                        onRevisitToggled: (v) => revisitScheduled = v,
                       ),
-                      maxLines: 2,
-                    ),
+                    ], // Spread list end
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -949,9 +1105,33 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                           onPressed: () async {
                             Navigator.pop(context);
 
+                            VisitStatus finalStatus = selectedStatus;
+                            if (selectedStatus == VisitStatus.interested || selectedStatus == VisitStatus.returnVisit) {
+                              int positiveCount = address.visits.where((v) => 
+                                v.status == VisitStatus.interested || 
+                                v.status == VisitStatus.returnVisit || 
+                                v.status == VisitStatus.bibleStudy
+                              ).length;
+                              // If this visit is ALREADY in the list, we don't count it twice.
+                              // But just to be safe, if the total positive is >= 3 (including this one if it was already positive),
+                              // or if it was NOT positive before and now is (so total will be >= 3), we promote.
+                              // The simpliest is: if total positive considering current state >= 3.
+                              bool wasPositive = visit.status == VisitStatus.interested || 
+                                                 visit.status == VisitStatus.returnVisit || 
+                                                 visit.status == VisitStatus.bibleStudy;
+                              int effectiveCount = wasPositive ? positiveCount : positiveCount + 1;
+                              if (effectiveCount >= 3) {
+                                finalStatus = VisitStatus.bibleStudy;
+                              }
+                            }
+
+                            if (revisitScheduled) {
+                              ref.read(monthlyServiceTimeProvider.notifier).incrementRevisitCount();
+                            }
+
                             final updatedVisit = Visit(
                               id: visit.id,
-                              status: selectedStatus,
+                              status: finalStatus,
                               notes: notesController.text.trim().isEmpty
                                   ? null
                                   : notesController.text.trim(),

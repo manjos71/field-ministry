@@ -58,17 +58,19 @@ class GoogleDriveService implements BackupService {
   Future<BackupUser?> signIn() async {
     try {
       _googleUser = await _googleSignIn.signIn();
-      if (_googleUser != null) {
-        final authHeaders = await _googleUser!.authHeaders;
-        final authenticateClient = GoogleAuthClient(authHeaders);
-        _driveApi = drive.DriveApi(authenticateClient);
-        _currentUser = BackupUser(
-          id: _googleUser!.id,
-          email: _googleUser!.email,
-          displayName: _googleUser!.displayName,
-          photoUrl: _googleUser!.photoUrl,
-        );
+      if (_googleUser == null) {
+        debugPrint('Google Sign-In: Login cancelado pelo usuário ou falhou.');
+        return null;
       }
+      final authHeaders = await _googleUser!.authHeaders;
+      final authenticateClient = GoogleAuthClient(authHeaders);
+      _driveApi = drive.DriveApi(authenticateClient);
+      _currentUser = BackupUser(
+        id: _googleUser!.id,
+        email: _googleUser!.email,
+        displayName: _googleUser!.displayName,
+        photoUrl: _googleUser!.photoUrl,
+      );
       return _currentUser;
     } catch (e) {
       debugPrint('Error signing in: $e');

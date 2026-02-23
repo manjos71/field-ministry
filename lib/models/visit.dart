@@ -94,7 +94,8 @@ enum VisitStatus {
   answered, // Atendeu
   letterLeft, // Deixou publicação
   returnVisit, // Revisita
-  otherLanguage, // Outro idioma (movido para último)
+  otherLanguage, // Outro idioma
+  bibleStudy,   // Estudo Bíblico
 }
 
 extension VisitStatusExtension on VisitStatus {
@@ -122,6 +123,8 @@ extension VisitStatusExtension on VisitStatus {
         return 'Revisita';
       case VisitStatus.otherLanguage:
         return 'Outro idioma';
+      case VisitStatus.bibleStudy:
+        return 'Estudo Bíblico';
     }
   }
 
@@ -149,6 +152,8 @@ extension VisitStatusExtension on VisitStatus {
         return '🔄';
       case VisitStatus.otherLanguage:
         return '🌐';
+      case VisitStatus.bibleStudy:
+        return '📖';
     }
   }
   

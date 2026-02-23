@@ -134,6 +134,17 @@ class SettingsTab extends ConsumerWidget {
                          ),
                        ),
                        DropdownMenuItem(
+                         value: 'google_drive',
+                         child: Row(
+                           mainAxisSize: MainAxisSize.min,
+                           children: [
+                             Icon(Icons.cloud_upload, size: 20, color: Colors.green),
+                             SizedBox(width: 8),
+                             Text('Google Drive'),
+                           ],
+                         ),
+                       ),
+                       DropdownMenuItem(
                          value: 'dropbox',
                          child: Row(
                            mainAxisSize: MainAxisSize.min,

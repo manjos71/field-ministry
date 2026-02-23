@@ -181,6 +181,8 @@ class VisitHistoryAccordion extends StatelessWidget {
         return AppColors.statusLetterLeft;
       case VisitStatus.returnVisit:
         return AppColors.statusReturnVisit;
+      case VisitStatus.bibleStudy:
+        return AppColors.statusBibleStudy;
     }
   }
 }
@@ -416,6 +418,8 @@ class _VisitItem extends StatelessWidget {
         return AppColors.statusLetterLeft;
       case VisitStatus.returnVisit:
         return AppColors.statusReturnVisit;
+      case VisitStatus.bibleStudy:
+        return AppColors.statusBibleStudy;
     }
   }
 }
