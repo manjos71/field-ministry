@@ -34,12 +34,23 @@ class RecursiveRevisitScheduler extends ConsumerStatefulWidget {
   final String personName;
   final String location;
   final void Function(bool)? onRevisitToggled;
+  // Contexto para criar a visita de Estudo Bíblico automaticamente
+  final String? territoryId;
+  final String? streetId;
+  final String? addressId;
+  final PersonCategory? personCategory;
+  final Gender? personGender;
 
   const RecursiveRevisitScheduler({
     Key? key,
     required this.personName,
     required this.location,
     this.onRevisitToggled,
+    this.territoryId,
+    this.streetId,
+    this.addressId,
+    this.personCategory,
+    this.personGender,
   }) : super(key: key);
 
   @override
@@ -217,19 +228,42 @@ class _RecursiveRevisitSchedulerState
                 Checkbox(
                   value: _bibleStudyChecked,
                   activeColor: const Color(0xFF673AB7),
-                  onChanged: (v) {
+                  onChanged: (v) async {
                     final checked = v ?? false;
                     setState(() => _bibleStudyChecked = checked);
                     if (checked) {
+                      // Contar no total mensal
                       ref
                           .read(monthlyServiceTimeProvider.notifier)
                           .incrementBibleStudyCount();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('📖 Estudo Bíblico contabilizado no mês!'),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
+                      // Criar visita bibleStudy para aparecer na aba Cards
+                      final tId = widget.territoryId;
+                      final sId = widget.streetId;
+                      final aId = widget.addressId;
+                      if (tId != null && sId != null && aId != null) {
+                        await ref
+                            .read(territoriesProvider.notifier)
+                            .addVisit(
+                              territoryId: tId,
+                              streetId: sId,
+                              addressId: aId,
+                              status: VisitStatus.bibleStudy,
+                              personName: widget.personName.isEmpty
+                                  ? null
+                                  : widget.personName,
+                              date: DateTime.now(),
+                              personCategory: widget.personCategory,
+                              gender: widget.personGender,
+                            );
+                      }
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('📖 Estudo Bíblico criado na aba Cards!'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
                     }
                   },
                 ),
@@ -911,6 +945,11 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         personName: personNameController.text,
                         location: '${street.name}, ${address.number} — ${territory.name}',
                         onRevisitToggled: (v) => revisitScheduled = v,
+                        territoryId: territory.id,
+                        streetId: street.id,
+                        addressId: address.id,
+                        personCategory: selectedCategory,
+                        personGender: selectedGender,
                       ),
                     const SizedBox(height: 24),
                     Row(
@@ -1187,6 +1226,11 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         personName: personNameController.text,
                         location: '${street.name}, ${address.number} — ${territory.name}',
                         onRevisitToggled: (v) => revisitScheduled = v,
+                        territoryId: territory.id,
+                        streetId: street.id,
+                        addressId: address.id,
+                        personCategory: selectedCategory,
+                        personGender: selectedGender,
                       ),
                     ], // Spread list end
                     const SizedBox(height: 24),
