@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/app_localizations.dart';
 import '../providers/territory_provider.dart';
+import '../providers/service_timer_provider.dart';
 import '../models/models.dart';
 import '../widgets/stats_grid.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,7 +15,7 @@ class CardTab extends ConsumerStatefulWidget {
 }
 
 class _CardTabState extends ConsumerState<CardTab> {
-  int? _expandedIndex;
+  String? _expandedAddressId;
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +48,7 @@ class _CardTabState extends ConsumerState<CardTab> {
           }
 
           final interestedItems = _getInterestedItems(territories);
+          final bibleStudyItems = _getBibleStudyItems(territories);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -72,7 +74,7 @@ class _CardTabState extends ConsumerState<CardTab> {
                 const SizedBox(height: 12),
                 
                 // Lista de interessados
-                if (interestedItems.isEmpty)
+                if (interestedItems.isEmpty && bibleStudyItems.isEmpty)
                   Container(
                     padding: const EdgeInsets.all(32),
                     child: Column(
@@ -88,6 +90,20 @@ class _CardTabState extends ConsumerState<CardTab> {
                   )
                 else
                   ..._buildInterestedCards(interestedItems),
+
+                if (bibleStudyItems.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  // Título da seção de Estudos Bíblicos
+                  const Text(
+                    'Estudos Bíblicos 📖',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ..._buildBibleStudyCards(bibleStudyItems),
+                ],
               ],
             ),
           );
@@ -98,17 +114,35 @@ class _CardTabState extends ConsumerState<CardTab> {
 
   List<Widget> _buildInterestedCards(List<_InterestedItem> items) {
     return items.map((item) {
-      final index = items.indexOf(item);
-      final isExpanded = index == _expandedIndex;
-      
+      final isExpanded = item.address.id == _expandedAddressId;
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: _InterestedStackCard(
           item: item,
           isExpanded: isExpanded,
+          isBibleStudy: false,
           onTap: () {
             setState(() {
-              _expandedIndex = isExpanded ? null : index;
+              _expandedAddressId = isExpanded ? null : item.address.id;
+            });
+          },
+        ),
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildBibleStudyCards(List<_InterestedItem> items) {
+    return items.map((item) {
+      final isExpanded = item.address.id == _expandedAddressId;
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: _InterestedStackCard(
+          item: item,
+          isExpanded: isExpanded,
+          isBibleStudy: true,
+          onTap: () {
+            setState(() {
+              _expandedAddressId = isExpanded ? null : item.address.id;
             });
           },
         ),
@@ -142,16 +176,43 @@ class _CardTabState extends ConsumerState<CardTab> {
     items.sort((a, b) => b.lastVisit.date.compareTo(a.lastVisit.date));
     return items;
   }
+
+  List<_InterestedItem> _getBibleStudyItems(List<Territory> territories) {
+    final items = <_InterestedItem>[];
+
+    for (var t in territories) {
+      if (t.isArchived) continue;
+      for (var s in t.streets) {
+        for (var a in s.addresses) {
+          final lastVisit = a.lastVisit;
+          if (lastVisit != null && lastVisit.status == VisitStatus.bibleStudy) {
+            items.add(_InterestedItem(
+              territory: t,
+              street: s,
+              address: a,
+              lastVisit: lastVisit,
+            ));
+          }
+        }
+      }
+    }
+    
+    // Sort by date (most recent first)
+    items.sort((a, b) => b.lastVisit.date.compareTo(a.lastVisit.date));
+    return items;
+  }
 }
 
-class _InterestedStackCard extends StatelessWidget {
+class _InterestedStackCard extends ConsumerWidget {
   final _InterestedItem item;
   final bool isExpanded;
+  final bool isBibleStudy;
   final VoidCallback onTap;
 
   const _InterestedStackCard({
     required this.item,
     required this.isExpanded,
+    required this.isBibleStudy,
     required this.onTap,
   });
 
@@ -162,59 +223,90 @@ class _InterestedStackCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final days = DateTime.now().difference(item.lastVisit.date).inDays;
     final catIconPath = item.lastVisit.personCategory?.getIconPath(item.lastVisit.gender);
 
-    // The header height is what's visible when collapsed.
-    // The total height includes the body.
-    
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        // Use higher elevation for expanded to "pop" visually
         elevation: isExpanded ? 8 : 4,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: isExpanded ? BorderSide(color: theme.primaryColor.withOpacity(0.5), width: 1.5) : BorderSide.none,
+          side: isExpanded
+              ? BorderSide(
+                  color: isBibleStudy
+                      ? const Color(0xFF673AB7).withOpacity(0.5)
+                      : theme.primaryColor.withOpacity(0.5),
+                  width: 1.5,
+                )
+              : BorderSide.none,
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
-            // HEADING (Always Visible - The "Tab")
+            // HEADING
             Container(
               height: 120,
-              color: isExpanded ? theme.primaryColor.withOpacity(0.05) : theme.cardColor,
+              color: isExpanded
+                  ? (isBibleStudy
+                      ? const Color(0xFF673AB7).withOpacity(0.05)
+                      : theme.primaryColor.withOpacity(0.05))
+                  : theme.cardColor,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Theme.of(context).dividerColor),
-                      boxShadow: [
-                         BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2)),
-                      ],
-                    ),
-                    child: catIconPath != null
-                        ? ClipOval(
-                            child: Image.asset(
-                              catIconPath,
-                              width: 36,
-                              height: 36,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Icon(Icons.person),
+                  Stack(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Theme.of(context).dividerColor),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
-                          )
-                        : const Icon(Icons.person),
+                          ],
+                        ),
+                        child: catIconPath != null
+                            ? ClipOval(
+                                child: Image.asset(
+                                  catIconPath,
+                                  width: 36,
+                                  height: 36,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => const Icon(Icons.person),
+                                ),
+                              )
+                            : const Icon(Icons.person),
+                      ),
+                      if (isBibleStudy)
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            width: 18,
+                            height: 18,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF673AB7),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Text('📖', style: TextStyle(fontSize: 10)),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -241,19 +333,18 @@ class _InterestedStackCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const Spacer(),
-                        // Status/Days indicator (Visible at bottom of header)
                         Row(
                           children: [
-                             Icon(Icons.access_time, size: 14, color: _getUrgencyColor(days)),
-                             const SizedBox(width: 4),
-                             Text(
-                               l10n.daysCount(days),
-                               style: TextStyle(
-                                 fontSize: 12,
-                                 fontWeight: FontWeight.bold,
-                                 color: _getUrgencyColor(days),
-                               ),
-                             ),
+                            Icon(Icons.access_time, size: 14, color: _getUrgencyColor(days)),
+                            const SizedBox(width: 4),
+                            Text(
+                              l10n.daysCount(days),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: _getUrgencyColor(days),
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -262,8 +353,8 @@ class _InterestedStackCard extends StatelessWidget {
                 ],
               ),
             ),
-            
-            // BODY (Visible only when expanded — collapsed cards show header only)
+
+            // BODY (expanded)
             if (isExpanded)
               Container(
                 color: theme.cardColor,
@@ -276,7 +367,8 @@ class _InterestedStackCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         'Notas:',
-                        style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
+                        style: theme.textTheme.labelSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Container(
@@ -285,14 +377,88 @@ class _InterestedStackCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: theme.colorScheme.secondaryContainer,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: theme.colorScheme.secondaryContainer.withOpacity(0.7)),
+                          border: Border.all(
+                            color: theme.colorScheme.secondaryContainer
+                                .withOpacity(0.7),
+                          ),
                         ),
                         child: Text(
                           item.lastVisit.notes!,
-                          style: TextStyle(color: theme.colorScheme.onSecondaryContainer),
+                          style: TextStyle(
+                            color: theme.colorScheme.onSecondaryContainer,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
+                    ],
+
+                    // ── Checkbox Estudo Bíblico (só para Interessados) ──
+                    if (!isBibleStudy) ...[
+                      const Divider(),
+                      InkWell(
+                        onTap: () async {
+                          await ref
+                              .read(territoriesProvider.notifier)
+                              .addVisit(
+                                territoryId: item.territory.id,
+                                streetId: item.street.id,
+                                addressId: item.address.id,
+                                status: VisitStatus.bibleStudy,
+                                personName: item.lastVisit.personName,
+                                date: DateTime.now(),
+                                personCategory: item.lastVisit.personCategory,
+                                gender: item.lastVisit.gender,
+                              );
+                          ref
+                              .read(monthlyServiceTimeProvider.notifier)
+                              .incrementBibleStudyCount();
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  '📖 Movido para Estudos Bíblicos!',
+                                ),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 4,
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: const Color(0xFF673AB7),
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Center(
+                                  child: Text('📖', style: TextStyle(fontSize: 12)),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'Promover a Estudo Bíblico',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF673AB7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                     ],
 
                     Row(
@@ -301,7 +467,8 @@ class _InterestedStackCard extends StatelessWidget {
                         IconButton(
                           onPressed: () {
                             launchUrl(Uri.parse(
-                              'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent("${item.street.name}, ${item.address.number}")}',
+                              'https://www.google.com/maps/search/?api=1&query='
+                              '${Uri.encodeComponent('${item.street.name}, ${item.address.number}')}',
                             ));
                           },
                           icon: const Icon(Icons.map_outlined),
@@ -310,8 +477,12 @@ class _InterestedStackCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         IconButton(
                           onPressed: () {
-                            final query = Uri.encodeComponent('${item.street.name}, ${item.address.number}');
-                            launchUrl(Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$query'));
+                            final query = Uri.encodeComponent(
+                              '${item.street.name}, ${item.address.number}',
+                            );
+                            launchUrl(Uri.parse(
+                              'https://www.google.com/maps/dir/?api=1&destination=$query',
+                            ));
                           },
                           icon: const Icon(Icons.navigation_outlined),
                           tooltip: 'Ir',

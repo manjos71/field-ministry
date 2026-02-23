@@ -1,9 +1,10 @@
-import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'backup_service.dart';
 
 class GoogleAuthClient extends http.BaseClient {
@@ -21,9 +22,6 @@ class GoogleAuthClient extends http.BaseClient {
 
 class GoogleDriveService implements BackupService {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    // ATENÇÃO: Aqui DEVE ser o ID do cliente WEB, não o do Android. 
-    // Estou usando o ID Web que você enviou na mensagem anterior.
-    serverClientId: '618817240736-4a3m7k0hqkqlvjt1otg8pvqbivf76e5g.apps.googleusercontent.com',
     scopes: [
       drive.DriveApi.driveAppdataScope,
       drive.DriveApi.driveFileScope,
@@ -36,7 +34,7 @@ class GoogleDriveService implements BackupService {
 
   @override
   Future<void> initialize() async {
-    // Tenta fazer o login silencioso com credenciais em cache
+    // Try to silently sign in with cached credentials
     try {
       _googleUser = await _googleSignIn.signInSilently();
       if (_googleUser != null) {
@@ -49,10 +47,10 @@ class GoogleDriveService implements BackupService {
           displayName: _googleUser!.displayName,
           photoUrl: _googleUser!.photoUrl,
         );
-        debugPrint('Google Drive: Sessão restaurada para ${_currentUser!.email}');
+        debugPrint('Google Drive: restored session for ${_currentUser!.email}');
       }
     } catch (e) {
-      debugPrint('Google Drive login silencioso falhou: $e');
+      debugPrint('Google Drive silent sign-in failed: $e');
     }
   }
 
@@ -75,7 +73,7 @@ class GoogleDriveService implements BackupService {
       );
       return _currentUser;
     } catch (e) {
-      debugPrint('Erro ao fazer login: $e');
+      debugPrint('Error signing in: $e');
       return null;
     }
   }
@@ -88,43 +86,48 @@ class GoogleDriveService implements BackupService {
     _driveApi = null;
   }
 
-  @override
   Future<void> uploadBackup(String jsonData, String fileName) async {
     if (_driveApi == null) await signIn();
-    if (_driveApi == null) throw Exception('Drive API não inicializada. Faça login.');
+    if (_driveApi == null) throw Exception('Not signed in');
 
     try {
-      final bytes = utf8.encode(jsonData);
-      final media = drive.Media(Stream.value(bytes), bytes.length);
+      // Create a temporary file to upload
+      final directory = await getTemporaryDirectory();
+      final localFile = File('${directory.path}/$fileName');
+      await localFile.writeAsString(jsonData);
+
+      final media = drive.Media(localFile.openRead(), localFile.lengthSync());
       
+      // Check if file exists to update or create new
       final fileList = await _driveApi!.files.list(
         q: "name = '$fileName' and trashed = false",
         spaces: 'appDataFolder',
       );
 
-      if (fileList.files?.isNotEmpty ?? false) {
-        // Atualiza arquivo existente
+      if (fileList.files != null && fileList.files!.isNotEmpty) {
+        // Update existing file
         final fileId = fileList.files!.first.id!;
-        await _driveApi!.files.update(drive.File(), fileId, uploadMedia: media);
-        debugPrint('Backup atualizado no Drive: $fileId');
+        final driveFile = drive.File(); // Empty metadata implies no change to name/parents
+        await _driveApi!.files.update(driveFile, fileId, uploadMedia: media);
+        debugPrint('Backup updated: $fileId');
       } else {
-        // Cria novo arquivo
+        // Create new file
         final driveFile = drive.File()
           ..name = fileName
           ..parents = ['appDataFolder'];
+
         await _driveApi!.files.create(driveFile, uploadMedia: media);
-        debugPrint('Novo backup criado no Drive.');
+        debugPrint('Backup created');
       }
     } catch (e) {
-      debugPrint('Falha no upload do backup: $e');
+      debugPrint('Error uploading backup: $e');
       rethrow;
     }
   }
 
-  @override
   Future<String?> downloadBackup(String fileName) async {
     if (_driveApi == null) await signIn();
-    if (_driveApi == null) throw Exception('Drive API não inicializada. Faça login.');
+    if (_driveApi == null) throw Exception('Not signed in');
 
     try {
       final fileList = await _driveApi!.files.list(
@@ -133,7 +136,7 @@ class GoogleDriveService implements BackupService {
       );
 
       if (fileList.files == null || fileList.files!.isEmpty) {
-        return null; // Arquivo de backup não encontrado
+        return null; // Backup not found
       }
 
       final fileId = fileList.files!.first.id!;
@@ -142,24 +145,18 @@ class GoogleDriveService implements BackupService {
         downloadOptions: drive.DownloadOptions.fullMedia,
       ) as drive.Media;
 
-      // Otimização de memória usando StringBuffer
-      final completer = Completer<String>();
-      final contents = StringBuffer();
+      final List<int> dataStore = [];
+      await media.stream.forEach((data) {
+        dataStore.addAll(data);
+      });
 
-      media.stream.transform(utf8.decoder).listen(
-        (data) => contents.write(data),
-        onDone: () => completer.complete(contents.toString()),
-        onError: (e) => completer.completeError(e),
-      );
-
-      return await completer.future;
+      return utf8.decode(dataStore);
     } catch (e) {
-      debugPrint('Erro ao fazer download do backup: $e');
+      debugPrint('Error downloading backup: $e');
       rethrow;
     }
   }
   
-  @override
   Future<DateTime?> getLastBackupTime(String fileName) async {
     if (_driveApi == null) await signIn();
     if (_driveApi == null) return null;
@@ -176,7 +173,7 @@ class GoogleDriveService implements BackupService {
       }
       return null;
     } catch (e) {
-      debugPrint('Erro ao obter informações do backup: $e');
+      debugPrint('Error getting backup info: $e');
       return null;
     }
   }

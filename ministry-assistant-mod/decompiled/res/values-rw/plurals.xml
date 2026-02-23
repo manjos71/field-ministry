@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <plurals name="alp_pmsg_connect_x_dots">
-        <item quantity="other">"Huza byibuze utudomo %1$d .
-Ngaho ongera…"</item>
-        <item quantity="one">"Huza byibuze akadomo %1$d .
-Ngaho ongera…"</item>
-    </plurals>
-</resources>

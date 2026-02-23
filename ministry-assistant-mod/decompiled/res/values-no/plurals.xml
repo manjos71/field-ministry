@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <plurals name="alp_pmsg_connect_x_dots">
-        <item quantity="other">"Koble sammen minst %1$d punkter.
-Prøv igjen…"</item>
-        <item quantity="one">"Koble sammen minst %1$d punkt.
-Prøv igjen…"</item>
-    </plurals>
-</resources>

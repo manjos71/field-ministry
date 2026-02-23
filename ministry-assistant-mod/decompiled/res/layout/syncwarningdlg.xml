@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:layout_width="wrap_content" android:layout_height="wrap_content"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <RelativeLayout android:padding="5.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content">
-        <TextView android:textAppearance="?android:textAppearanceMedium" android:id="@id/txtInfo" android:paddingLeft="3.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="" android:layout_alignParentTop="true" android:paddingStart="3.0dip" />
-        <CheckBox android:id="@id/chkUnderstandRisk" android:paddingTop="10.0dip" android:paddingBottom="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strSyncWarningUnderstand" android:layout_below="@id/txtInfo" android:layout_alignParentLeft="true" android:layout_alignParentStart="true" />
-        <include android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/chkUnderstandRisk" layout="@layout/action_synccancel" />
-    </RelativeLayout>
-</ScrollView>

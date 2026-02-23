@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <TextView android:textAppearance="?android:textAppearanceLarge" android:textStyle="bold" android:gravity="center_vertical" android:id="@id/headerText" android:paddingLeft="5.0dip" android:paddingRight="5.0dip" android:layout_width="fill_parent" android:layout_height="48.0dip" android:layout_marginTop="10.0dip" android:layout_marginBottom="10.0dip" android:paddingStart="5.0dip" android:paddingEnd="5.0dip" fontPath="fonts/OpenSans-Bold.ttf" />
-    <View android:background="#ff272727" android:layout_width="fill_parent" android:layout_height="1.0dip" />
-    <com.mobeta.android.dslv.DragSortListView android:id="@id/listScriptures" android:layout_width="wrap_content" android:layout_height="wrap_content" android:drawSelectorOnTop="false" dslv:drag_enabled="true" dslv:drag_handle_id="@id/drag_handle" dslv:float_alpha="0.6" dslv:use_default_controller="true"
-      xmlns:dslv="http://schemas.android.com/apk/res/com.lostpixels.fieldservice" />
-</LinearLayout>

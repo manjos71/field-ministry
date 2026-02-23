@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <RadioGroup android:orientation="horizontal" android:id="@id/radioGroupTag" android:layout_width="wrap_content" android:layout_height="48.0dip" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" android:layout_alignParentStart="true">
-        <RadioButton android:layout_gravity="center_vertical" android:id="@id/rdOnlyUntagged" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/lblOnlyNotTagged" />
-        <RadioButton android:layout_gravity="center_vertical" android:id="@id/rdAllItems" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="20.0dip" android:text="@string/lblAllItems" android:layout_marginStart="20.0dip" />
-    </RadioGroup>
-    <ListView android:id="@id/listItems" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/radioGroupTag" android:layout_alignParentLeft="true" android:layout_alignParentStart="true" />
-</RelativeLayout>

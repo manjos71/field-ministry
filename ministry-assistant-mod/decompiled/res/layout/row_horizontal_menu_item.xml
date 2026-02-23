@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:gravity="center" android:id="@id/view_parent" android:paddingLeft="@dimen/menu_padding_horizontal" android:paddingTop="@dimen/menu_padding_vertical" android:paddingRight="@dimen/menu_padding_horizontal" android:paddingBottom="@dimen/menu_padding_vertical" android:clickable="true" android:layout_width="@dimen/column_size" android:layout_height="wrap_content" android:minHeight="@dimen/row_horizontal_size" android:paddingStart="@dimen/menu_padding_horizontal" android:paddingEnd="@dimen/menu_padding_horizontal"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <ImageView android:id="@id/img_menu_item" android:layout_width="@dimen/menu_size_horizontal" android:layout_height="@dimen/menu_size_horizontal" android:scaleType="fitCenter" android:layout_alignParentTop="true" android:layout_centerHorizontal="true" />
-    <TextView android:textSize="12.0sp" android:textColor="@android:color/white" android:gravity="center" android:id="@id/txt_title_menu_item" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5.0dip" android:maxLines="1" android:layout_below="@id/img_menu_item" android:layout_centerHorizontal="true" />
-</RelativeLayout>

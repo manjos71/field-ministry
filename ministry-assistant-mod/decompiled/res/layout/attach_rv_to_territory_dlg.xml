@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
-  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:treeView="http://schemas.android.com/apk/res-auto">
-    <pl.polidea.treeview.TreeViewList android:id="@id/mainTreeView" android:scrollbars="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginLeft="5.0dip" android:layout_marginRight="5.0dip" android:listSelector="?selectableItemBackground" android:smoothScrollbar="true" android:layout_marginStart="5.0dip" android:layout_marginEnd="5.0dip" treeView:indicator_gravity="right|center" />
-</LinearLayout>

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@id/layoutStudy" android:padding="5.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/btnTimeForRV"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <TextView android:textStyle="bold" android:id="@id/lblPublication" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/txtPublication" fontPath="fonts/OpenSans-Bold.ttf" />
-    <EditText android:textSize="16.0sp" android:gravity="top" android:id="@id/edtStudyPublication" android:paddingLeft="5.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/txtPublication" android:lines="1" android:scrollHorizontally="true" android:singleLine="true" android:capitalize="sentences" android:layout_below="@id/lblPublication" android:imeOptions="actionNext" android:paddingStart="5.0dip" />
-    <TextView android:textStyle="bold" android:id="@id/lblContinue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strContinueWhere" android:layout_below="@id/edtStudyPublication" fontPath="fonts/OpenSans-Bold.ttf" />
-    <EditText android:textSize="16.0sp" android:gravity="top" android:id="@id/edtContinueStudy" android:layout_width="fill_parent" android:layout_height="wrap_content" android:hint="@string/strContinueStudy" android:lines="1" android:scrollHorizontally="true" android:singleLine="true" android:capitalize="sentences" android:layout_below="@id/lblContinue" android:layout_alignParentRight="true" android:imeOptions="actionNext" android:layout_alignParentEnd="true" />
-    <include android:paddingTop="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/edtContinueStudy" layout="@layout/action_okcancel" />
-</RelativeLayout>

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<merge
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <HorizontalScrollView android:id="@id/ms_stepTabsScrollView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:fillViewport="true" style="?ms_stepTabsScrollViewStyle">
-        <LinearLayout android:orientation="horizontal" android:id="@id/ms_stepTabsInnerContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" style="?ms_stepTabsInnerContainerStyle" />
-    </HorizontalScrollView>
-    <TextView android:id="@id/ms_stepTabsProgressMessage" android:visibility="gone" android:alpha="0.0" android:translationY="@dimen/ms_progress_message_translation_when_hidden" style="?ms_stepTabsProgressMessageStyle" />
-</merge>

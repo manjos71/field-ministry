@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="WidgetPaddingStyle">
-        <item name="android:paddingTop">3.0dip</item>
-    </style>
-    <style name="WidgetTextStyle">
-        <item name="android:drawablePadding">-3.0dip</item>
-    </style>
-</resources>

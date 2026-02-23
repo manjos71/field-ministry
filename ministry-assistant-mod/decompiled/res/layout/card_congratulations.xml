@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:background="@drawable/congrat_bg" android:padding="20.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <TextView android:textSize="@dimen/card_xl_text" android:textColor="@color/golden" android:id="@id/textHeader" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/strCongratulations" android:layout_alignParentTop="true" android:layout_centerHorizontal="true" />
-    <ImageView android:id="@id/imageCongrat" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20.0dip" android:src="@drawable/clapping" android:layout_below="@id/textHeader" android:layout_alignParentLeft="true" android:layout_alignParentStart="true" />
-    <TextView android:textAppearance="?android:textAppearanceLarge" android:id="@id/textCongrat" android:paddingLeft="15.0dip" android:paddingTop="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12.0dip" android:text="@string/strCongratulationsAux" android:layout_toRightOf="@id/imageCongrat" android:layout_below="@id/textHeader" android:paddingStart="15.0dip" android:layout_toEndOf="@id/imageCongrat" />
-</RelativeLayout>

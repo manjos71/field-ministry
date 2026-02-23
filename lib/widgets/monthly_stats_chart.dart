@@ -64,7 +64,7 @@ final monthlyStatsProvider = FutureProvider<List<MonthlyStats>>((ref) async {
       year: targetMonth.year,
       month: targetMonth.month,
       hours: hoursData.totalMinutes / 60,
-      returnVisits: returnVisitCount,
+      returnVisits: returnVisitCount + hoursData.revisitCount,
     ));
   }
   

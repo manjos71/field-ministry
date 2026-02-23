@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<appwidget-provider android:minWidth="40.0dip" android:minHeight="40.0dip" android:updatePeriodMillis="86400000" android:initialLayout="@layout/publication_counter_widget" android:configure="com.lostpixels.fieldservice.WidgetSettingsPubCounter" android:previewImage="@drawable/widget_add_placements" android:resizeMode="none" android:widgetCategory="home_screen|keyguard" android:widgetFeatures="reconfigurable"
-  xmlns:android="http://schemas.android.com/apk/res/android" />

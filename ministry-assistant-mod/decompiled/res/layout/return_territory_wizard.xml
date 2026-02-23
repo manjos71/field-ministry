@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:background="?MA_themeBackground" android:layout_width="fill_parent" android:layout_height="fill_parent"
-  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
-    <include layout="@layout/actionbar" />
-    <com.stepstone.stepper.StepperLayout android:id="@id/stepperLayout" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/custom_action_bar" app:ms_backButtonColor="#ff808080" app:ms_backButtonText="@string/ms_back" app:ms_completeButtonColor="#ff808080" app:ms_completeButtonText="@string/ms_complete" app:ms_nextButtonColor="#ff808080" app:ms_nextButtonText="@string/ms_next" app:ms_showBackButtonOnFirstStep="true" app:ms_stepperType="dots" />
-</RelativeLayout>

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="FabStyle">
-        <item name="android:layout_width">64.0dip</item>
-        <item name="android:layout_height">64.0dip</item>
-    </style>
-</resources>

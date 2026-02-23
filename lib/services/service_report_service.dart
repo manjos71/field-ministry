@@ -92,6 +92,52 @@ class ServiceReportService {
     return value;
   }
 
+  /// Parse a CSV string (previously exported by generateNotHomeCSV) back to a list.
+  /// Returns a map with keys matching the header row, and a list of rows.
+  static Map<String, dynamic> parseNotHomeCSV(String csvContent) {
+    final lines = csvContent.split('\n').where((l) => l.trim().isNotEmpty).toList();
+    if (lines.isEmpty) return {'headers': <String>[], 'rows': <Map<String, String>>[]};
+
+    final headers = _parseCsvRow(lines.first);
+    final rows = <Map<String, String>>[];
+
+    for (int i = 1; i < lines.length; i++) {
+      final values = _parseCsvRow(lines[i]);
+      final row = <String, String>{};
+      for (int j = 0; j < headers.length && j < values.length; j++) {
+        row[headers[j]] = values[j];
+      }
+      rows.add(row);
+    }
+
+    return {'headers': headers, 'rows': rows};
+  }
+
+  static List<String> _parseCsvRow(String row) {
+    final result = <String>[];
+    final buffer = StringBuffer();
+    bool inQuotes = false;
+
+    for (int i = 0; i < row.length; i++) {
+      final char = row[i];
+      if (char == '"') {
+        if (inQuotes && i + 1 < row.length && row[i + 1] == '"') {
+          buffer.write('"');
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char == ',' && !inQuotes) {
+        result.add(buffer.toString());
+        buffer.clear();
+      } else {
+        buffer.write(char);
+      }
+    }
+    result.add(buffer.toString());
+    return result;
+  }
+
   // Send report to WhatsApp
   static Future<void> sendToWhatsApp(String message, String phoneNumber) async {
     // Clean phone number

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/MySectionItemStyle"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <TextView android:id="@id/listTextView" android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/MySectionTextViewStyle" />
-    <View android:id="@id/separator" style="@style/BlueSeparatorBarNoBottom" />
-</LinearLayout>

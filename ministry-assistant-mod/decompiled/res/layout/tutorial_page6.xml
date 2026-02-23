@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:id="@id/scrollView" android:background="#ffffffff" android:layout_width="fill_parent" android:layout_height="wrap_content"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <FrameLayout android:paddingLeft="10.0dip" android:paddingTop="3.0dip" android:paddingRight="10.0dip" android:paddingBottom="3.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent" android:paddingStart="10.0dip" android:paddingEnd="10.0dip">
-        <com.lostpixels.fieldservice.ui.FlowTextView android:id="@id/tutPage6" android:layout_width="fill_parent" android:layout_height="fill_parent">
-            <ImageView android:id="@id/imgReturnVisit" android:paddingLeft="3.0dip" android:paddingTop="3.0dip" android:paddingBottom="3.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20.0dip" android:src="@drawable/tut_returnvisit" android:layout_alignParentRight="true" android:paddingStart="3.0dip" android:layout_alignParentEnd="true" />
-        </com.lostpixels.fieldservice.ui.FlowTextView>
-    </FrameLayout>
-</ScrollView>
