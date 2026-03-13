@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
@@ -74,9 +75,18 @@ class GoogleDriveService implements BackupService {
         photoUrl: _googleUser!.photoUrl,
       );
       return _currentUser;
+    } on PlatformException catch (e) {
+      final raw = '${e.code} ${e.message ?? ''}';
+      if (raw.contains('ApiException: 10') || raw.contains('sign_in_failed')) {
+        throw Exception(
+          'Falha na configuração do Google Sign-In (ApiException: 10). '
+          'Confirme package name e SHA-1/SHA-256 no cliente OAuth Android do Google Cloud.',
+        );
+      }
+      throw Exception('Falha no login Google: ${e.message ?? e.code}');
     } catch (e) {
       debugPrint('Erro ao fazer login: $e');
-      return null;
+      rethrow;
     }
   }
 

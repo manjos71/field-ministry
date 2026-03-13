@@ -28,10 +28,162 @@ class ReportsTab extends ConsumerWidget {
             _ServiceTimerCard(),
             SizedBox(height: 16),
             MonthlyStatsChart(),
+            SizedBox(height: 12),
+            _LastFourMonthsTotalsCard(),
           ],
         ),
       ),
     );
+  }
+}
+
+class _LastFourMonthsTotalsCard extends ConsumerWidget {
+  const _LastFourMonthsTotalsCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final statsAsync = ref.watch(monthlyStatsByMonthsProvider(4));
+
+    return statsAsync.when(
+      loading: () => const Card(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (stats) {
+        if (stats.isEmpty) return const SizedBox.shrink();
+
+        final totalHours =
+            stats.fold<double>(0, (sum, item) => sum + item.hours);
+        final totalRevisits =
+            stats.fold<int>(0, (sum, item) => sum + item.returnVisits);
+        final totalVisitedHouses =
+            stats.fold<int>(0, (sum, item) => sum + item.visitedHouses);
+
+        return Card(
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _lastFourMonthsTitle(context),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...stats.map((item) {
+                  final monthLabel = l10n.getMonthName(item.month);
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '$monthLabel/${item.year}',
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 2,
+                          alignment: WrapAlignment.end,
+                          children: [
+                            Text('${item.hours.toStringAsFixed(1)}h'),
+                            Text(
+                                '${item.returnVisits} ${l10n.returnVisit.toLowerCase()}'),
+                            Text(
+                                '${item.visitedHouses} ${_housesVisitedLabel(context)}'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                const Divider(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.total,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 2,
+                      alignment: WrapAlignment.end,
+                      children: [
+                        Text(
+                          '${totalHours.toStringAsFixed(1)}h',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '$totalRevisits ${l10n.returnVisit.toLowerCase()}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '$totalVisitedHouses ${_housesVisitedLabel(context)}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _housesVisitedLabel(BuildContext context) {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    switch (languageCode) {
+      case 'en':
+        return 'houses';
+      case 'es':
+        return 'casas';
+      case 'de':
+        return 'Haeuser';
+      case 'fr':
+        return 'maisons';
+      case 'it':
+        return 'case';
+      case 'ru':
+        return 'domov';
+      case 'pt':
+      default:
+        return 'casas';
+    }
+  }
+
+  String _lastFourMonthsTitle(BuildContext context) {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    switch (languageCode) {
+      case 'en':
+        return 'Last 4 months';
+      case 'es':
+        return 'Ultimos 4 meses';
+      case 'de':
+        return 'Letzte 4 Monate';
+      case 'fr':
+        return '4 derniers mois';
+      case 'it':
+        return 'Ultimi 4 mesi';
+      case 'ru':
+        return 'Poslednie 4 mesyatsa';
+      case 'pt':
+      default:
+        return 'Ultimos 4 meses';
+    }
   }
 }
 
@@ -76,10 +228,12 @@ class _ServiceTimerCard extends ConsumerWidget {
                       final now = DateTime.now();
                       final time = await showTimePicker(
                         context: context,
-                        initialTime: TimeOfDay.fromDateTime(session.startTime ?? now),
+                        initialTime:
+                            TimeOfDay.fromDateTime(session.startTime ?? now),
                       );
                       if (time != null) {
-                        final newDate = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+                        final newDate = DateTime(now.year, now.month, now.day,
+                            time.hour, time.minute);
                         notifier.setStartTime(newDate);
                       }
                     },
@@ -96,10 +250,12 @@ class _ServiceTimerCard extends ConsumerWidget {
                       final now = DateTime.now();
                       final time = await showTimePicker(
                         context: context,
-                        initialTime: TimeOfDay.fromDateTime(session.endTime ?? now),
+                        initialTime:
+                            TimeOfDay.fromDateTime(session.endTime ?? now),
                       );
                       if (time != null) {
-                        final newDate = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+                        final newDate = DateTime(now.year, now.month, now.day,
+                            time.hour, time.minute);
                         notifier.setEndTime(newDate);
                       }
                     },
@@ -113,7 +269,8 @@ class _ServiceTimerCard extends ConsumerWidget {
               children: [
                 Expanded(
                   child: FilledButton.icon(
-                    onPressed: (session.startTime != null && session.endTime != null)
+                    onPressed: (session.startTime != null &&
+                            session.endTime != null)
                         ? () async {
                             // Add time to monthly total
                             await monthlyNotifier.addTime(session.duration);
@@ -122,8 +279,10 @@ class _ServiceTimerCard extends ConsumerWidget {
                             final today = DateTime.now().day;
                             final plan = ref.read(monthlyPlanProvider);
                             final currentActual = plan.dailyActual[today] ?? 0;
-                            final hoursToAdd = session.duration.inMinutes / 60.0;
-                            await monthlyPlanNotifier.setActualForDay(today, currentActual + hoursToAdd);
+                            final hoursToAdd =
+                                session.duration.inMinutes / 60.0;
+                            await monthlyPlanNotifier.setActualForDay(
+                                today, currentActual + hoursToAdd);
 
                             // Reset session
                             await notifier.reset();
@@ -140,20 +299,23 @@ class _ServiceTimerCard extends ConsumerWidget {
                     icon: const Icon(Icons.add_circle),
                     label: Text(l10n.add.toUpperCase()),
                     style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: (session.startTime != null && session.endTime != null)
-                        ? () => _generateReport(context, ref)
-                        : null,
+                    onPressed:
+                        (session.startTime != null && session.endTime != null)
+                            ? () => _generateReport(context, ref)
+                            : null,
                     icon: const Icon(Icons.assessment),
                     label: Text(l10n.report.toUpperCase()),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                     ),
                   ),
                 ),
@@ -178,16 +340,16 @@ class _ServiceTimerCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final session = ref.read(serviceTimerProvider);
     final elapsed = session.duration;
-    
+
     // Collect data
     final territories = ref.read(territoriesProvider).asData?.value ?? [];
-    
+
     final report = ServiceReportService.collectSessionData(
       territories: territories,
-      sessionStart: session.startTime!, 
+      sessionStart: session.startTime!,
       workTime: elapsed,
     );
-    
+
     final message = ServiceReportService.generateReport(
       workTime: report.workTime,
       totalVisits: report.totalVisits,
@@ -201,7 +363,8 @@ class _ServiceTimerCard extends ConsumerWidget {
       notHomeLabel: l10n.notHome,
       interestedLabel: l10n.interested,
       othersLabel: l10n.others,
-      generatedAtLabel: l10n.generatedAt(DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())),
+      generatedAtLabel: l10n
+          .generatedAt(DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())),
     );
 
     if (context.mounted) {
@@ -224,56 +387,82 @@ class _ServiceTimerCard extends ConsumerWidget {
                   child: SelectableText(message),
                 ),
                 const SizedBox(height: 16),
-                Text('${l10n.share}:', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text('${l10n.share}:',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: [
                     ActionChip(
-                      avatar: const Icon(Icons.share, size: 16, color: Colors.green),
+                      avatar: const Icon(Icons.share,
+                          size: 16, color: Colors.green),
                       label: const Text('WhatsApp'),
                       onPressed: () {
-                         Share.share(message); 
+                        Share.share(message);
                       },
                     ),
                     if (kIsWeb)
                       ActionChip(
-                        avatar: const Icon(Icons.download, size: 16, color: Colors.blue),
+                        avatar: const Icon(Icons.download,
+                            size: 16, color: Colors.blue),
                         label: Text(l10n.exportCsv),
                         onPressed: () async {
-                           final db = await ref.read(databaseServiceProvider.future);
-                           final fields = db.getSetting<List<dynamic>>('csv_export_fields')?.cast<String>() ?? [];
-                           final csv = ServiceReportService.generateNotHomeCSV(report.notHomeAddresses, fields);
-                           ServiceReportService.downloadCSV(csv, 'nao_em_casa.csv');
+                          final db =
+                              await ref.read(databaseServiceProvider.future);
+                          final fields = db
+                                  .getSetting<List<dynamic>>(
+                                      'csv_export_fields')
+                                  ?.cast<String>() ??
+                              [];
+                          final csv = ServiceReportService.generateNotHomeCSV(
+                              report.notHomeAddresses, fields);
+                          ServiceReportService.downloadCSV(
+                              csv, 'nao_em_casa.csv');
                         },
                       ),
                     if (!kIsWeb)
                       ActionChip(
-                        avatar: const Icon(Icons.table_chart, size: 16, color: Colors.blue),
+                        avatar: const Icon(Icons.table_chart,
+                            size: 16, color: Colors.blue),
                         label: Text(l10n.csvNotHome),
                         onPressed: () async {
-                          final db = await ref.read(databaseServiceProvider.future);
-                          final fields = db.getSetting<List<dynamic>>('csv_export_fields')?.cast<String>() ?? [];
+                          final db =
+                              await ref.read(databaseServiceProvider.future);
+                          final fields = db
+                                  .getSetting<List<dynamic>>(
+                                      'csv_export_fields')
+                                  ?.cast<String>() ??
+                              [];
 
-                          final csv = ServiceReportService.generateNotHomeCSV(report.notHomeAddresses, fields);
+                          final csv = ServiceReportService.generateNotHomeCSV(
+                              report.notHomeAddresses, fields);
 
                           // Save to temp file and share
-                          final directory = await Directory.systemTemp.createTemp();
-                          final file = File('${directory.path}/nao_em_casa.csv');
+                          final directory =
+                              await Directory.systemTemp.createTemp();
+                          final file =
+                              File('${directory.path}/nao_em_casa.csv');
                           await file.writeAsString(csv);
 
-                          await Share.shareXFiles([XFile(file.path)], text: l10n.csvNotHome);
+                          await Share.shareXFiles([XFile(file.path)],
+                              text: l10n.csvNotHome);
                         },
                       ),
                     // Exportar como Texto (CSV)
                     ActionChip(
-                      avatar: const Icon(Icons.text_snippet, size: 16, color: Colors.teal),
+                      avatar: const Icon(Icons.text_snippet,
+                          size: 16, color: Colors.teal),
                       label: const Text('Texto CSV'),
                       onPressed: () async {
-                        final db = await ref.read(databaseServiceProvider.future);
-                        final fields = db.getSetting<List<dynamic>>('csv_export_fields')?.cast<String>() ?? [];
-                        final csv = ServiceReportService.generateNotHomeCSV(report.notHomeAddresses, fields);
+                        final db =
+                            await ref.read(databaseServiceProvider.future);
+                        final fields = db
+                                .getSetting<List<dynamic>>('csv_export_fields')
+                                ?.cast<String>() ??
+                            [];
+                        final csv = ServiceReportService.generateNotHomeCSV(
+                            report.notHomeAddresses, fields);
                         // Share directly as plain text (importable as CSV)
                         Share.share(csv, subject: 'Não em casa - CSV');
                       },

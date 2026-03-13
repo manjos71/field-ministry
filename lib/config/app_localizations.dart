@@ -1748,6 +1748,16 @@ class AppLocalizations {
     AppLanguage.ru: 'Другой язык',
   });
 
+  String get witness => _t({
+    AppLanguage.pt: 'Testemunha',
+    AppLanguage.en: 'Witness',
+    AppLanguage.es: 'Testigo',
+    AppLanguage.de: 'Zeuge',
+    AppLanguage.fr: 'Témoin',
+    AppLanguage.it: 'Testimone',
+    AppLanguage.ru: 'Свидетель',
+  });
+
   // ==================== HORAS ====================
   String get hours => _t({
     AppLanguage.pt: 'Horas',

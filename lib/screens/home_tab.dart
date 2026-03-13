@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import '../providers/service_timer_provider.dart';
 import '../providers/publisher_profile_provider.dart';
 import '../providers/theme_provider.dart';
@@ -33,7 +34,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final db = await ref.read(databaseServiceProvider.future);
     final name = db.getSetting<String>('user_name');
     final imagePath = db.getSetting<String>('user_image_path');
-    
+
     if (mounted) {
       setState(() {
         if (name != null) {
@@ -59,10 +60,11 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
+      final persistedPath = await _persistProfileImage(pickedFile.path);
       final db = await ref.read(databaseServiceProvider.future);
-      await db.saveSetting('user_image_path', pickedFile.path);
+      await db.saveSetting('user_image_path', persistedPath);
       setState(() {
-        _userImagePath = pickedFile.path;
+        _userImagePath = persistedPath;
       });
     }
   }
@@ -72,12 +74,41 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
+      final persistedPath = await _persistProfileImage(pickedFile.path);
       final db = await ref.read(databaseServiceProvider.future);
-      await db.saveSetting('user_image_path', pickedFile.path);
+      await db.saveSetting('user_image_path', persistedPath);
       setState(() {
-        _userImagePath = pickedFile.path;
+        _userImagePath = persistedPath;
       });
     }
+  }
+
+  Future<String> _persistProfileImage(String sourcePath) async {
+    final sourceFile = File(sourcePath);
+    if (!await sourceFile.exists()) return sourcePath;
+
+    final documentsDir = await getApplicationDocumentsDirectory();
+    final profileDir = Directory('${documentsDir.path}/profile_images');
+    if (!await profileDir.exists()) {
+      await profileDir.create(recursive: true);
+    }
+
+    final extension = _extractExtension(sourcePath);
+    final targetPath =
+        '${profileDir.path}/profile_${DateTime.now().millisecondsSinceEpoch}$extension';
+    final copied = await sourceFile.copy(targetPath);
+    return copied.path;
+  }
+
+  String _extractExtension(String path) {
+    final dotIndex = path.lastIndexOf('.');
+    if (dotIndex == -1 || dotIndex == path.length - 1) {
+      return '.jpg';
+    }
+
+    final extension = path.substring(dotIndex);
+    if (extension.length > 6) return '.jpg';
+    return extension;
   }
 
   void _showImageOptions(BuildContext context, AppLocalizations l10n) {
@@ -106,7 +137,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             if (_userImagePath != null)
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
-                title: Text(l10n.removePhoto, style: const TextStyle(color: Colors.red)),
+                title: Text(l10n.removePhoto,
+                    style: const TextStyle(color: Colors.red)),
                 onTap: () async {
                   Navigator.pop(context);
                   final db = await ref.read(databaseServiceProvider.future);
@@ -173,7 +205,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     color: selectedColor.withOpacity(isDark ? 0.5 : 1.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: isDark ? BorderSide(color: selectedColor, width: 1.5) : BorderSide.none,
+                      side: isDark
+                          ? BorderSide(color: selectedColor, width: 1.5)
+                          : BorderSide.none,
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -188,7 +222,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                             onLongPress: () {
                               if (kIsWeb) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(l10n.photoEditUnavailable)),
+                                  SnackBar(
+                                      content: Text(l10n.photoEditUnavailable)),
                                 );
                                 return;
                               }
@@ -201,10 +236,12 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                               backgroundImage: _userImagePath != null
                                   ? (kIsWeb
                                       ? NetworkImage(_userImagePath!)
-                                      : FileImage(File(_userImagePath!)) as ImageProvider)
+                                      : FileImage(File(_userImagePath!))
+                                          as ImageProvider)
                                   : null,
                               child: _userImagePath == null
-                                  ? const Icon(Icons.add_a_photo, size: 28, color: Colors.grey)
+                                  ? const Icon(Icons.add_a_photo,
+                                      size: 28, color: Colors.grey)
                                   : null,
                             ),
                           ),
@@ -222,13 +259,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                   ),
                                 ),
                                 Text(
-                                  AppLocalizations.of(context).goodWorkInMinistry,
-                                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                  AppLocalizations.of(context)
+                                      .goodWorkInMinistry,
+                                  style: const TextStyle(
+                                      color: Colors.white70, fontSize: 12),
                                 ),
                               ],
                             ),
                           ),
-                          const Icon(Icons.chevron_right, color: Colors.white54),
+                          const Icon(Icons.chevron_right,
+                              color: Colors.white54),
                         ],
                       ),
                     ),
@@ -238,8 +278,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             ),
             // Monthly Time Display with Progress Indicator
             const SizedBox(height: 8),
-            _buildMonthlyTimeDisplay(context, monthlyTime, monthlyNotifier, progressStatus, profile),
-            
+            _buildMonthlyTimeDisplay(
+                context, monthlyTime, monthlyNotifier, progressStatus, profile),
+
             // Calendário de Planejamento
             const SizedBox(height: 16),
             Text(
@@ -251,7 +292,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             ),
             const SizedBox(height: 8),
             const ServicePlanningCalendar(),
-
           ],
         ),
       ),
@@ -305,12 +345,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               ),
               FilledButton(
                 onPressed: () {
-                  final text = controller.text.trim().replaceAll(',', ':').replaceAll('.', ':');
+                  final text = controller.text
+                      .trim()
+                      .replaceAll(',', ':')
+                      .replaceAll('.', ':');
                   int? totalMinutes;
                   if (text.contains(':')) {
                     final parts = text.split(':');
                     final hh = int.tryParse(parts[0]) ?? 0;
-                    final mm = parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0;
+                    final mm =
+                        parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0;
                     totalMinutes = hh * 60 + mm;
                   } else {
                     final hours = double.tryParse(text);
@@ -332,7 +376,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         decoration: BoxDecoration(
           color: statusColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
-          border: hasTarget ? Border.all(color: statusColor.withOpacity(0.3)) : null,
+          border: hasTarget
+              ? Border.all(color: statusColor.withOpacity(0.3))
+              : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -350,12 +396,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   children: [
                     Text(
                       l10n.monthlyTime,
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                      style:
+                          TextStyle(fontSize: 12, color: Colors.grey.shade600),
                     ),
                     if (hasTarget) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: statusColor.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(4),
@@ -389,7 +437,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     if (monthlyTime.revisitCount > 0) ...[
                       const SizedBox(width: 12),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.orange.shade50,
                           borderRadius: BorderRadius.circular(12),
@@ -397,7 +446,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.loop, size: 12, color: Colors.orange),
+                            const Icon(Icons.loop,
+                                size: 12, color: Colors.orange),
                             const SizedBox(width: 4),
                             Text(
                               '${monthlyTime.revisitCount}',
@@ -414,7 +464,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     if (monthlyTime.bibleStudyCount > 0) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF3E5F5),
                           borderRadius: BorderRadius.circular(12),
@@ -509,7 +560,8 @@ class _ProfileBottomSheet extends ConsumerStatefulWidget {
   const _ProfileBottomSheet({required this.userName, required this.onSaveName});
 
   @override
-  ConsumerState<_ProfileBottomSheet> createState() => _ProfileBottomSheetState();
+  ConsumerState<_ProfileBottomSheet> createState() =>
+      _ProfileBottomSheetState();
 }
 
 class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
@@ -529,9 +581,12 @@ class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
 
   String _typeName(PublisherType t, AppLocalizations l10n) {
     switch (t) {
-      case PublisherType.publisher: return l10n.publisherTypeName;
-      case PublisherType.auxiliaryPioneer: return l10n.auxiliaryPioneerTypeName;
-      case PublisherType.regularPioneer: return l10n.regularPioneerTypeName;
+      case PublisherType.publisher:
+        return l10n.publisherTypeName;
+      case PublisherType.auxiliaryPioneer:
+        return l10n.auxiliaryPioneerTypeName;
+      case PublisherType.regularPioneer:
+        return l10n.regularPioneerTypeName;
     }
   }
 
@@ -544,7 +599,9 @@ class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
-          left: 16, right: 16, top: 24,
+          left: 16,
+          right: 16,
+          top: 24,
           bottom: MediaQuery.of(context).viewInsets.bottom + 16,
         ),
         child: Column(
@@ -554,7 +611,8 @@ class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
             // Handle bar
             Center(
               child: Container(
-                width: 40, height: 4,
+                width: 40,
+                height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade300,
@@ -564,7 +622,9 @@ class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
             ),
 
             // Name
-            Text(l10n.yourName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(l10n.yourName,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
             const SizedBox(height: 6),
             Row(
               children: [
@@ -606,11 +666,19 @@ class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
                 value: profile.type,
                 underline: const SizedBox(),
                 items: [
-                  DropdownMenuItem(value: PublisherType.publisher, child: Text(l10n.publisher)),
-                  DropdownMenuItem(value: PublisherType.auxiliaryPioneer, child: Text(l10n.auxiliaryPioneer)),
-                  DropdownMenuItem(value: PublisherType.regularPioneer, child: Text(l10n.regularPioneer)),
+                  DropdownMenuItem(
+                      value: PublisherType.publisher,
+                      child: Text(l10n.publisher)),
+                  DropdownMenuItem(
+                      value: PublisherType.auxiliaryPioneer,
+                      child: Text(l10n.auxiliaryPioneer)),
+                  DropdownMenuItem(
+                      value: PublisherType.regularPioneer,
+                      child: Text(l10n.regularPioneer)),
                 ],
-                onChanged: (t) { if (t != null) notifier.setType(t); },
+                onChanged: (t) {
+                  if (t != null) notifier.setType(t);
+                },
               ),
             ),
 
@@ -622,11 +690,13 @@ class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.timer_outlined),
                 title: Text(l10n.hourGoal),
-                subtitle: Text('${profile.customTargetHours ?? 0} ${l10n.hoursPerMonth}'),
+                subtitle: Text(
+                    '${profile.customTargetHours ?? 0} ${l10n.hoursPerMonth}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () => _showHoursDialog(
-                    context, l10n,
+                    context,
+                    l10n,
                     initial: (profile.customTargetHours ?? 0).toString(),
                     onSave: (h) => notifier.setCustomTargetHours(h),
                   ),
@@ -638,33 +708,44 @@ class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.timer_outlined),
                 title: Text(l10n.hourGoal),
-                subtitle: Text('${profile.monthlyTargetHours} ${l10n.hoursPerMonth}'),
+                subtitle:
+                    Text('${profile.monthlyTargetHours} ${l10n.hoursPerMonth}'),
                 trailing: DropdownButton<AuxiliaryPioneerTarget>(
-                  value: profile.auxiliaryTarget ?? AuxiliaryPioneerTarget.hours15,
+                  value:
+                      profile.auxiliaryTarget ?? AuxiliaryPioneerTarget.hours15,
                   underline: const SizedBox(),
                   items: [
-                    DropdownMenuItem(value: AuxiliaryPioneerTarget.hours15, child: Text('15 ${l10n.hours}')),
-                    DropdownMenuItem(value: AuxiliaryPioneerTarget.hours30, child: Text('30 ${l10n.hours}')),
+                    DropdownMenuItem(
+                        value: AuxiliaryPioneerTarget.hours15,
+                        child: Text('15 ${l10n.hours}')),
+                    DropdownMenuItem(
+                        value: AuxiliaryPioneerTarget.hours30,
+                        child: Text('30 ${l10n.hours}')),
                   ],
-                  onChanged: (t) { if (t != null) notifier.setAuxiliaryTarget(t); },
+                  onChanged: (t) {
+                    if (t != null) notifier.setAuxiliaryTarget(t);
+                  },
                 ),
               ),
 
-            if (profile.type == PublisherType.regularPioneer) ...[ 
+            if (profile.type == PublisherType.regularPioneer) ...[
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.timer_outlined),
                 title: Text(l10n.hourGoal),
                 subtitle: Text('50 ${l10n.hoursPerMonth}'),
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Theme.of(context).primaryColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     '50h',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor),
                   ),
                 ),
               ),
@@ -687,10 +768,12 @@ class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
                           ? () {
                               ref
                                   .read(monthlyServiceTimeProvider.notifier)
-                                  .addTime(Duration(hours: profile.creditHours));
+                                  .addTime(
+                                      Duration(hours: profile.creditHours));
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(l10n.creditHoursAdded(profile.creditHours)),
+                                  content: Text(l10n
+                                      .creditHoursAdded(profile.creditHours)),
                                   backgroundColor: Colors.green,
                                 ),
                               );
@@ -699,7 +782,8 @@ class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit),
-                      onPressed: () => _showCreditDialog(context, l10n, profile, notifier),
+                      onPressed: () =>
+                          _showCreditDialog(context, l10n, profile, notifier),
                     ),
                   ],
                 ),
@@ -743,7 +827,8 @@ class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           FilledButton(
             onPressed: () {
               notifier.setCreditHours(int.tryParse(ctrl.text) ?? 0);
@@ -771,12 +856,18 @@ class _ProfileBottomSheetState extends ConsumerState<_ProfileBottomSheet> {
           controller: ctrl,
           keyboardType: TextInputType.number,
           autofocus: true,
-          decoration: InputDecoration(labelText: l10n.hoursPerMonth, border: const OutlineInputBorder()),
+          decoration: InputDecoration(
+              labelText: l10n.hoursPerMonth,
+              border: const OutlineInputBorder()),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           FilledButton(
-            onPressed: () { onSave(int.tryParse(ctrl.text) ?? 0); Navigator.pop(ctx); },
+            onPressed: () {
+              onSave(int.tryParse(ctrl.text) ?? 0);
+              Navigator.pop(ctx);
+            },
             child: Text(l10n.save),
           ),
         ],

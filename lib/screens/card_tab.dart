@@ -5,6 +5,7 @@ import '../providers/territory_provider.dart';
 import '../providers/service_timer_provider.dart';
 import '../models/models.dart';
 import '../widgets/stats_grid.dart';
+import 'street_detail_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CardTab extends ConsumerStatefulWidget {
@@ -34,7 +35,7 @@ class _CardTabState extends ConsumerState<CardTab> {
           int totalVisits = 0;
           int interestedCount = 0;
           int territoriesCount = territories.where((t) => !t.isArchived).length;
-          
+
           for (var t in territories) {
             if (t.isArchived) continue;
             for (var s in t.streets) {
@@ -62,7 +63,7 @@ class _CardTabState extends ConsumerState<CardTab> {
                   visitsCount: totalVisits,
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Título da seção de interessados
                 Text(
                   l10n.interested,
@@ -72,18 +73,20 @@ class _CardTabState extends ConsumerState<CardTab> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Lista de interessados
                 if (interestedItems.isEmpty && bibleStudyItems.isEmpty)
                   Container(
                     padding: const EdgeInsets.all(32),
                     child: Column(
                       children: [
-                        const Icon(Icons.star_border, size: 48, color: Colors.grey),
+                        const Icon(Icons.star_border,
+                            size: 48, color: Colors.grey),
                         const SizedBox(height: 12),
                         Text(
                           l10n.noInterested,
-                          style: const TextStyle(fontSize: 14, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 14, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -121,10 +124,22 @@ class _CardTabState extends ConsumerState<CardTab> {
           item: item,
           isExpanded: isExpanded,
           isBibleStudy: false,
-          onTap: () {
+          onToggleExpand: () {
             setState(() {
               _expandedAddressId = isExpanded ? null : item.address.id;
             });
+          },
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => StreetDetailScreen(
+                  territoryId: item.territory.id,
+                  streetId: item.street.id,
+                  initialAddressId: item.address.id,
+                ),
+              ),
+            );
           },
         ),
       );
@@ -140,10 +155,22 @@ class _CardTabState extends ConsumerState<CardTab> {
           item: item,
           isExpanded: isExpanded,
           isBibleStudy: true,
-          onTap: () {
+          onToggleExpand: () {
             setState(() {
               _expandedAddressId = isExpanded ? null : item.address.id;
             });
+          },
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => StreetDetailScreen(
+                  territoryId: item.territory.id,
+                  streetId: item.street.id,
+                  initialAddressId: item.address.id,
+                ),
+              ),
+            );
           },
         ),
       );
@@ -171,7 +198,7 @@ class _CardTabState extends ConsumerState<CardTab> {
         }
       }
     }
-    
+
     // Sort by date (most recent first)
     items.sort((a, b) => b.lastVisit.date.compareTo(a.lastVisit.date));
     return items;
@@ -196,7 +223,7 @@ class _CardTabState extends ConsumerState<CardTab> {
         }
       }
     }
-    
+
     // Sort by date (most recent first)
     items.sort((a, b) => b.lastVisit.date.compareTo(a.lastVisit.date));
     return items;
@@ -208,12 +235,14 @@ class _InterestedStackCard extends ConsumerWidget {
   final bool isExpanded;
   final bool isBibleStudy;
   final VoidCallback onTap;
+  final VoidCallback onToggleExpand;
 
   const _InterestedStackCard({
     required this.item,
     required this.isExpanded,
     required this.isBibleStudy,
     required this.onTap,
+    required this.onToggleExpand,
   });
 
   Color _getUrgencyColor(int days) {
@@ -227,7 +256,8 @@ class _InterestedStackCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final days = DateTime.now().difference(item.lastVisit.date).inDays;
-    final catIconPath = item.lastVisit.personCategory?.getIconPath(item.lastVisit.gender);
+    final catIconPath =
+        item.lastVisit.personCategory?.getIconPath(item.lastVisit.gender);
 
     return GestureDetector(
       onTap: onTap,
@@ -269,7 +299,8 @@ class _InterestedStackCard extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: theme.cardColor,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Theme.of(context).dividerColor),
+                          border:
+                              Border.all(color: Theme.of(context).dividerColor),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.05),
@@ -285,7 +316,8 @@ class _InterestedStackCard extends ConsumerWidget {
                                   width: 36,
                                   height: 36,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => const Icon(Icons.person),
+                                  errorBuilder: (_, __, ___) =>
+                                      const Icon(Icons.person),
                                 ),
                               )
                             : const Icon(Icons.person),
@@ -335,7 +367,8 @@ class _InterestedStackCard extends ConsumerWidget {
                         const Spacer(),
                         Row(
                           children: [
-                            Icon(Icons.access_time, size: 14, color: _getUrgencyColor(days)),
+                            Icon(Icons.access_time,
+                                size: 14, color: _getUrgencyColor(days)),
                             const SizedBox(width: 4),
                             Text(
                               l10n.daysCount(days),
@@ -349,6 +382,14 @@ class _InterestedStackCard extends ConsumerWidget {
                         ),
                       ],
                     ),
+                  ),
+                  IconButton(
+                    onPressed: onToggleExpand,
+                    icon: Icon(
+                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                    ),
+                    tooltip:
+                        isExpanded ? 'Recolher detalhes' : 'Expandir detalhes',
                   ),
                 ],
               ),
@@ -397,9 +438,7 @@ class _InterestedStackCard extends ConsumerWidget {
                       const Divider(),
                       InkWell(
                         onTap: () async {
-                          await ref
-                              .read(territoriesProvider.notifier)
-                              .addVisit(
+                          await ref.read(territoriesProvider.notifier).addVisit(
                                 territoryId: item.territory.id,
                                 streetId: item.street.id,
                                 addressId: item.address.id,
@@ -442,7 +481,8 @@ class _InterestedStackCard extends ConsumerWidget {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: const Center(
-                                  child: Text('📖', style: TextStyle(fontSize: 12)),
+                                  child: Text('📖',
+                                      style: TextStyle(fontSize: 12)),
                                 ),
                               ),
                               const SizedBox(width: 12),

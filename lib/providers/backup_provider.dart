@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import '../services/backup_service.dart';
 import '../services/google_drive_service.dart';
 import '../services/onedrive_service.dart';
@@ -15,7 +18,7 @@ final selectedBackupServiceProvider = StateProvider<String>((ref) {
 // Provider for the active backup service
 final backupServiceProvider = Provider<BackupService>((ref) {
   final serviceType = ref.watch(selectedBackupServiceProvider);
-  
+
   switch (serviceType) {
     case 'google_drive':
       return GoogleDriveService();
@@ -64,6 +67,8 @@ class BackupNotifier extends StateNotifier<BackupState> {
   final DatabaseService _dbService;
   final Ref _ref;
   static const String _backupFileName = 'field_ministry_backup.json';
+  static const String _embeddedImagesKey = 'embedded_images';
+  static const String _restoredImagesDir = 'backup_restored_images';
 
   BackupNotifier(this._backupService, this._dbService, this._ref)
       : super(BackupState()) {
@@ -117,16 +122,20 @@ class BackupNotifier extends StateNotifier<BackupState> {
 
     state = state.copyWith(isLoading: true, error: null, successMessage: null);
     try {
-      final data = _dbService.exportAllData();
+      final data = Map<String, dynamic>.from(_dbService.exportAllData());
+      final embeddedImages = await _collectImagePayload(data);
+      if (embeddedImages.isNotEmpty) {
+        data[_embeddedImagesKey] = embeddedImages;
+      }
+
       final jsonString = jsonEncode(data);
-      
+
       await _backupService.uploadBackup(jsonString, _backupFileName);
-      
+
       state = state.copyWith(
-        isLoading: false, 
-        successMessage: 'Backup realizado com sucesso!',
-        lastBackupDate: DateTime.now()
-      );
+          isLoading: false,
+          successMessage: 'Backup realizado com sucesso!',
+          lastBackupDate: DateTime.now());
     } catch (e) {
       state = state.copyWith(isLoading: false, error: 'Falha no backup: $e');
     }
@@ -139,31 +148,153 @@ class BackupNotifier extends StateNotifier<BackupState> {
     state = state.copyWith(isLoading: true, error: null, successMessage: null);
     try {
       final jsonString = await _backupService.downloadBackup(_backupFileName);
-      
+
       if (jsonString == null) {
-        state = state.copyWith(isLoading: false, error: 'Backup não encontrado');
+        state =
+            state.copyWith(isLoading: false, error: 'Backup não encontrado');
         return;
       }
-      
-      final data = jsonDecode(jsonString) as Map<String, dynamic>;
+
+      final data = Map<String, dynamic>.from(
+          jsonDecode(jsonString) as Map<String, dynamic>);
+      await _restoreEmbeddedImages(data);
       await _dbService.importAllData(data);
-      
+
       // Refresh territories
-      _ref.refresh(territoriesProvider);
-      
+      _ref.invalidate(territoriesProvider);
+
       state = state.copyWith(
-        isLoading: false, 
-        successMessage: 'Dados restaurados com sucesso!'
-      );
+          isLoading: false, successMessage: 'Dados restaurados com sucesso!');
     } catch (e) {
       state = state.copyWith(isLoading: false, error: 'Falha ao restaurar: $e');
     }
   }
+
+  Future<Map<String, String>> _collectImagePayload(
+      Map<String, dynamic> data) async {
+    if (kIsWeb) return {};
+
+    final imagePaths = <String>{};
+
+    final settings = data['settings'];
+    if (settings is Map) {
+      final profileImagePath = settings['user_image_path'];
+      if (profileImagePath is String && profileImagePath.trim().isNotEmpty) {
+        imagePaths.add(profileImagePath);
+      }
+    }
+
+    final territories = data['territories'];
+    if (territories is List) {
+      for (final item in territories) {
+        if (item is Map) {
+          final territoryImagePath = item['imagePath'];
+          if (territoryImagePath is String &&
+              territoryImagePath.trim().isNotEmpty) {
+            imagePaths.add(territoryImagePath);
+          }
+        }
+      }
+    }
+
+    final imagesByPath = <String, String>{};
+    for (final path in imagePaths) {
+      try {
+        final file = File(path);
+        if (!await file.exists()) continue;
+        final bytes = await file.readAsBytes();
+        if (bytes.isEmpty) continue;
+        imagesByPath[path] = base64Encode(bytes);
+      } catch (_) {
+        // Ignore unreadable files to avoid blocking backup.
+      }
+    }
+
+    return imagesByPath;
+  }
+
+  Future<void> _restoreEmbeddedImages(Map<String, dynamic> data) async {
+    if (kIsWeb) return;
+
+    final rawEmbedded = data[_embeddedImagesKey];
+    if (rawEmbedded is! Map) return;
+
+    final directory = await getApplicationDocumentsDirectory();
+    final restoredDir = Directory('${directory.path}/$_restoredImagesDir');
+    if (!await restoredDir.exists()) {
+      await restoredDir.create(recursive: true);
+    }
+
+    final restoredPathByOriginal = <String, String>{};
+    var index = 0;
+
+    for (final entry in rawEmbedded.entries) {
+      final originalPath = entry.key;
+      final base64Data = entry.value;
+      if (originalPath is! String || base64Data is! String) continue;
+
+      try {
+        final bytes = base64Decode(base64Data);
+        if (bytes.isEmpty) continue;
+
+        final extension = _extractExtension(originalPath);
+        final fileName =
+            'img_${DateTime.now().millisecondsSinceEpoch}_${index++}$extension';
+        final file = File('${restoredDir.path}/$fileName');
+        await file.writeAsBytes(bytes, flush: true);
+        restoredPathByOriginal[originalPath] = file.path;
+      } catch (_) {
+        // Skip malformed image payloads without aborting restore.
+      }
+    }
+
+    if (restoredPathByOriginal.isEmpty) return;
+
+    final settings = data['settings'];
+    if (settings is Map) {
+      final profileImagePath = settings['user_image_path'];
+      if (profileImagePath is String &&
+          restoredPathByOriginal.containsKey(profileImagePath)) {
+        settings['user_image_path'] = restoredPathByOriginal[profileImagePath];
+      }
+    }
+
+    final territories = data['territories'];
+    if (territories is List) {
+      for (final item in territories) {
+        if (item is Map) {
+          final territoryImagePath = item['imagePath'];
+          if (territoryImagePath is String &&
+              restoredPathByOriginal.containsKey(territoryImagePath)) {
+            item['imagePath'] = restoredPathByOriginal[territoryImagePath];
+          }
+        }
+      }
+    }
+  }
+
+  String _extractExtension(String path) {
+    final separatorIndex = path.lastIndexOf('/');
+    final fileName =
+        separatorIndex >= 0 ? path.substring(separatorIndex + 1) : path;
+    final dotIndex = fileName.lastIndexOf('.');
+    if (dotIndex <= 0 || dotIndex == fileName.length - 1) {
+      return '.jpg';
+    }
+
+    final extension = fileName.substring(dotIndex);
+    if (extension.length > 6) {
+      return '.jpg';
+    }
+    return extension;
+  }
 }
 
-final backupProvider = StateNotifierProvider<BackupNotifier, BackupState>((ref) {
+final backupProvider =
+    StateNotifierProvider<BackupNotifier, BackupState>((ref) {
   final backupService = ref.watch(backupServiceProvider);
-  final dbService = ref.watch(databaseServiceProvider).valueOrNull!; // Assuming db is initialized
+  final dbService = ref
+      .watch(databaseServiceProvider)
+      .valueOrNull!; // Assuming db is initialized
   return BackupNotifier(backupService, dbService, ref);
 });
-

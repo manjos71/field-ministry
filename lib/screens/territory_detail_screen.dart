@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import '../providers/territory_provider.dart';
 import '../models/models.dart';
 import 'street_detail_screen.dart';
@@ -69,7 +70,8 @@ class TerritoryDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context, WidgetRef ref, Territory territory) {
+  Widget _buildEmptyState(
+      BuildContext context, WidgetRef ref, Territory territory) {
     final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
@@ -105,7 +107,8 @@ class TerritoryDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showAddStreetDialog(BuildContext context, WidgetRef ref, Territory territory) {
+  void _showAddStreetDialog(
+      BuildContext context, WidgetRef ref, Territory territory) {
     final l10n = AppLocalizations.of(context);
     final nameController = TextEditingController();
 
@@ -139,9 +142,9 @@ class TerritoryDetailScreen extends ConsumerWidget {
               Navigator.pop(context);
 
               await ref.read(territoriesProvider.notifier).addStreet(
-                territoryId: territory.id,
-                name: nameController.text.trim(),
-              );
+                    territoryId: territory.id,
+                    name: nameController.text.trim(),
+                  );
 
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -156,13 +159,14 @@ class TerritoryDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showEditDialog(BuildContext context, WidgetRef ref, Territory territory) {
+  void _showEditDialog(
+      BuildContext context, WidgetRef ref, Territory territory) {
     final l10n = AppLocalizations.of(context);
     final nameController = TextEditingController(text: territory.name);
     final neighborhoodController =
         TextEditingController(text: territory.neighborhood);
     final notesController = TextEditingController(text: territory.notes);
-    
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showDialog(
@@ -180,8 +184,8 @@ class TerritoryDetailScreen extends ConsumerWidget {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                    filled: true,
-                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                  filled: true,
+                  fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                 ),
               ),
               const SizedBox(height: 16),
@@ -192,8 +196,8 @@ class TerritoryDetailScreen extends ConsumerWidget {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                    filled: true,
-                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                  filled: true,
+                  fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                 ),
               ),
               const SizedBox(height: 16),
@@ -204,8 +208,8 @@ class TerritoryDetailScreen extends ConsumerWidget {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                    filled: true,
-                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                  filled: true,
+                  fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                 ),
                 maxLines: 3,
               ),
@@ -352,7 +356,8 @@ class _StreetCard extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+              title:
+                  Text(l10n.delete, style: const TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 _confirmDelete(context, ref);
@@ -384,13 +389,16 @@ class _StreetCard extends ConsumerWidget {
           ),
           FilledButton(
             onPressed: () {
-              final updatedStreet = street.copyWith(name: nameController.text.trim());
+              final updatedStreet =
+                  street.copyWith(name: nameController.text.trim());
               final updatedTerritory = territory.copyWith(
                 streets: territory.streets
                     .map((s) => s.id == street.id ? updatedStreet : s)
                     .toList(),
               );
-              ref.read(territoriesProvider.notifier).updateTerritory(updatedTerritory);
+              ref
+                  .read(territoriesProvider.notifier)
+                  .updateTerritory(updatedTerritory);
               Navigator.pop(context);
             },
             child: Text(l10n.save),
@@ -428,32 +436,42 @@ class _StreetCard extends ConsumerWidget {
               constraints: const BoxConstraints(maxHeight: 300),
               child: SingleChildScrollView(
                 child: Column(
-                  children: otherTerritories.map((t) => ListTile(
-                    leading: const Icon(Icons.map),
-                    title: Text(t.name),
-                    subtitle: t.neighborhood != null ? Text(t.neighborhood!) : null,
-                    onTap: () async {
-                      Navigator.pop(context);
-                      try {
-                        await ref.read(territoriesProvider.notifier).moveStreet(
-                          fromTerritoryId: territory.id,
-                          toTerritoryId: t.id,
-                          streetId: street.id,
-                        );
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.streetMovedTo(t.name))),
-                          );
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.errorMoving(e.toString()))),
-                          );
-                        }
-                      }
-                    },
-                  )).toList(),
+                  children: otherTerritories
+                      .map((t) => ListTile(
+                            leading: const Icon(Icons.map),
+                            title: Text(t.name),
+                            subtitle: t.neighborhood != null
+                                ? Text(t.neighborhood!)
+                                : null,
+                            onTap: () async {
+                              Navigator.pop(context);
+                              try {
+                                await ref
+                                    .read(territoriesProvider.notifier)
+                                    .moveStreet(
+                                      fromTerritoryId: territory.id,
+                                      toTerritoryId: t.id,
+                                      streetId: street.id,
+                                    );
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content:
+                                            Text(l10n.streetMovedTo(t.name))),
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            l10n.errorMoving(e.toString()))),
+                                  );
+                                }
+                              }
+                            },
+                          ))
+                      .toList(),
                 ),
               ),
             ),
@@ -487,9 +505,9 @@ class _StreetCard extends ConsumerWidget {
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               ref.read(territoriesProvider.notifier).removeStreet(
-                territoryId: territory.id,
-                streetId: street.id,
-              );
+                    territoryId: territory.id,
+                    streetId: street.id,
+                  );
               Navigator.pop(context);
             },
             child: Text(l10n.delete),
@@ -517,7 +535,8 @@ class _TerritoryMapHeader extends ConsumerWidget {
           border: Border.all(color: Colors.grey.shade300),
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(11), // Slightly smaller to fit inside border
+          borderRadius: BorderRadius.circular(
+              11), // Slightly smaller to fit inside border
           child: territory.imagePath != null
               ? Image.file(
                   File(territory.imagePath!),
@@ -579,7 +598,8 @@ class _TerritoryMapHeader extends ConsumerWidget {
             if (territory.imagePath != null)
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
-                title: Text(l10n.removeMap, style: const TextStyle(color: Colors.red)),
+                title: Text(l10n.removeMap,
+                    style: const TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   _removeImage(ref);
@@ -606,9 +626,38 @@ class _TerritoryMapHeader extends ConsumerWidget {
     final picker = ImagePicker();
     final image = await picker.pickImage(source: source);
     if (image != null) {
-      final updated = territory.copyWith(imagePath: image.path);
+      final persistedPath = await _persistTerritoryImage(image.path);
+      final updated = territory.copyWith(imagePath: persistedPath);
       ref.read(territoriesProvider.notifier).updateTerritory(updated);
     }
+  }
+
+  Future<String> _persistTerritoryImage(String sourcePath) async {
+    final sourceFile = File(sourcePath);
+    if (!await sourceFile.exists()) return sourcePath;
+
+    final documentsDir = await getApplicationDocumentsDirectory();
+    final territoryDir = Directory('${documentsDir.path}/territory_images');
+    if (!await territoryDir.exists()) {
+      await territoryDir.create(recursive: true);
+    }
+
+    final extension = _extractExtension(sourcePath);
+    final targetPath =
+        '${territoryDir.path}/territory_${territory.id}_${DateTime.now().millisecondsSinceEpoch}$extension';
+    final copied = await sourceFile.copy(targetPath);
+    return copied.path;
+  }
+
+  String _extractExtension(String path) {
+    final dotIndex = path.lastIndexOf('.');
+    if (dotIndex == -1 || dotIndex == path.length - 1) {
+      return '.jpg';
+    }
+
+    final extension = path.substring(dotIndex);
+    if (extension.length > 6) return '.jpg';
+    return extension;
   }
 
   void _removeImage(WidgetRef ref) {

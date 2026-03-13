@@ -5,11 +5,12 @@ import '../config/theme.dart';
 import '../config/app_localizations.dart';
 
 /// Widget de accordion (sanfona) para mostrar o histórico de visitas de um endereço
-/// 
+///
 /// Esta é a feature principal do app - cada número de rua pode expandir
 /// para mostrar todas as visitas anteriores como "children"
 class VisitHistoryAccordion extends StatelessWidget {
   final Address address;
+  final bool initiallyExpanded;
   final VoidCallback onAddVisit;
   final Function(Visit) onEditVisit;
   final Function(Visit) onDeleteVisit;
@@ -18,6 +19,7 @@ class VisitHistoryAccordion extends StatelessWidget {
   const VisitHistoryAccordion({
     super.key,
     required this.address,
+    this.initiallyExpanded = false,
     required this.onAddVisit,
     required this.onEditVisit,
     required this.onDeleteVisit,
@@ -36,6 +38,7 @@ class VisitHistoryAccordion extends StatelessWidget {
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
+          initiallyExpanded: initiallyExpanded,
           // Ícone do lado esquerdo com número de visitas
           leading: Container(
             width: 48,
@@ -58,7 +61,8 @@ class VisitHistoryAccordion extends StatelessWidget {
                 ),
                 if (hasVisits)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                     decoration: BoxDecoration(
                       color: statusColor,
                       borderRadius: BorderRadius.circular(8),
@@ -94,7 +98,10 @@ class VisitHistoryAccordion extends StatelessWidget {
           // Subtítulo com última visita
           subtitle: hasVisits
               ? Text(
-                      l10n.lastVisitOn(DateFormat('dd/MM/yyyy').format(address.lastVisit!.date), address.lastVisit!.personName),
+                  l10n.lastVisitOn(
+                      DateFormat('dd/MM/yyyy HH:mm')
+                          .format(address.lastVisit!.date),
+                      address.lastVisit!.personName),
                   style: Theme.of(context).textTheme.bodySmall,
                 )
               : null,
@@ -183,6 +190,8 @@ class VisitHistoryAccordion extends StatelessWidget {
         return AppColors.statusReturnVisit;
       case VisitStatus.bibleStudy:
         return AppColors.statusBibleStudy;
+      case VisitStatus.witness:
+        return Colors.purple;
     }
   }
 }
@@ -224,7 +233,8 @@ class _VisitItem extends StatelessWidget {
                     height: 10,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: _getStatusColor(visit.status), width: 2),
+                      border: Border.all(
+                          color: _getStatusColor(visit.status), width: 2),
                     ),
                   ),
                   Container(
@@ -258,13 +268,15 @@ class _VisitItem extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(visit.status).withOpacity(0.15),
+                          color:
+                              _getStatusColor(visit.status).withOpacity(0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(visit.status.icon, style: const TextStyle(fontSize: 12)),
+                            Text(visit.status.icon,
+                                style: const TextStyle(fontSize: 12)),
                             const SizedBox(width: 4),
                             Text(
                               visit.status.label,
@@ -280,24 +292,28 @@ class _VisitItem extends StatelessWidget {
                     ],
                   ),
                   // Nome da pessoa e/ou categoria
-                  if (visit.personName != null || visit.personCategory != null) ...[
+                  if (visit.personName != null ||
+                      visit.personCategory != null) ...[
                     const SizedBox(height: 4),
                     Row(
                       children: [
                         if (visit.personCategory != null) ...[
-                           ClipOval(
-                             child: Image.asset(
-                               visit.personCategory!.getIconPath(visit.gender),
-                               width: 20,
-                               height: 20,
-                               fit: BoxFit.cover,
-                               errorBuilder: (_, __, ___) => const Icon(Icons.person_outline, size: 16, color: AppColors.textSecondary),
-                             ),
-                           ),
-                           const SizedBox(width: 8),
+                          ClipOval(
+                            child: Image.asset(
+                              visit.personCategory!.getIconPath(visit.gender),
+                              width: 20,
+                              height: 20,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.person_outline,
+                                  size: 16,
+                                  color: AppColors.textSecondary),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
                         ] else
-                           const Icon(Icons.person_outline, size: 14, color: AppColors.textSecondary),
-                        
+                          const Icon(Icons.person_outline,
+                              size: 14, color: AppColors.textSecondary),
                         const SizedBox(width: 4),
                         if (visit.personName != null)
                           Text(
@@ -307,7 +323,10 @@ class _VisitItem extends StatelessWidget {
                         else if (visit.personCategory != null)
                           Text(
                             visit.personCategory!.label,
-                             style: Theme.of(context).textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(fontStyle: FontStyle.italic),
                           ),
                       ],
                     ),
@@ -317,7 +336,8 @@ class _VisitItem extends StatelessWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        const Icon(Icons.phone_outlined, size: 14, color: AppColors.textSecondary),
+                        const Icon(Icons.phone_outlined,
+                            size: 14, color: AppColors.textSecondary),
                         const SizedBox(width: 4),
                         Text(
                           visit.phoneNumber!,
@@ -338,12 +358,16 @@ class _VisitItem extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.notes, size: 14, color: AppColors.textSecondary),
+                          const Icon(Icons.notes,
+                              size: 14, color: AppColors.textSecondary),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               visit.notes!,
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
                                     fontStyle: FontStyle.italic,
                                   ),
                             ),
@@ -382,7 +406,8 @@ class _VisitItem extends StatelessWidget {
                     children: [
                       const Icon(Icons.delete, size: 18, color: Colors.red),
                       const SizedBox(width: 8),
-                      Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+                      Text(l10n.delete,
+                          style: const TextStyle(color: Colors.red)),
                     ],
                   ),
                 ),
@@ -420,6 +445,8 @@ class _VisitItem extends StatelessWidget {
         return AppColors.statusReturnVisit;
       case VisitStatus.bibleStudy:
         return AppColors.statusBibleStudy;
+      case VisitStatus.witness:
+        return Colors.purple;
     }
   }
 }

@@ -12,63 +12,84 @@ class MonthlyStats {
   final int month;
   final double hours;
   final int returnVisits;
+  final int visitedHouses;
 
   MonthlyStats({
     required this.year,
     required this.month,
     required this.hours,
     required this.returnVisits,
+    required this.visitedHouses,
   });
 }
 
-/// Provider for monthly stats (last 3 months)
-final monthlyStatsProvider = FutureProvider<List<MonthlyStats>>((ref) async {
+final monthlyStatsByMonthsProvider =
+    FutureProvider.family<List<MonthlyStats>, int>((ref, months) async {
   final monthlyNotifier = ref.read(monthlyServiceTimeProvider.notifier);
   final territories = ref.watch(territoriesProvider).asData?.value ?? [];
-  
+
+  final safeMonths = months < 1 ? 1 : months;
+
   // Get historical hours data
-  final hoursHistory = await monthlyNotifier.getHistoricalData(3);
-  
+  final hoursHistory = await monthlyNotifier.getHistoricalData(safeMonths);
+
   // Calculate return visits per month
   final now = DateTime.now();
   final List<MonthlyStats> stats = [];
-  
-  for (int i = 0; i < 3; i++) {
-    final targetMonth = DateTime(now.year, now.month - (2 - i), 1);
+
+  for (int i = 0; i < safeMonths; i++) {
+    final targetMonth = DateTime(now.year, now.month - (safeMonths - 1 - i), 1);
     final monthStart = DateTime(targetMonth.year, targetMonth.month, 1);
-    final monthEnd = DateTime(targetMonth.year, targetMonth.month + 1, 0, 23, 59, 59);
-    
+    final monthEnd =
+        DateTime(targetMonth.year, targetMonth.month + 1, 0, 23, 59, 59);
+
     // Count return visits for this month
     int returnVisitCount = 0;
+    final visitedAddressKeys = <String>{};
     for (final territory in territories) {
       for (final street in territory.streets) {
         for (final address in street.addresses) {
+          var hasVisitInMonth = false;
           for (final visit in address.visits) {
-            if (visit.date.isAfter(monthStart.subtract(const Duration(days: 1))) &&
-                visit.date.isBefore(monthEnd.add(const Duration(days: 1))) &&
-                visit.status == VisitStatus.returnVisit) {
-              returnVisitCount++;
+            if (visit.date
+                    .isAfter(monthStart.subtract(const Duration(days: 1))) &&
+                visit.date.isBefore(monthEnd.add(const Duration(days: 1)))) {
+              hasVisitInMonth = true;
+              if (visit.status == VisitStatus.returnVisit) {
+                returnVisitCount++;
+              }
             }
+          }
+          if (hasVisitInMonth) {
+            visitedAddressKeys
+                .add('${territory.id}:${street.id}:${address.id}');
           }
         }
       }
     }
-    
+
     // Find corresponding hours
     final hoursData = hoursHistory.firstWhere(
       (h) => h.year == targetMonth.year && h.month == targetMonth.month,
-      orElse: () => MonthlyServiceTime(year: targetMonth.year, month: targetMonth.month),
+      orElse: () =>
+          MonthlyServiceTime(year: targetMonth.year, month: targetMonth.month),
     );
-    
+
     stats.add(MonthlyStats(
       year: targetMonth.year,
       month: targetMonth.month,
       hours: hoursData.totalMinutes / 60,
       returnVisits: returnVisitCount + hoursData.revisitCount,
+      visitedHouses: visitedAddressKeys.length,
     ));
   }
-  
+
   return stats;
+});
+
+/// Provider for monthly stats (last 3 months)
+final monthlyStatsProvider = FutureProvider<List<MonthlyStats>>((ref) async {
+  return ref.watch(monthlyStatsByMonthsProvider(3).future);
 });
 
 /// Widget that displays a line chart with hours and return visits
@@ -79,7 +100,7 @@ class MonthlyStatsChart extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final statsAsync = ref.watch(monthlyStatsProvider);
-    
+
     return statsAsync.when(
       loading: () => const SizedBox(
         height: 200,
@@ -88,7 +109,7 @@ class MonthlyStatsChart extends ConsumerWidget {
       error: (_, __) => const SizedBox.shrink(),
       data: (stats) {
         if (stats.isEmpty) return const SizedBox.shrink();
-        
+
         return Card(
           elevation: 2,
           child: Padding(
@@ -129,19 +150,30 @@ class MonthlyStatsChart extends ConsumerWidget {
     );
   }
 
-  Widget _buildChart(List<MonthlyStats> stats, AppLocalizations l10n, BuildContext context) {
+  Widget _buildChart(
+      List<MonthlyStats> stats, AppLocalizations l10n, BuildContext context) {
     final maxHours = stats.map((s) => s.hours).reduce((a, b) => a > b ? a : b);
-    final maxVisits = stats.map((s) => s.returnVisits.toDouble()).reduce((a, b) => a > b ? a : b);
-    
-    // Scale factor to normalize both lines
-    final scale = maxHours > 0 ? maxVisits / maxHours : 1.0;
-    
+    final maxVisits = stats
+        .map((s) => s.returnVisits.toDouble())
+        .reduce((a, b) => a > b ? a : b);
+    final chartMaxY = maxHours > 0 ? maxHours * 1.1 : 10.0;
+
+    // Conversion factors for dual Y axes (hours on left, revisits on right).
+    final chartUnitPerVisit = maxVisits > 0 ? chartMaxY / maxVisits : 0.0;
+
+    final leftInterval = (chartMaxY / 4).clamp(1.0, chartMaxY);
+    final visitsTickStep =
+        maxVisits > 0 ? (maxVisits / 4).ceil().toDouble() : 1.0;
+    final rightInterval = maxVisits > 0
+        ? (chartUnitPerVisit * visitsTickStep).clamp(1.0, chartMaxY)
+        : chartMaxY;
+
     return LineChart(
       LineChartData(
         gridData: FlGridData(
           show: true,
           drawVerticalLine: true,
-          horizontalInterval: maxHours > 0 ? maxHours / 4 : 1,
+          horizontalInterval: leftInterval,
           verticalInterval: 1,
           getDrawingHorizontalLine: (value) => FlLine(
             color: Colors.grey.shade300,
@@ -158,10 +190,25 @@ class MonthlyStatsChart extends ConsumerWidget {
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 40,
+              interval: rightInterval,
               getTitlesWidget: (value, meta) {
-                // Show return visits scale
-                final visitValue = (value * scale).round();
-                if (visitValue < 0) return const SizedBox.shrink();
+                if (maxVisits <= 0) {
+                  if (value.abs() > 0.001) return const SizedBox.shrink();
+                  return Text(
+                    '0',
+                    style: TextStyle(
+                      color: Colors.orange.shade700,
+                      fontSize: 10,
+                    ),
+                  );
+                }
+
+                final tickIndex = (value / rightInterval).round();
+                final visitValue = (tickIndex * visitsTickStep).round();
+                if (visitValue < 0 || visitValue > maxVisits.round()) {
+                  return const SizedBox.shrink();
+                }
+
                 return Text(
                   '$visitValue',
                   style: TextStyle(
@@ -202,6 +249,7 @@ class MonthlyStatsChart extends ConsumerWidget {
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 40,
+              interval: leftInterval,
               getTitlesWidget: (value, meta) {
                 return Text(
                   '${value.toInt()}h',
@@ -221,7 +269,7 @@ class MonthlyStatsChart extends ConsumerWidget {
         minX: 0,
         maxX: (stats.length - 1).toDouble(),
         minY: 0,
-        maxY: maxHours > 0 ? maxHours * 1.1 : 10,
+        maxY: chartMaxY,
         lineBarsData: [
           // Hours line (blue)
           LineChartBarData(
@@ -251,7 +299,7 @@ class MonthlyStatsChart extends ConsumerWidget {
           // Return visits line (orange) - scaled to hours
           LineChartBarData(
             spots: stats.asMap().entries.map((e) {
-              final scaledValue = scale > 0 ? e.value.returnVisits / scale : 0.0;
+              final scaledValue = e.value.returnVisits * chartUnitPerVisit;
               return FlSpot(e.key.toDouble(), scaledValue);
             }).toList(),
             isCurved: true,
@@ -280,7 +328,7 @@ class MonthlyStatsChart extends ConsumerWidget {
             getTooltipItems: (touchedSpots) {
               return touchedSpots.map((spot) {
                 final isHours = spot.barIndex == 0;
-                final value = isHours 
+                final value = isHours
                     ? '${spot.y.toStringAsFixed(1)}h'
                     : '${stats[spot.x.toInt()].returnVisits} ${l10n.returnVisit.toLowerCase()}';
                 return LineTooltipItem(

@@ -96,6 +96,7 @@ enum VisitStatus {
   returnVisit, // Revisita
   otherLanguage, // Outro idioma
   bibleStudy,   // Estudo Bíblico
+  witness,      // Testemunha
 }
 
 extension VisitStatusExtension on VisitStatus {
@@ -125,6 +126,8 @@ extension VisitStatusExtension on VisitStatus {
         return 'Outro idioma';
       case VisitStatus.bibleStudy:
         return 'Estudo Bíblico';
+      case VisitStatus.witness:
+        return 'Testemunha';
     }
   }
 
@@ -154,7 +157,30 @@ extension VisitStatusExtension on VisitStatus {
         return '🌐';
       case VisitStatus.bibleStudy:
         return '📖';
+      case VisitStatus.witness:
+        return 'JW';
     }
+  }
+
+  Widget buildIcon({double size = 18}) {
+    if (this == VisitStatus.witness) {
+      return Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF9C27B0), // Purple
+          borderRadius: BorderRadius.circular(4),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Text(
+          'JW',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: size - 6,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
+    return Text(icon, style: TextStyle(fontSize: size));
   }
   
   Color get color {
@@ -164,6 +190,8 @@ extension VisitStatusExtension on VisitStatus {
        case VisitStatus.answered:
          return Colors.green;
        case VisitStatus.otherLanguage:
+         return Colors.purple;
+       case VisitStatus.witness:
          return Colors.purple;
        default:
          return Colors.grey;

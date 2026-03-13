@@ -13,6 +13,15 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
+// Align Java compilation target across all Android modules (including plugins).
+subprojects {
+    tasks.withType(JavaCompile).configureEach {
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
+        options.compilerArgs << "-Xlint:-options"
+    }
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

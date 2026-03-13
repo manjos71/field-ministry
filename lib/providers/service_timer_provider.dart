@@ -20,13 +20,13 @@ class ServiceSession {
       endTime: endTime ?? this.endTime,
     );
   }
-  
+
   Duration get duration {
     if (startTime != null && endTime != null) {
       if (endTime!.isBefore(startTime!)) {
-         // Handle case where end is before start (e.g. over midnight? or error)
-         // For now assume same day or valid sequence. If negative, return zero.
-         return Duration.zero;
+        // If end time is before start time, assume session crossed midnight.
+        final adjustedEnd = endTime!.add(const Duration(days: 1));
+        return adjustedEnd.difference(startTime!);
       }
       return endTime!.difference(startTime!);
     }
@@ -77,11 +77,14 @@ class MonthlyServiceTime {
 
 // Monthly Service Time Notifier
 class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
-  MonthlyServiceTimeNotifier() : super(MonthlyServiceTime(
-    year: DateTime.now().year,
-    month: DateTime.now().month,
-  )) {
-    _loadMonthlyTime();
+  late final Future<void> _loadFuture;
+
+  MonthlyServiceTimeNotifier()
+      : super(MonthlyServiceTime(
+          year: DateTime.now().year,
+          month: DateTime.now().month,
+        )) {
+    _loadFuture = _loadMonthlyTime();
   }
 
   String _getStorageKey(int year, int month) {
@@ -120,36 +123,45 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
   }
 
   Future<void> addTime(Duration duration) async {
+    await _loadFuture;
     final now = DateTime.now();
-    
+    final addedMinutes =
+        duration.inSeconds <= 0 ? 0 : ((duration.inSeconds + 59) ~/ 60);
+    if (addedMinutes == 0) return;
+
     // Check if we need to reset for a new month
     if (state.year != now.year || state.month != now.month) {
       state = MonthlyServiceTime(
         year: now.year,
         month: now.month,
-        totalMinutes: duration.inMinutes,
+        totalMinutes: addedMinutes,
+        revisitCount: 0,
+        bibleStudyCount: 0,
       );
     } else {
       state = state.copyWith(
-        totalMinutes: state.totalMinutes + duration.inMinutes,
+        totalMinutes: state.totalMinutes + addedMinutes,
       );
     }
-    
+
     await _saveMonthlyTime();
   }
 
   Future<void> setTime(int minutes) async {
+    await _loadFuture;
     final now = DateTime.now();
     state = MonthlyServiceTime(
       year: now.year,
       month: now.month,
       totalMinutes: minutes,
       revisitCount: state.revisitCount,
+      bibleStudyCount: state.bibleStudyCount,
     );
     await _saveMonthlyTime();
   }
 
   Future<void> incrementRevisitCount() async {
+    await _loadFuture;
     final now = DateTime.now();
     // Reset if new month
     if (state.year != now.year || state.month != now.month) {
@@ -166,6 +178,7 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
   }
 
   Future<void> incrementBibleStudyCount() async {
+    await _loadFuture;
     final now = DateTime.now();
     if (state.year != now.year || state.month != now.month) {
       await _loadMonthlyTime();
@@ -191,6 +204,7 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
   }
 
   Future<void> checkAndResetForNewMonth() async {
+    await _loadFuture;
     final now = DateTime.now();
     if (state.year != now.year || state.month != now.month) {
       await _loadMonthlyTime();
@@ -201,15 +215,15 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
   Future<List<MonthlyServiceTime>> getHistoricalData(int months) async {
     final List<MonthlyServiceTime> history = [];
     final now = DateTime.now();
-    
+
     try {
       final db = await DatabaseService.getInstance();
-      
+
       for (int i = 0; i < months; i++) {
         final date = DateTime(now.year, now.month - i, 1);
         final key = _getStorageKey(date.year, date.month);
         final savedMinutes = db.getSetting<int>(key) ?? 0;
-        
+
         history.add(MonthlyServiceTime(
           year: date.year,
           month: date.month,
@@ -219,7 +233,7 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
     } catch (_) {
       // Return empty list on error
     }
-    
+
     return history.reversed.toList(); // Ordem cronológica
   }
 }
@@ -249,12 +263,12 @@ class ServiceTimerNotifier extends StateNotifier<ServiceSession> {
     state = state.copyWith(startTime: time);
     await _saveSession();
   }
-  
+
   Future<void> setEndTime(DateTime time) async {
     state = state.copyWith(endTime: time);
     await _saveSession();
   }
-  
+
   Future<void> reset() async {
     state = ServiceSession();
     await _clearSession();
@@ -263,8 +277,10 @@ class ServiceTimerNotifier extends StateNotifier<ServiceSession> {
   Future<void> _saveSession() async {
     try {
       final db = await DatabaseService.getInstance();
-      await db.saveSetting('service_start_time', state.startTime?.toIso8601String());
-      await db.saveSetting('service_end_time', state.endTime?.toIso8601String());
+      await db.saveSetting(
+          'service_start_time', state.startTime?.toIso8601String());
+      await db.saveSetting(
+          'service_end_time', state.endTime?.toIso8601String());
     } catch (_) {
       // Ignore save errors
     }
@@ -282,10 +298,13 @@ class ServiceTimerNotifier extends StateNotifier<ServiceSession> {
 }
 
 // Providers
-final serviceTimerProvider = StateNotifierProvider<ServiceTimerNotifier, ServiceSession>((ref) {
+final serviceTimerProvider =
+    StateNotifierProvider<ServiceTimerNotifier, ServiceSession>((ref) {
   return ServiceTimerNotifier();
 });
 
-final monthlyServiceTimeProvider = StateNotifierProvider<MonthlyServiceTimeNotifier, MonthlyServiceTime>((ref) {
+final monthlyServiceTimeProvider =
+    StateNotifierProvider<MonthlyServiceTimeNotifier, MonthlyServiceTime>(
+        (ref) {
   return MonthlyServiceTimeNotifier();
 });

@@ -18,10 +18,12 @@ class StatusSelector extends StatelessWidget {
 
   static const List<VisitStatus> allowedStatus = [
     VisitStatus.notHome,
+    VisitStatus.noTime,
     VisitStatus.notAnswered,
     VisitStatus.answered,
     VisitStatus.interested,
     VisitStatus.otherLanguage,
+    VisitStatus.witness,
   ];
 
   String _getStatusLabel(VisitStatus status, AppLocalizations l10n) {
@@ -30,12 +32,16 @@ class StatusSelector extends StatelessWidget {
         return l10n.notHome;
       case VisitStatus.notAnswered:
         return l10n.notAnswered;
+      case VisitStatus.noTime:
+        return l10n.noTime;
       case VisitStatus.answered:
         return l10n.answered;
       case VisitStatus.interested:
         return l10n.interested;
       case VisitStatus.otherLanguage:
         return l10n.otherLanguage;
+      case VisitStatus.witness:
+        return l10n.witness;
       default:
         return '';
     }
@@ -72,7 +78,7 @@ class StatusSelector extends StatelessWidget {
           value: status,
           child: Row(
             children: [
-              Text(status.icon, style: const TextStyle(fontSize: 18)),
+              status.buildIcon(size: 18),
               const SizedBox(width: 8),
               Text(_getStatusLabel(status, l10n)),
             ],
@@ -86,7 +92,7 @@ class StatusSelector extends StatelessWidget {
         return allowedStatus.map((status) {
           return Row(
             children: [
-              Text(status.icon, style: const TextStyle(fontSize: 18)),
+              status.buildIcon(size: 18),
               const SizedBox(width: 8),
               Text(_getStatusLabel(status, l10n)),
             ],

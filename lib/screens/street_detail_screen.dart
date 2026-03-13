@@ -12,22 +12,24 @@ import '../widgets/visit_history_accordion.dart';
 import '../widgets/status_selector.dart';
 
 enum AddressFilter { all, odd, even }
+
 enum AddressSortOrder { ascending, descending }
 
 class StreetDetailScreen extends ConsumerStatefulWidget {
   final String territoryId;
   final String streetId;
+  final String? initialAddressId;
 
   const StreetDetailScreen({
     super.key,
     required this.territoryId,
     required this.streetId,
+    this.initialAddressId,
   });
 
   @override
   ConsumerState<StreetDetailScreen> createState() => _StreetDetailScreenState();
 }
-
 
 // Widget para agendamento de revisitas — máximo 2 revisitas + Estudo Bíblico
 class RecursiveRevisitScheduler extends ConsumerStatefulWidget {
@@ -241,9 +243,7 @@ class _RecursiveRevisitSchedulerState
                       final sId = widget.streetId;
                       final aId = widget.addressId;
                       if (tId != null && sId != null && aId != null) {
-                        await ref
-                            .read(territoriesProvider.notifier)
-                            .addVisit(
+                        await ref.read(territoriesProvider.notifier).addVisit(
                               territoryId: tId,
                               streetId: sId,
                               addressId: aId,
@@ -259,7 +259,8 @@ class _RecursiveRevisitSchedulerState
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('📖 Estudo Bíblico criado na aba Cards!'),
+                            content:
+                                Text('📖 Estudo Bíblico criado na aba Cards!'),
                             duration: Duration(seconds: 2),
                           ),
                         );
@@ -283,21 +284,22 @@ class _RecursiveRevisitSchedulerState
   }
 }
 
-
 class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
   bool _isGenerating = false;
   AddressFilter _filter = AddressFilter.all;
   AddressSortOrder _sortOrder = AddressSortOrder.ascending;
+  final GlobalKey _targetAddressKey = GlobalKey();
+  bool _didAutoScrollToTarget = false;
 
   List<Address> _getFilteredAndSortedAddresses(List<Address> addresses) {
     // 1. Filter
     List<Address> filtered = addresses.where((addr) {
       if (_filter == AddressFilter.all) return true;
-      
+
       // Try to extract numeric part
       final numMatch = RegExp(r'\d+').firstMatch(addr.number);
       if (numMatch == null) return true; // Non-numeric always shown
-      
+
       final num = int.parse(numMatch.group(0)!);
       if (_filter == AddressFilter.odd) {
         return num % 2 != 0;
@@ -311,14 +313,14 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
       // Extract numeric and alpha parts
       final aNumMatch = RegExp(r'\d+').firstMatch(a.number);
       final bNumMatch = RegExp(r'\d+').firstMatch(b.number);
-      
+
       int comparison = 0;
-      
+
       if (aNumMatch != null && bNumMatch != null) {
         final aNum = int.parse(aNumMatch.group(0)!);
         final bNum = int.parse(bNumMatch.group(0)!);
         comparison = aNum.compareTo(bNum);
-        
+
         // If numbers are equal, compare alpha parts
         if (comparison == 0) {
           final aAlpha = a.number.substring(aNumMatch.end);
@@ -329,8 +331,10 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
         // Fallback to string comparison
         comparison = a.number.compareTo(b.number);
       }
-      
-      return _sortOrder == AddressSortOrder.ascending ? comparison : -comparison;
+
+      return _sortOrder == AddressSortOrder.ascending
+          ? comparison
+          : -comparison;
     });
 
     return filtered;
@@ -350,6 +354,24 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
     }
 
     final displayAddresses = _getFilteredAndSortedAddresses(street.addresses);
+
+    if (!_didAutoScrollToTarget &&
+        widget.initialAddressId != null &&
+        displayAddresses.any((a) => a.id == widget.initialAddressId)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final ctx = _targetAddressKey.currentContext;
+        if (ctx != null) {
+          Scrollable.ensureVisible(
+            ctx,
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeInOut,
+            alignment: 0.1,
+          );
+        }
+      });
+      _didAutoScrollToTarget = true;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -383,33 +405,38 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
               padding: const EdgeInsets.only(bottom: 80, top: 8),
               itemCount: displayAddresses.length,
               itemBuilder: (context, index) {
+                final address = displayAddresses[index];
+                final isTargetAddress = widget.initialAddressId != null &&
+                    address.id == widget.initialAddressId;
                 return VisitHistoryAccordion(
-                  address: displayAddresses[index],
+                  key: isTargetAddress ? _targetAddressKey : null,
+                  address: address,
+                  initiallyExpanded: isTargetAddress,
                   onAddVisit: () => _showAddVisitDialog(
                     context,
                     territory,
                     street,
-                    displayAddresses[index],
+                    address,
                   ),
                   onEditVisit: (visit) => _showEditVisitDialog(
                     context,
                     territory,
                     street,
-                    displayAddresses[index],
+                    address,
                     visit,
                   ),
                   onDeleteVisit: (visit) => _confirmDeleteVisit(
                     context,
                     territory,
                     street,
-                    displayAddresses[index],
+                    address,
                     visit,
                   ),
                   onDeleteAddress: () => _confirmDeleteAddress(
                     context,
                     territory,
                     street,
-                    displayAddresses[index],
+                    address,
                   ),
                 );
               },
@@ -507,7 +534,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context, Territory territory, Street street) {
+  Widget _buildEmptyState(
+      BuildContext context, Territory territory, Street street) {
     final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
@@ -536,13 +564,15 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 OutlinedButton.icon(
-                  onPressed: () => _showGenerateDialog(context, territory, street),
+                  onPressed: () =>
+                      _showGenerateDialog(context, territory, street),
                   icon: const Icon(Icons.auto_awesome),
                   label: Text(l10n.generate),
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton.icon(
-                  onPressed: () => _showAddAddressDialog(context, territory, street),
+                  onPressed: () =>
+                      _showAddAddressDialog(context, territory, street),
                   icon: const Icon(Icons.add),
                   label: Text(l10n.add),
                 ),
@@ -581,14 +611,17 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
             onPressed: () {
               if (nameController.text.trim().isEmpty) return;
 
-              final updatedStreet = street.copyWith(name: nameController.text.trim());
+              final updatedStreet =
+                  street.copyWith(name: nameController.text.trim());
               final updatedTerritory = territory.copyWith(
                 streets: territory.streets
                     .map((s) => s.id == street.id ? updatedStreet : s)
                     .toList(),
               );
-              
-              ref.read(territoriesProvider.notifier).updateTerritory(updatedTerritory);
+
+              ref
+                  .read(territoriesProvider.notifier)
+                  .updateTerritory(updatedTerritory);
               Navigator.pop(context);
             },
             child: Text(l10n.save),
@@ -636,10 +669,10 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
               Navigator.pop(context);
 
               await ref.read(territoriesProvider.notifier).addAddress(
-                territoryId: territory.id,
-                streetId: street.id,
-                number: numberController.text.trim(),
-              );
+                    territoryId: territory.id,
+                    streetId: street.id,
+                    number: numberController.text.trim(),
+                  );
             },
             child: Text(l10n.add),
           ),
@@ -721,14 +754,16 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                       Navigator.pop(context);
                       setState(() => _isGenerating = true);
 
-                      await ref.read(territoriesProvider.notifier).generateAddresses(
-                        territoryId: territory.id,
-                        streetId: street.id,
-                        from: from,
-                        to: to,
-                        oddOnly: filter == 'odd',
-                        evenOnly: filter == 'even',
-                      );
+                      await ref
+                          .read(territoriesProvider.notifier)
+                          .generateAddresses(
+                            territoryId: territory.id,
+                            streetId: street.id,
+                            from: from,
+                            to: to,
+                            oddOnly: filter == 'odd',
+                            evenOnly: filter == 'even',
+                          );
 
                       if (mounted) {
                         setState(() => _isGenerating = false);
@@ -808,7 +843,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                           context: context,
                           initialDate: selectedTime,
                           firstDate: DateTime(2000),
-                          lastDate: DateTime.now().add(const Duration(days: 365)),
+                          lastDate:
+                              DateTime.now().add(const Duration(days: 365)),
                         );
                         if (date != null) {
                           setState(() {
@@ -827,7 +863,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                           labelText: l10n.visitDate,
                           prefixIcon: const Icon(Icons.calendar_today),
                         ),
-                        child: Text(DateFormat('dd/MM/yyyy').format(selectedTime)),
+                        child:
+                            Text(DateFormat('dd/MM/yyyy').format(selectedTime)),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -840,13 +877,13 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         );
                         if (time != null) {
                           setState(() {
-                             selectedTime = DateTime(
-                               selectedTime.year,
-                               selectedTime.month,
-                               selectedTime.day,
-                               time.hour,
-                               time.minute,
-                             );
+                            selectedTime = DateTime(
+                              selectedTime.year,
+                              selectedTime.month,
+                              selectedTime.day,
+                              time.hour,
+                              time.minute,
+                            );
                           });
                         }
                       },
@@ -858,7 +895,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         child: Text(DateFormat('HH:mm').format(selectedTime)),
                       ),
                     ),
-                    
+
                     if (selectedStatus == VisitStatus.interested) ...[
                       const SizedBox(height: 12),
                       TextField(
@@ -869,7 +906,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                               ? Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Image.asset(
-                                    selectedCategory!.getIconPath(selectedGender),
+                                    selectedCategory!
+                                        .getIconPath(selectedGender),
                                     width: 24,
                                     height: 24,
                                   ),
@@ -879,7 +917,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           filled: true,
-                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                          fillColor:
+                              Theme.of(context).inputDecorationTheme.fillColor,
                         ),
                         textCapitalization: TextCapitalization.words,
                       ),
@@ -888,9 +927,12 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         selectedCategory: selectedCategory,
                         selectedSkinTone: selectedSkinTone,
                         selectedGender: selectedGender,
-                        onCategoryChanged: (cat) => setState(() => selectedCategory = cat),
-                        onSkinToneChanged: (tone) => setState(() => selectedSkinTone = tone),
-                        onGenderChanged: (gender) => setState(() => selectedGender = gender),
+                        onCategoryChanged: (cat) =>
+                            setState(() => selectedCategory = cat),
+                        onSkinToneChanged: (tone) =>
+                            setState(() => selectedSkinTone = tone),
+                        onGenderChanged: (gender) =>
+                            setState(() => selectedGender = gender),
                       ),
                       const SizedBox(height: 12),
                       TextField(
@@ -902,14 +944,14 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           filled: true,
-                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                          fillColor:
+                              Theme.of(context).inputDecorationTheme.fillColor,
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.contacts),
                             onPressed: () => _saveToContacts(
-                              context, 
-                              personNameController.text, 
-                              phoneController.text
-                            ),
+                                context,
+                                personNameController.text,
+                                phoneController.text),
                             tooltip: l10n.saveToContacts,
                           ),
                         ),
@@ -919,9 +961,12 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: OutlinedButton.icon(
-                            onPressed: () => _openWhatsApp(phoneController.text),
-                            icon: const Icon(Icons.message, color: Colors.green),
-                            label: Text(l10n.openInWhatsApp, style: const TextStyle(color: Colors.green)),
+                            onPressed: () =>
+                                _openWhatsApp(phoneController.text),
+                            icon:
+                                const Icon(Icons.message, color: Colors.green),
+                            label: Text(l10n.openInWhatsApp,
+                                style: const TextStyle(color: Colors.green)),
                           ),
                         ),
                     ],
@@ -935,7 +980,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         filled: true,
-                        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                        fillColor:
+                            Theme.of(context).inputDecorationTheme.fillColor,
                       ),
                       maxLines: 2,
                     ),
@@ -943,7 +989,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                     if (selectedStatus == VisitStatus.interested)
                       RecursiveRevisitScheduler(
                         personName: personNameController.text,
-                        location: '${street.name}, ${address.number} — ${territory.name}',
+                        location:
+                            '${street.name}, ${address.number} — ${territory.name}',
                         onRevisitToggled: (v) => revisitScheduled = v,
                         territoryId: territory.id,
                         streetId: street.id,
@@ -967,19 +1014,28 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                                   Navigator.pop(context);
 
                                   VisitStatus finalStatus = selectedStatus!;
-                                  if (selectedStatus == VisitStatus.interested || selectedStatus == VisitStatus.returnVisit) {
-                                    int positiveCount = address.visits.where((v) => 
-                                      v.status == VisitStatus.interested || 
-                                      v.status == VisitStatus.returnVisit || 
-                                      v.status == VisitStatus.bibleStudy
-                                    ).length;
+                                  if (selectedStatus ==
+                                          VisitStatus.interested ||
+                                      selectedStatus ==
+                                          VisitStatus.returnVisit) {
+                                    int positiveCount = address.visits
+                                        .where((v) =>
+                                            v.status ==
+                                                VisitStatus.interested ||
+                                            v.status ==
+                                                VisitStatus.returnVisit ||
+                                            v.status == VisitStatus.bibleStudy)
+                                        .length;
                                     if (positiveCount >= 2) {
                                       finalStatus = VisitStatus.bibleStudy;
                                     }
                                   }
 
                                   if (revisitScheduled) {
-                                    ref.read(monthlyServiceTimeProvider.notifier).incrementRevisitCount();
+                                    ref
+                                        .read(
+                                            monthlyServiceTimeProvider.notifier)
+                                        .incrementRevisitCount();
                                   }
 
                                   await ref
@@ -989,13 +1045,15 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                                         streetId: street.id,
                                         addressId: address.id,
                                         status: finalStatus,
-                                        notes: notesController.text.trim().isEmpty
-                                            ? null
-                                            : notesController.text.trim(),
-                                        personName:
-                                            personNameController.text.trim().isEmpty
+                                        notes:
+                                            notesController.text.trim().isEmpty
                                                 ? null
-                                                : personNameController.text.trim(),
+                                                : notesController.text.trim(),
+                                        personName: personNameController.text
+                                                .trim()
+                                                .isEmpty
+                                            ? null
+                                            : personNameController.text.trim(),
                                         phoneNumber:
                                             phoneController.text.trim().isEmpty
                                                 ? null
@@ -1096,7 +1154,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                           context: context,
                           initialDate: selectedTime,
                           firstDate: DateTime(2000),
-                          lastDate: DateTime.now().add(const Duration(days: 365)),
+                          lastDate:
+                              DateTime.now().add(const Duration(days: 365)),
                         );
                         if (date != null) {
                           setState(() {
@@ -1115,7 +1174,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                           labelText: l10n.visitDate,
                           prefixIcon: const Icon(Icons.calendar_today),
                         ),
-                        child: Text(DateFormat('dd/MM/yyyy').format(selectedTime)),
+                        child:
+                            Text(DateFormat('dd/MM/yyyy').format(selectedTime)),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1128,13 +1188,13 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         );
                         if (time != null) {
                           setState(() {
-                             selectedTime = DateTime(
-                               selectedTime.year,
-                               selectedTime.month,
-                               selectedTime.day,
-                               time.hour,
-                               time.minute,
-                             );
+                            selectedTime = DateTime(
+                              selectedTime.year,
+                              selectedTime.month,
+                              selectedTime.day,
+                              time.hour,
+                              time.minute,
+                            );
                           });
                         }
                       },
@@ -1146,7 +1206,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         child: Text(DateFormat('HH:mm').format(selectedTime)),
                       ),
                     ),
-                    
+
                     if (selectedStatus == VisitStatus.interested) ...[
                       const SizedBox(height: 12),
                       TextField(
@@ -1157,7 +1217,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                               ? Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Image.asset(
-                                    selectedCategory!.getIconPath(selectedGender),
+                                    selectedCategory!
+                                        .getIconPath(selectedGender),
                                     width: 24,
                                     height: 24,
                                   ),
@@ -1166,8 +1227,9 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                            filled: true,
-                            fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                          filled: true,
+                          fillColor:
+                              Theme.of(context).inputDecorationTheme.fillColor,
                         ),
                         textCapitalization: TextCapitalization.words,
                       ),
@@ -1176,9 +1238,12 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         selectedCategory: selectedCategory,
                         selectedSkinTone: selectedSkinTone,
                         selectedGender: selectedGender,
-                        onCategoryChanged: (cat) => setState(() => selectedCategory = cat),
-                        onSkinToneChanged: (tone) => setState(() => selectedSkinTone = tone),
-                        onGenderChanged: (gender) => setState(() => selectedGender = gender),
+                        onCategoryChanged: (cat) =>
+                            setState(() => selectedCategory = cat),
+                        onSkinToneChanged: (tone) =>
+                            setState(() => selectedSkinTone = tone),
+                        onGenderChanged: (gender) =>
+                            setState(() => selectedGender = gender),
                       ),
                       const SizedBox(height: 12),
                       TextField(
@@ -1189,16 +1254,16 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                            filled: true,
-                            fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                          filled: true,
+                          fillColor:
+                              Theme.of(context).inputDecorationTheme.fillColor,
                           suffixIcon: IconButton(
-                             icon: const Icon(Icons.contacts),
-                             onPressed: () => _saveToContacts(
-                               context, 
-                               personNameController.text, 
-                               phoneController.text
-                             ),
-                             tooltip: l10n.saveToContacts,
+                            icon: const Icon(Icons.contacts),
+                            onPressed: () => _saveToContacts(
+                                context,
+                                personNameController.text,
+                                phoneController.text),
+                            tooltip: l10n.saveToContacts,
                           ),
                         ),
                         keyboardType: TextInputType.phone,
@@ -1207,9 +1272,12 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: OutlinedButton.icon(
-                            onPressed: () => _openWhatsApp(phoneController.text),
-                            icon: const Icon(Icons.message, color: Colors.green),
-                            label: Text(l10n.openInWhatsApp, style: const TextStyle(color: Colors.green)),
+                            onPressed: () =>
+                                _openWhatsApp(phoneController.text),
+                            icon:
+                                const Icon(Icons.message, color: Colors.green),
+                            label: Text(l10n.openInWhatsApp,
+                                style: const TextStyle(color: Colors.green)),
                           ),
                         ),
                       const SizedBox(height: 12),
@@ -1224,7 +1292,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                       const SizedBox(height: 12),
                       RecursiveRevisitScheduler(
                         personName: personNameController.text,
-                        location: '${street.name}, ${address.number} — ${territory.name}',
+                        location:
+                            '${street.name}, ${address.number} — ${territory.name}',
                         onRevisitToggled: (v) => revisitScheduled = v,
                         territoryId: territory.id,
                         streetId: street.id,
@@ -1247,27 +1316,34 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                             Navigator.pop(context);
 
                             VisitStatus finalStatus = selectedStatus;
-                            if (selectedStatus == VisitStatus.interested || selectedStatus == VisitStatus.returnVisit) {
-                              int positiveCount = address.visits.where((v) => 
-                                v.status == VisitStatus.interested || 
-                                v.status == VisitStatus.returnVisit || 
-                                v.status == VisitStatus.bibleStudy
-                              ).length;
+                            if (selectedStatus == VisitStatus.interested ||
+                                selectedStatus == VisitStatus.returnVisit) {
+                              int positiveCount = address.visits
+                                  .where((v) =>
+                                      v.status == VisitStatus.interested ||
+                                      v.status == VisitStatus.returnVisit ||
+                                      v.status == VisitStatus.bibleStudy)
+                                  .length;
                               // If this visit is ALREADY in the list, we don't count it twice.
                               // But just to be safe, if the total positive is >= 3 (including this one if it was already positive),
                               // or if it was NOT positive before and now is (so total will be >= 3), we promote.
                               // The simpliest is: if total positive considering current state >= 3.
-                              bool wasPositive = visit.status == VisitStatus.interested || 
-                                                 visit.status == VisitStatus.returnVisit || 
-                                                 visit.status == VisitStatus.bibleStudy;
-                              int effectiveCount = wasPositive ? positiveCount : positiveCount + 1;
+                              bool wasPositive =
+                                  visit.status == VisitStatus.interested ||
+                                      visit.status == VisitStatus.returnVisit ||
+                                      visit.status == VisitStatus.bibleStudy;
+                              int effectiveCount = wasPositive
+                                  ? positiveCount
+                                  : positiveCount + 1;
                               if (effectiveCount >= 3) {
                                 finalStatus = VisitStatus.bibleStudy;
                               }
                             }
 
                             if (revisitScheduled) {
-                              ref.read(monthlyServiceTimeProvider.notifier).incrementRevisitCount();
+                              ref
+                                  .read(monthlyServiceTimeProvider.notifier)
+                                  .incrementRevisitCount();
                             }
 
                             final updatedVisit = Visit(
@@ -1336,11 +1412,11 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               ref.read(territoriesProvider.notifier).removeVisit(
-                territoryId: territory.id,
-                streetId: street.id,
-                addressId: address.id,
-                visitId: visit.id,
-              );
+                    territoryId: territory.id,
+                    streetId: street.id,
+                    addressId: address.id,
+                    visitId: visit.id,
+                  );
               Navigator.pop(context);
             },
             child: Text(l10n.delete),
@@ -1373,16 +1449,17 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               final updatedStreet = street.copyWith(
-                addresses: street.addresses
-                    .where((a) => a.id != address.id)
-                    .toList(),
+                addresses:
+                    street.addresses.where((a) => a.id != address.id).toList(),
               );
               final updatedTerritory = territory.copyWith(
                 streets: territory.streets
                     .map((s) => s.id == street.id ? updatedStreet : s)
                     .toList(),
               );
-              ref.read(territoriesProvider.notifier).updateTerritory(updatedTerritory);
+              ref
+                  .read(territoriesProvider.notifier)
+                  .updateTerritory(updatedTerritory);
               Navigator.pop(context);
             },
             child: Text(l10n.delete),
@@ -1392,7 +1469,8 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
     );
   }
 
-  Future<void> _saveToContacts(BuildContext context, String name, String phone) async {
+  Future<void> _saveToContacts(
+      BuildContext context, String name, String phone) async {
     final l10n = AppLocalizations.of(context);
     if (name.isEmpty || phone.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1404,9 +1482,10 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
     try {
       if (await contacts.FlutterContacts.requestPermission()) {
         // 1. Buscar ou Criar o Grupo "Pregação"
-        List<contacts.Group> groups = await contacts.FlutterContacts.getGroups();
+        List<contacts.Group> groups =
+            await contacts.FlutterContacts.getGroups();
         contacts.Group? targetGroup;
-        
+
         // Tenta encontrar
         try {
           targetGroup = groups.firstWhere((g) => g.name == 'Pregação');
@@ -1417,36 +1496,37 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
         // Se não existe, cria
         if (targetGroup == null) {
           try {
-             targetGroup = await contacts.FlutterContacts.insertGroup(contacts.Group('', 'Pregação'));
+            targetGroup = await contacts.FlutterContacts.insertGroup(
+                contacts.Group('', 'Pregação'));
           } catch (e) {
-             // Fallback se falhar criar grupo (alguns dispositivos não suportam)
-             debugPrint('Erro ao criar grupo: $e');
+            // Fallback se falhar criar grupo (alguns dispositivos não suportam)
+            debugPrint('Erro ao criar grupo: $e');
           }
         }
 
         final newContact = contacts.Contact()
           ..name.first = name
           ..phones = [contacts.Phone(phone)];
-        
+
         // Adiciona ao grupo se conseguiu obter/criar
         if (targetGroup != null) {
-           newContact.groups = [targetGroup];
+          newContact.groups = [targetGroup];
         } else {
-           // Fallback para nota se grupo falhar
-           newContact.notes = [contacts.Note('Pregação')];
+          // Fallback para nota se grupo falhar
+          newContact.notes = [contacts.Note('Pregação')];
         }
 
         await newContact.insert();
-        
+
         if (context.mounted) {
-           ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.contactSavedWithLabel)),
           );
         }
       }
     } catch (e) {
       if (context.mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.errorSavingContact(e.toString()))),
         );
       }
@@ -1458,7 +1538,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
     final cleanPhone = phone.replaceAll(RegExp(r'\D'), '');
     // Assume Brazil if no country code (length <= 11) - just heuristic
     final finalPhone = cleanPhone.length <= 11 ? '55$cleanPhone' : cleanPhone;
-    
+
     final uri = Uri.parse("https://wa.me/$finalPhone");
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -1495,7 +1575,7 @@ class _PersonAttributesSelector extends StatelessWidget {
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
-        
+
         // Seletor de Gênero
         Wrap(
           spacing: 8,
@@ -1510,17 +1590,17 @@ class _PersonAttributesSelector extends StatelessWidget {
             );
           }).toList(),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Seletor de Categoria (Idade)
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: PersonCategory.values
-              .where((c) => 
-                  c == PersonCategory.young || 
-                  c == PersonCategory.adult || 
+              .where((c) =>
+                  c == PersonCategory.young ||
+                  c == PersonCategory.adult ||
                   c == PersonCategory.elderly)
               .map((category) {
             final isSelected = selectedCategory == category;
@@ -1530,7 +1610,8 @@ class _PersonAttributesSelector extends StatelessWidget {
                 category.getIconPath(selectedGender),
                 width: 24,
                 height: 24,
-                errorBuilder: (context, error, stackTrace) => Text(category.getIcon()), // Keep emoji fallback here
+                errorBuilder: (context, error, stackTrace) =>
+                    Text(category.getIcon()), // Keep emoji fallback here
               ),
               selected: isSelected,
               onSelected: (selected) {
@@ -1541,7 +1622,7 @@ class _PersonAttributesSelector extends StatelessWidget {
         ),
         // Removido seletor de tom de pele se estiver usando imagens fixas?
         // O usuário pediu icones do MA que são fixos.
-        // Vou manter oculto se um Gênero estiver selecionado (assumindo imagem fixa), 
+        // Vou manter oculto se um Gênero estiver selecionado (assumindo imagem fixa),
         // ou mostrar se nenhum gênero selecionado (fallback para emoji).
         // Mas como getIconPath agora retorna imagem sempre (com default male),
         // talvez seja melhor esconder sempre para simplificar, ou deixar como opcional.
