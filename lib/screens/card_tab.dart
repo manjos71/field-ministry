@@ -18,6 +18,8 @@ class CardTab extends ConsumerStatefulWidget {
 class _CardTabState extends ConsumerState<CardTab> {
   String? _expandedInterestedAddressId;
   String? _expandedBibleStudyAddressId;
+  bool _hasInitializedInterested = false;
+  bool _hasInitializedBibleStudy = false;
 
   bool _isRevisitAnchorStatus(VisitStatus status) {
     return status == VisitStatus.interested ||
@@ -151,13 +153,13 @@ class _CardTabState extends ConsumerState<CardTab> {
           final interestedItems = _getInterestedItems(territories, l10n);
           final bibleStudyItems = _getBibleStudyItems(territories, l10n);
 
-          if (_expandedInterestedAddressId == null &&
-              interestedItems.isNotEmpty) {
+          if (!_hasInitializedInterested && interestedItems.isNotEmpty) {
+            _hasInitializedInterested = true;
             _expandedInterestedAddressId = interestedItems.first.address.id;
           }
 
-          if (_expandedBibleStudyAddressId == null &&
-              bibleStudyItems.isNotEmpty) {
+          if (!_hasInitializedBibleStudy && bibleStudyItems.isNotEmpty) {
+            _hasInitializedBibleStudy = true;
             _expandedBibleStudyAddressId = bibleStudyItems.first.address.id;
           }
 
@@ -227,14 +229,30 @@ class _CardTabState extends ConsumerState<CardTab> {
   }
 
   Widget _buildInterestedStack(List<_InterestedItem> items) {
-    final activeIndex = items.indexWhere(
-      (item) => item.address.id == _expandedInterestedAddressId,
-    );
+    // O card selecionado vai para a última posição inferior da vertical da pilha
+    final List<_InterestedItem> orderedItems;
+    final int? activeIndex;
+
+    if (_expandedInterestedAddressId != null &&
+        items.any((item) => item.address.id == _expandedInterestedAddressId)) {
+      final selectedItem = items.firstWhere(
+        (item) => item.address.id == _expandedInterestedAddressId,
+      );
+      final unselectedItems = items
+          .where((item) => item.address.id != _expandedInterestedAddressId)
+          .toList();
+
+      orderedItems = [...unselectedItems, selectedItem];
+      activeIndex = orderedItems.length - 1; // Última posição inferior
+    } else {
+      orderedItems = items;
+      activeIndex = null;
+    }
 
     return OverlapStack(
       overlap: 12.0,
-      activeIndex: activeIndex >= 0 ? activeIndex : null,
-      children: items.asMap().entries.map<Widget>((entry) {
+      activeIndex: activeIndex,
+      children: orderedItems.asMap().entries.map<Widget>((entry) {
         final index = entry.key;
         final item = entry.value;
         final isExpanded = index == activeIndex;
@@ -256,14 +274,30 @@ class _CardTabState extends ConsumerState<CardTab> {
   }
 
   Widget _buildBibleStudyStack(List<_InterestedItem> items) {
-    final activeIndex = items.indexWhere(
-      (item) => item.address.id == _expandedBibleStudyAddressId,
-    );
+    // O card selecionado vai para a última posição inferior da vertical da pilha
+    final List<_InterestedItem> orderedItems;
+    final int? activeIndex;
+
+    if (_expandedBibleStudyAddressId != null &&
+        items.any((item) => item.address.id == _expandedBibleStudyAddressId)) {
+      final selectedItem = items.firstWhere(
+        (item) => item.address.id == _expandedBibleStudyAddressId,
+      );
+      final unselectedItems = items
+          .where((item) => item.address.id != _expandedBibleStudyAddressId)
+          .toList();
+
+      orderedItems = [...unselectedItems, selectedItem];
+      activeIndex = orderedItems.length - 1; // Última posição inferior
+    } else {
+      orderedItems = items;
+      activeIndex = null;
+    }
 
     return OverlapStack(
       overlap: 12.0,
-      activeIndex: activeIndex >= 0 ? activeIndex : null,
-      children: items.asMap().entries.map<Widget>((entry) {
+      activeIndex: activeIndex,
+      children: orderedItems.asMap().entries.map<Widget>((entry) {
         final index = entry.key;
         final item = entry.value;
         final isExpanded = index == activeIndex;
