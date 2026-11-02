@@ -4,6 +4,7 @@ import '../config/app_localizations.dart';
 import '../providers/territory_provider.dart';
 import '../models/models.dart';
 import '../widgets/stats_grid.dart';
+import '../widgets/overlap_stack.dart';
 import 'street_detail_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -15,7 +16,8 @@ class CardTab extends ConsumerStatefulWidget {
 }
 
 class _CardTabState extends ConsumerState<CardTab> {
-  String? _expandedAddressId;
+  String? _expandedInterestedAddressId;
+  String? _expandedBibleStudyAddressId;
 
   bool _isRevisitAnchorStatus(VisitStatus status) {
     return status == VisitStatus.interested ||
@@ -149,6 +151,16 @@ class _CardTabState extends ConsumerState<CardTab> {
           final interestedItems = _getInterestedItems(territories, l10n);
           final bibleStudyItems = _getBibleStudyItems(territories, l10n);
 
+          if (_expandedInterestedAddressId == null &&
+              interestedItems.isNotEmpty) {
+            _expandedInterestedAddressId = interestedItems.first.address.id;
+          }
+
+          if (_expandedBibleStudyAddressId == null &&
+              bibleStudyItems.isNotEmpty) {
+            _expandedBibleStudyAddressId = bibleStudyItems.first.address.id;
+          }
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -189,21 +201,22 @@ class _CardTabState extends ConsumerState<CardTab> {
                       ],
                     ),
                   )
-                else
-                  ..._buildInterestedCards(interestedItems),
-
-                if (bibleStudyItems.isNotEmpty) ...[
-                  const SizedBox(height: 24),
-                  // Título da seção de Estudos Bíblicos
-                  Text(
-                    l10n.bibleStudiesTitle,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                else ...[
+                  if (interestedItems.isNotEmpty)
+                    _buildInterestedStack(interestedItems),
+                  if (bibleStudyItems.isNotEmpty) ...[
+                    const SizedBox(height: 28),
+                    // Título da seção de Estudos Bíblicos
+                    Text(
+                      l10n.bibleStudiesTitle,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  ..._buildBibleStudyCards(bibleStudyItems),
+                    const SizedBox(height: 12),
+                    _buildBibleStudyStack(bibleStudyItems),
+                  ],
                 ],
               ],
             ),
@@ -213,66 +226,75 @@ class _CardTabState extends ConsumerState<CardTab> {
     );
   }
 
-  List<Widget> _buildInterestedCards(List<_InterestedItem> items) {
-    return items.map((item) {
-      final isExpanded = item.address.id == _expandedAddressId;
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: _InterestedStackCard(
+  Widget _buildInterestedStack(List<_InterestedItem> items) {
+    final activeIndex = items.indexWhere(
+      (item) => item.address.id == _expandedInterestedAddressId,
+    );
+
+    return OverlapStack(
+      overlap: 12.0,
+      activeIndex: activeIndex >= 0 ? activeIndex : null,
+      children: items.asMap().entries.map((entry) {
+        final index = entry.key;
+        final item = entry.value;
+        final isExpanded = index == activeIndex;
+        return _InterestedStackCard(
+          key: ValueKey(item.address.id),
           item: item,
           isExpanded: isExpanded,
           isBibleStudy: false,
-          onToggleExpand: () {
+          onHeaderTap: () {
             setState(() {
-              _expandedAddressId = isExpanded ? null : item.address.id;
+              _expandedInterestedAddressId =
+                  isExpanded ? null : item.address.id;
             });
           },
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => StreetDetailScreen(
-                  territoryId: item.territory.id,
-                  streetId: item.street.id,
-                  initialAddressId: item.address.id,
-                ),
-              ),
-            );
-          },
-        ),
-      );
-    }).toList();
+          onActionTap: () => _openAddress(item),
+        );
+      }).toList(),
+    );
   }
 
-  List<Widget> _buildBibleStudyCards(List<_InterestedItem> items) {
-    return items.map((item) {
-      final isExpanded = item.address.id == _expandedAddressId;
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: _InterestedStackCard(
+  Widget _buildBibleStudyStack(List<_InterestedItem> items) {
+    final activeIndex = items.indexWhere(
+      (item) => item.address.id == _expandedBibleStudyAddressId,
+    );
+
+    return OverlapStack(
+      overlap: 12.0,
+      activeIndex: activeIndex >= 0 ? activeIndex : null,
+      children: items.asMap().entries.map((entry) {
+        final index = entry.key;
+        final item = entry.value;
+        final isExpanded = index == activeIndex;
+        return _InterestedStackCard(
+          key: ValueKey(item.address.id),
           item: item,
           isExpanded: isExpanded,
           isBibleStudy: true,
-          onToggleExpand: () {
+          onHeaderTap: () {
             setState(() {
-              _expandedAddressId = isExpanded ? null : item.address.id;
+              _expandedBibleStudyAddressId =
+                  isExpanded ? null : item.address.id;
             });
           },
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => StreetDetailScreen(
-                  territoryId: item.territory.id,
-                  streetId: item.street.id,
-                  initialAddressId: item.address.id,
-                ),
-              ),
-            );
-          },
+          onActionTap: () => _openAddress(item),
+        );
+      }).toList(),
+    );
+  }
+
+  void _openAddress(_InterestedItem item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => StreetDetailScreen(
+          territoryId: item.territory.id,
+          streetId: item.street.id,
+          initialAddressId: item.address.id,
         ),
-      );
-    }).toList();
+      ),
+    );
   }
 
   List<_InterestedItem> _getInterestedItems(
@@ -349,15 +371,15 @@ class _InterestedStackCard extends ConsumerWidget {
   final _InterestedItem item;
   final bool isExpanded;
   final bool isBibleStudy;
-  final VoidCallback onTap;
-  final VoidCallback onToggleExpand;
+  final VoidCallback onHeaderTap;
+  final VoidCallback onActionTap;
 
   const _InterestedStackCard({
     required this.item,
     required this.isExpanded,
     required this.isBibleStudy,
-    required this.onTap,
-    required this.onToggleExpand,
+    required this.onHeaderTap,
+    required this.onActionTap,
   });
 
   Color _getUrgencyColor(int days) {
@@ -366,21 +388,50 @@ class _InterestedStackCard extends ConsumerWidget {
     return Colors.green;
   }
 
+  String _resolvePersonName(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (item.lastVisit.personName?.isNotEmpty == true) {
+      return item.lastVisit.personName!;
+    }
+    if (item.lastVisit.parentId != null) {
+      try {
+        final parent = item.address.visits
+            .firstWhere((v) => v.id == item.lastVisit.parentId);
+        if (parent.personName?.isNotEmpty == true) {
+          return parent.personName!;
+        }
+      } catch (_) {}
+    }
+    try {
+      return item.address.visits
+          .firstWhere((v) => v.personName?.isNotEmpty == true)
+          .personName!;
+    } catch (_) {}
+
+    return l10n.noName;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final days = DateTime.now().difference(item.lastVisit.date).inDays;
-    
+    final personName = _resolvePersonName(context);
+
     // Herdar metadados (categoria e gênero) do pai ou de outros registros no endereço
     final personCategory = item.lastVisit.personCategory ?? () {
       if (item.lastVisit.parentId != null) {
         try {
-          return item.address.visits.firstWhere((v) => v.id == item.lastVisit.parentId).personCategory;
+          return item.address.visits
+              .firstWhere((v) => v.id == item.lastVisit.parentId)
+              .personCategory;
         } catch (_) {}
       }
       try {
-        return item.address.visits.firstWhere((v) => v.personCategory != null).personCategory;
+        return item.address.visits
+            .firstWhere((v) => v.personCategory != null)
+            .personCategory;
       } catch (_) {}
       return null;
     }();
@@ -388,231 +439,281 @@ class _InterestedStackCard extends ConsumerWidget {
     final gender = item.lastVisit.gender ?? () {
       if (item.lastVisit.parentId != null) {
         try {
-          return item.address.visits.firstWhere((v) => v.id == item.lastVisit.parentId).gender;
+          return item.address.visits
+              .firstWhere((v) => v.id == item.lastVisit.parentId)
+              .gender;
         } catch (_) {}
       }
       try {
-        return item.address.visits.firstWhere((v) => v.gender != null).gender;
+        return item.address.visits
+            .firstWhere((v) => v.gender != null)
+            .gender;
       } catch (_) {}
       return null;
     }();
 
     final catIconPath = personCategory?.getIconPath(gender);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        elevation: isExpanded ? 8 : 4,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: isExpanded
-              ? BorderSide(
-                  color: isBibleStudy
-                      ? const Color(0xFF673AB7).withOpacity(0.5)
-                      : theme.primaryColor.withOpacity(0.5),
-                  width: 1.5,
-                )
-              : BorderSide.none,
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          children: [
-            // HEADING
-            Container(
-              height: 120,
-              color: isExpanded
-                  ? (isBibleStudy
-                      ? const Color(0xFF673AB7).withOpacity(0.05)
-                      : theme.primaryColor.withOpacity(0.05))
-                  : theme.cardColor,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Stack(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: theme.cardColor,
-                          shape: BoxShape.circle,
-                          border:
-                              Border.all(color: Theme.of(context).dividerColor),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: catIconPath != null
-                            ? ClipOval(
-                                child: Image.asset(
-                                  catIconPath,
-                                  width: 36,
-                                  height: 36,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      const Icon(Icons.person),
-                                ),
-                              )
-                            : const Icon(Icons.person),
-                      ),
-                      if (isBibleStudy)
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            width: 18,
-                            height: 18,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF673AB7),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Center(
-                              child: Text('📖', style: TextStyle(fontSize: 10)),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          () {
-                            if (item.lastVisit.personName?.isNotEmpty == true) {
-                              return item.lastVisit.personName!;
-                            }
-                            // Se for um child, buscar nome do pai
-                            if (item.lastVisit.parentId != null) {
-                              try {
-                                final parent = item.address.visits.firstWhere(
-                                    (v) => v.id == item.lastVisit.parentId);
-                                if (parent.personName?.isNotEmpty == true) {
-                                  return parent.personName!;
-                                }
-                              } catch (_) {}
-                            }
-                            // Se não achou por ID, pegar o primeiro que tiver nome no endereço
-                            try {
-                              return item.address.visits
-                                  .firstWhere((v) =>
-                                      v.personName?.isNotEmpty == true)
-                                  .personName!;
-                            } catch (_) {}
+    final cardBg = isDark ? const Color(0xFF404040) : Colors.white;
+    final cardBorder = isDark ? Colors.white12 : Colors.grey.shade300;
+    final accentColor =
+        isBibleStudy ? const Color(0xFF7E57C2) : theme.primaryColor;
 
-                            return l10n.noName;
-                          }(),
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${item.street.name}, ${item.address.number}',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const Spacer(),
-                        Row(
-                          children: [
-                            Icon(Icons.access_time,
-                                size: 14, color: _getUrgencyColor(days)),
-                            const SizedBox(width: 4),
-                            Text(
-                              l10n.daysCount(days),
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: _getUrgencyColor(days),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(999),
-                                border: Border.all(
-                                    color: Colors.blue.withOpacity(0.3)),
-                              ),
-                              child: Text(
-                                item.revisitStage,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+    return Container(
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isExpanded ? accentColor.withOpacity(0.7) : cardBorder,
+          width: isExpanded ? 1.5 : 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? (isExpanded ? 0.45 : 0.25) : (isExpanded ? 0.14 : 0.06)),
+            blurRadius: isExpanded ? 10 : 4,
+            offset: Offset(0, isExpanded ? 4 : 2),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 1. HEADER (Espaço do nome - onde o clique assume a sobreposição)
+          InkWell(
+            onTap: onHeaderTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      personName,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? Colors.white.withOpacity(0.92)
+                            : Colors.black87,
+                        letterSpacing: 0.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  IconButton(
-                    onPressed: onToggleExpand,
-                    icon: Icon(
-                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                  if (!isExpanded) ...[
+                    Icon(
+                      Icons.access_time,
+                      size: 14,
+                      color: _getUrgencyColor(days),
                     ),
-                    tooltip:
-                        isExpanded ? l10n.collapseDetails : l10n.expandDetails,
-                  ),
+                    const SizedBox(width: 4),
+                    Text(
+                      l10n.daysCount(days),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: _getUrgencyColor(days),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
+          ),
 
-            // BODY (expanded)
-            if (isExpanded)
-              Container(
-                color: theme.cardColor,
-                padding: const EdgeInsets.all(16),
+          // Linha divisória horizontal logo abaixo do nome (estética idêntica à imagem 1)
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: isDark ? Colors.white12 : Colors.grey.shade200,
+          ),
+
+          // Espaço de sobreposição quando recolhido para o próximo card iniciar na divisória
+          if (!isExpanded) const SizedBox(height: 12),
+
+          // 2. CORPO DO CARD (Aparece apenas quando o card está expandido na sobreposição)
+          if (isExpanded)
+            GestureDetector(
+              onTap: onActionTap,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Divider(),
+                    // Linha Avatar + Dias (Grande destaque, igual Ministry Assistant)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Avatar circular
+                        Stack(
+                          children: [
+                            Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: isBibleStudy
+                                    ? const Color(0xFF673AB7)
+                                    : (catIconPath != null
+                                        ? (isDark
+                                            ? Colors.grey.shade800
+                                            : Colors.grey.shade200)
+                                        : const Color(0xFFE53935)), // Vermelho da imagem 1
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              alignment: Alignment.center,
+                              child: catIconPath != null
+                                  ? ClipOval(
+                                      child: Image.asset(
+                                        catIconPath,
+                                        width: 44,
+                                        height: 44,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) =>
+                                            const Icon(Icons.person,
+                                                size: 36, color: Colors.white),
+                                      ),
+                                    )
+                                  : const Icon(Icons.person,
+                                      size: 36, color: Colors.white),
+                            ),
+                            if (isBibleStudy)
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.shade700,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.white, width: 1.5),
+                                  ),
+                                  child: const Center(
+                                    child: Text('📖',
+                                        style: TextStyle(fontSize: 10)),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+
+                        // Dias em fonte grande + badge de estágio
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.daysCount(days),
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w400,
+                                  color: isDark
+                                      ? Colors.white.withOpacity(0.92)
+                                      : Colors.black87,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: (isBibleStudy
+                                          ? const Color(0xFF673AB7)
+                                          : Colors.blue)
+                                      .withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: (isBibleStudy
+                                            ? const Color(0xFF673AB7)
+                                            : Colors.blue)
+                                        .withOpacity(0.4),
+                                  ),
+                                ),
+                                child: Text(
+                                  item.revisitStage,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: isBibleStudy
+                                        ? const Color(0xFFB39DDB)
+                                        : Colors.blue.shade300,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Endereço
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.location_on_outlined,
+                          size: 18,
+                          color: isDark ? Colors.white70 : Colors.grey.shade700,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            '${item.street.name}, ${item.address.number}${item.territory.neighborhood.isNotEmpty ? ' - ${item.territory.neighborhood}' : ''}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? Colors.white.withOpacity(0.85)
+                                  : Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Notas / Observações
                     if (item.lastVisit.notes?.isNotEmpty == true) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.notesLabel,
-                        style: theme.textTheme.labelSmall
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 10),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.secondaryContainer,
+                          color: isDark ? Colors.black26 : Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: theme.colorScheme.secondaryContainer
-                                .withOpacity(0.7),
+                            color:
+                                isDark ? Colors.white12 : Colors.grey.shade300,
                           ),
                         ),
                         child: Text(
                           item.lastVisit.notes!,
                           style: TextStyle(
-                            color: theme.colorScheme.onSecondaryContainer,
+                            fontSize: 14,
+                            color: isDark ? Colors.white70 : Colors.black87,
+                            height: 1.3,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
                     ],
 
+                    const SizedBox(height: 14),
+
+                    // Ações: Mapas, Navegação GPS e Botão "+" idêntico à imagem 1
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -625,8 +726,9 @@ class _InterestedStackCard extends ConsumerWidget {
                           },
                           icon: const Icon(Icons.map_outlined),
                           tooltip: l10n.openMaps,
+                          color: isDark ? Colors.white70 : Colors.grey.shade700,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 4),
                         IconButton(
                           onPressed: () {
                             final query = Uri.encodeComponent(
@@ -638,14 +740,37 @@ class _InterestedStackCard extends ConsumerWidget {
                           },
                           icon: const Icon(Icons.navigation_outlined),
                           tooltip: l10n.navigate,
+                          color: isDark ? Colors.white70 : Colors.grey.shade700,
+                        ),
+                        const SizedBox(width: 12),
+                        // Botão circular "+" (estilo Ministry Assistant da imagem 1)
+                        GestureDetector(
+                          onTap: onActionTap,
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF009688), // Teal da imagem 1
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(Icons.add,
+                                color: Colors.white, size: 26),
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
