@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../models/models.dart';
 import '../services/database_service.dart';
+import 'service_timer_provider.dart';
 
 const _uuid = Uuid();
 
@@ -12,7 +13,8 @@ final databaseServiceProvider = FutureProvider<DatabaseService>((ref) async {
 
 /// Provider para a lista de territórios
 final territoriesProvider =
-    StateNotifierProvider<TerritoriesNotifier, AsyncValue<List<Territory>>>((ref) {
+    StateNotifierProvider<TerritoriesNotifier, AsyncValue<List<Territory>>>(
+        (ref) {
   final dbAsync = ref.watch(databaseServiceProvider);
   return TerritoriesNotifier(ref, dbAsync);
 });
@@ -58,7 +60,8 @@ class TerritoriesNotifier extends StateNotifier<AsyncValue<List<Territory>>> {
   final Ref _ref;
   final AsyncValue<DatabaseService> _dbAsync;
 
-  TerritoriesNotifier(this._ref, this._dbAsync) : super(const AsyncValue.loading()) {
+  TerritoriesNotifier(this._ref, this._dbAsync)
+      : super(const AsyncValue.loading()) {
     _loadTerritories();
   }
 
@@ -106,7 +109,7 @@ class TerritoriesNotifier extends StateNotifier<AsyncValue<List<Territory>>> {
 
     final db = await _getDb();
     await db.saveTerritory(territory);
-    
+
     state = state.whenData((list) => [...list, territory]);
     return territory;
   }
@@ -114,19 +117,20 @@ class TerritoriesNotifier extends StateNotifier<AsyncValue<List<Territory>>> {
   /// Atualiza um território existente
   Future<void> updateTerritory(Territory territory) async {
     final updatedTerritory = territory.copyWith(updatedAt: DateTime.now());
-    
+
     final db = await _getDb();
     await db.saveTerritory(updatedTerritory);
-    
-    state = state.whenData((list) =>
-        list.map((t) => t.id == updatedTerritory.id ? updatedTerritory : t).toList());
+
+    state = state.whenData((list) => list
+        .map((t) => t.id == updatedTerritory.id ? updatedTerritory : t)
+        .toList());
   }
 
   /// Deleta um território
   Future<void> deleteTerritory(String id) async {
     final db = await _getDb();
     await db.deleteTerritory(id);
-    
+
     state = state.whenData((list) => list.where((t) => t.id != id).toList());
   }
 
@@ -178,9 +182,10 @@ class TerritoriesNotifier extends StateNotifier<AsyncValue<List<Territory>>> {
   }) async {
     if (fromTerritoryId == toTerritoryId) return;
 
-    final fromTerritory = state.value?.firstWhere((t) => t.id == fromTerritoryId);
+    final fromTerritory =
+        state.value?.firstWhere((t) => t.id == fromTerritoryId);
     final toTerritory = state.value?.firstWhere((t) => t.id == toTerritoryId);
-    
+
     if (fromTerritory == null || toTerritory == null) {
       throw Exception('Território não encontrado');
     }
@@ -259,6 +264,8 @@ class TerritoriesNotifier extends StateNotifier<AsyncValue<List<Territory>>> {
     PersonCategory? personCategory,
     SkinTone? personSkinTone,
     Gender? gender,
+    bool? hadInteraction,
+    String? parentId,
   }) async {
     final territory = state.value?.firstWhere((t) => t.id == territoryId);
     if (territory == null) throw Exception('Território não encontrado');
@@ -281,9 +288,46 @@ class TerritoriesNotifier extends StateNotifier<AsyncValue<List<Territory>>> {
       personCategory: personCategory,
       personSkinTone: personSkinTone,
       gender: gender,
+      hadInteraction: hadInteraction,
+      parentId: parentId,
     );
 
     address.addVisit(visit);
+
+    // Lógica para estatísticas e progressão de status
+    if (parentId != null) {
+      try {
+        final parentVisit = address.visits.firstWhere((v) => v.id == parentId);
+
+        if (status == VisitStatus.bibleStudy) {
+          // Se for uma visita de estudo bíblico, marcar o pai como estudo bíblico também
+          if (parentVisit.status == VisitStatus.interested) {
+            parentVisit.status = VisitStatus.bibleStudy;
+          }
+          // Registrar estatística (estudo + revisita)
+          _ref
+              .read(monthlyServiceTimeProvider.notifier)
+              .recordBibleStudyVisit(parentId);
+        } else if (status == VisitStatus.returnVisit) {
+          // Incrementar revisita
+          _ref.read(monthlyServiceTimeProvider.notifier).incrementRevisitCount();
+
+          // Se completar 2 revisitas, o Interessado vira Estudo Bíblico
+          final currentRevisits = address.visits
+              .where((v) =>
+                  v.parentId == parentId && v.status == VisitStatus.returnVisit)
+              .length;
+          // Se o tamanho após adicionar for >= 2, e o pai for interessado, vira Estudo
+          if (currentRevisits >= 2 &&
+              parentVisit.status == VisitStatus.interested) {
+            parentVisit.status = VisitStatus.bibleStudy;
+          }
+        }
+      } catch (_) {
+        // Ignorar se pai não encontrado
+      }
+    }
+
     await updateTerritory(territory);
     return visit;
   }

@@ -5,7 +5,7 @@ part 'visit.g.dart';
 
 /// Gênero da pessoa
 enum Gender {
-  male,   // Masculino
+  male, // Masculino
   female, // Feminino
 }
 
@@ -22,9 +22,9 @@ extension GenderExtension on Gender {
 
 /// Categoria da pessoa
 enum PersonCategory {
-  young,      // Jovem
-  adult,      // Adulto
-  elderly,    // Idoso
+  young, // Jovem
+  adult, // Adulto
+  elderly, // Idoso
 }
 
 extension PersonCategoryExtension on PersonCategory {
@@ -54,26 +54,25 @@ extension PersonCategoryExtension on PersonCategory {
   String getIconPath(Gender? gender) {
     // Sufixo de idade: 'old' para idoso, 'now' para os demais
     final ageSuffix = this == PersonCategory.elderly ? 'old' : 'now';
-    
-    // Prefixo de gênero: 'card_male', 'card_female' ou 'card_couple' (se tivéssemos essa opção no enum Gender, mas Couple é categoria no conceito antigo. 
-    // O usuário pediu Gênero separado. 'Couple' (Casal) sumiu? 
+
+    // Prefixo de gênero: 'card_male', 'card_female' ou 'card_couple' (se tivéssemos essa opção no enum Gender, mas Couple é categoria no conceito antigo.
+    // O usuário pediu Gênero separado. 'Couple' (Casal) sumiu?
     // O usuário removeu 'Couple' e 'Family' na mensagem anterior? "Tirar não interessado... definir genero masculino, Feminino".
     // Se a pessoa visita um Casal, qual o gênero? Talvez deva manter 'Casal' como uma opção de gênero ou categoria especial?
     // Vou assumir que Casal continua sendo uma Categoria se o usuário não pediu para remover, mas ele disse "definir genero".
     // Se o usuário selecionar Masculino/Feminino, usamos os icons específicos.
     // Se não selecionar (null), poderíamos usar um genérico.
-    
+
     String genderPrefix = 'card_male'; // Default
     if (gender == Gender.female) {
       genderPrefix = 'card_female';
-    } 
+    }
     // Se quisermos suportar Casal, precisaríamos ver onde ele se encaixa.
     // Por enquanto, vou focar em Male/Female como pedido.
-    
-    return 'assets/icons/${genderPrefix}_${ageSuffix}.png';
+
+    return 'assets/icons/${genderPrefix}_$ageSuffix.png';
   }
 }
-
 
 /// Tom de pele
 enum SkinTone {
@@ -95,8 +94,9 @@ enum VisitStatus {
   letterLeft, // Deixou publicação
   returnVisit, // Revisita
   otherLanguage, // Outro idioma
-  bibleStudy,   // Estudo Bíblico
-  witness,      // Testemunha
+  bibleStudy, // Estudo Bíblico
+  witness, // Testemunha
+  notAtHome, // Não em casa
 }
 
 extension VisitStatusExtension on VisitStatus {
@@ -128,6 +128,8 @@ extension VisitStatusExtension on VisitStatus {
         return 'Estudo Bíblico';
       case VisitStatus.witness:
         return 'Testemunha';
+      case VisitStatus.notAtHome:
+        return 'Não em casa';
     }
   }
 
@@ -159,6 +161,8 @@ extension VisitStatusExtension on VisitStatus {
         return '📖';
       case VisitStatus.witness:
         return 'JW';
+      case VisitStatus.notAtHome:
+        return '🚶';
     }
   }
 
@@ -182,19 +186,21 @@ extension VisitStatusExtension on VisitStatus {
     }
     return Text(icon, style: TextStyle(fontSize: size));
   }
-  
+
   Color get color {
     switch (this) {
-       case VisitStatus.notAnswered:
-         return Colors.orange;
-       case VisitStatus.answered:
-         return Colors.green;
-       case VisitStatus.otherLanguage:
-         return Colors.purple;
-       case VisitStatus.witness:
-         return Colors.purple;
-       default:
-         return Colors.grey;
+      case VisitStatus.notAnswered:
+        return Colors.orange;
+      case VisitStatus.answered:
+        return Colors.green;
+      case VisitStatus.otherLanguage:
+        return Colors.purple;
+      case VisitStatus.witness:
+        return Colors.purple;
+      case VisitStatus.notAtHome:
+        return Colors.orange;
+      default:
+        return Colors.grey;
     }
   }
 }
@@ -217,10 +223,15 @@ class Visit {
   @HiveField(6)
   PersonCategory? personCategory;
   @HiveField(7)
-  SkinTone? personSkinTone; // Mantendo para compatibilidade, mas icons png não usam tint?
-                            // O usuário pediu icones diferentes.
+  SkinTone?
+      personSkinTone; // Mantendo para compatibilidade, mas icons png não usam tint?
+  // O usuário pediu icones diferentes.
   @HiveField(8)
   Gender? gender; // Novo campo
+  @HiveField(9)
+  bool? hadInteraction;
+  @HiveField(10)
+  String? parentId;
 
   Visit({
     required this.id,
@@ -232,6 +243,8 @@ class Visit {
     this.personCategory,
     this.personSkinTone,
     this.gender,
+    this.hadInteraction,
+    this.parentId,
   });
 
   Visit copyWith({
@@ -244,6 +257,8 @@ class Visit {
     PersonCategory? personCategory,
     SkinTone? personSkinTone,
     Gender? gender,
+    bool? hadInteraction,
+    String? parentId,
   }) {
     return Visit(
       id: id ?? this.id,
@@ -255,6 +270,8 @@ class Visit {
       personCategory: personCategory ?? this.personCategory,
       personSkinTone: personSkinTone ?? this.personSkinTone,
       gender: gender ?? this.gender,
+      hadInteraction: hadInteraction ?? this.hadInteraction,
+      parentId: parentId ?? this.parentId,
     );
   }
 
@@ -269,6 +286,8 @@ class Visit {
       'personCategory': personCategory?.index,
       'personSkinTone': personSkinTone?.index,
       'gender': gender?.index,
+      'hadInteraction': hadInteraction,
+      'parentId': parentId,
     };
   }
 
@@ -280,15 +299,16 @@ class Visit {
       notes: json['notes'] as String?,
       personName: json['personName'] as String?,
       phoneNumber: json['phoneNumber'] as String?,
-      personCategory: json['personCategory'] != null 
+      personCategory: json['personCategory'] != null
           ? PersonCategory.values[json['personCategory'] as int]
           : null,
       personSkinTone: json['personSkinTone'] != null
           ? SkinTone.values[json['personSkinTone'] as int]
           : null,
-      gender: json['gender'] != null
-          ? Gender.values[json['gender'] as int]
-          : null,
+      gender:
+          json['gender'] != null ? Gender.values[json['gender'] as int] : null,
+      hadInteraction: json['hadInteraction'] as bool?,
+      parentId: json['parentId'] as String?,
     );
   }
 }

@@ -29,7 +29,8 @@ class ReportsTab extends ConsumerWidget {
             SizedBox(height: 16),
             MonthlyStatsChart(),
             SizedBox(height: 12),
-            _LastFourMonthsTotalsCard(),
+            _LastThreeMonthsTotalsCard(),
+            SizedBox(height: 16),
           ],
         ),
       ),
@@ -37,13 +38,13 @@ class ReportsTab extends ConsumerWidget {
   }
 }
 
-class _LastFourMonthsTotalsCard extends ConsumerWidget {
-  const _LastFourMonthsTotalsCard();
+class _LastThreeMonthsTotalsCard extends ConsumerWidget {
+  const _LastThreeMonthsTotalsCard();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final statsAsync = ref.watch(monthlyStatsByMonthsProvider(4));
+    final statsAsync = ref.watch(monthlyStatsByMonthsProvider(3));
 
     return statsAsync.when(
       loading: () => const Card(
@@ -60,6 +61,8 @@ class _LastFourMonthsTotalsCard extends ConsumerWidget {
             stats.fold<double>(0, (sum, item) => sum + item.hours);
         final totalRevisits =
             stats.fold<int>(0, (sum, item) => sum + item.returnVisits);
+        final totalBibleStudies =
+            stats.fold<int>(0, (sum, item) => sum + item.bibleStudies);
         final totalVisitedHouses =
             stats.fold<int>(0, (sum, item) => sum + item.visitedHouses);
 
@@ -71,7 +74,7 @@ class _LastFourMonthsTotalsCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _lastFourMonthsTitle(context),
+                  _lastThreeMonthsTitle(context),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -80,13 +83,16 @@ class _LastFourMonthsTotalsCard extends ConsumerWidget {
                 const SizedBox(height: 12),
                 ...stats.map((item) {
                   final monthLabel = l10n.getMonthName(item.month);
+                  final shortMonth = monthLabel.length >= 3
+                      ? monthLabel.substring(0, 3).toLowerCase()
+                      : monthLabel.toLowerCase();
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       children: [
                         Expanded(
                           child: Text(
-                            '$monthLabel/${item.year}',
+                            '$shortMonth/${item.year}',
                             style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
                         ),
@@ -98,6 +104,7 @@ class _LastFourMonthsTotalsCard extends ConsumerWidget {
                             Text('${item.hours.toStringAsFixed(1)}h'),
                             Text(
                                 '${item.returnVisits} ${l10n.returnVisit.toLowerCase()}'),
+                            Text('${item.bibleStudies} estudos'),
                             Text(
                                 '${item.visitedHouses} ${_housesVisitedLabel(context)}'),
                           ],
@@ -126,6 +133,10 @@ class _LastFourMonthsTotalsCard extends ConsumerWidget {
                         ),
                         Text(
                           '$totalRevisits ${l10n.returnVisit.toLowerCase()}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '$totalBibleStudies estudos',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
@@ -165,24 +176,24 @@ class _LastFourMonthsTotalsCard extends ConsumerWidget {
     }
   }
 
-  String _lastFourMonthsTitle(BuildContext context) {
+  String _lastThreeMonthsTitle(BuildContext context) {
     final languageCode = Localizations.localeOf(context).languageCode;
     switch (languageCode) {
       case 'en':
-        return 'Last 4 months';
+        return 'Last 3 months';
       case 'es':
-        return 'Ultimos 4 meses';
+        return 'Ultimos 3 meses';
       case 'de':
-        return 'Letzte 4 Monate';
+        return 'Letzte 3 Monate';
       case 'fr':
-        return '4 derniers mois';
+        return '3 derniers mois';
       case 'it':
-        return 'Ultimi 4 mesi';
+        return 'Ultimi 3 mesi';
       case 'ru':
-        return 'Poslednie 4 mesyatsa';
+        return 'Poslednie 3 mesyatsa';
       case 'pt':
       default:
-        return 'Ultimos 4 meses';
+        return 'Últimos 3 meses';
     }
   }
 }

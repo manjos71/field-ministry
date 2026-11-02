@@ -177,11 +177,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    // Obter estado
-    final monthlyTime = ref.watch(monthlyServiceTimeProvider);
-    final monthlyNotifier = ref.read(monthlyServiceTimeProvider.notifier);
-    final progressStatus = ref.watch(progressStatusProvider);
-    final profile = ref.watch(publisherProfileProvider);
     // Usar a cor selecionada diretamente para evitar que o tema escuro a ofusque
     final selectedColor = ref.watch(themeColorProvider);
 
@@ -278,8 +273,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             ),
             // Monthly Time Display with Progress Indicator
             const SizedBox(height: 8),
-            _buildMonthlyTimeDisplay(
-                context, monthlyTime, monthlyNotifier, progressStatus, profile),
+            const _MonthlyTimeDisplay(),
 
             // Calendário de Planejamento
             const SizedBox(height: 16),
@@ -292,210 +286,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             ),
             const SizedBox(height: 8),
             const ServicePlanningCalendar(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMonthlyTimeDisplay(
-    BuildContext context,
-    MonthlyServiceTime monthlyTime,
-    MonthlyServiceTimeNotifier monthlyNotifier,
-    ProgressStatus progressStatus,
-    PublisherProfile profile,
-  ) {
-    final l10n = AppLocalizations.of(context);
-    final bool hasTarget = profile.effectiveTargetHours > 0;
-    final bool isOnTrack = progressStatus.isOnTrack;
-    final Color statusColor = !hasTarget
-        ? Theme.of(context).primaryColor
-        : (isOnTrack ? Colors.blue : Colors.amber.shade700);
-    final String statusEmoji = !hasTarget ? '' : (isOnTrack ? '😊' : '😟');
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: () async {
-        final h = monthlyTime.totalMinutes ~/ 60;
-        final m = monthlyTime.totalMinutes % 60;
-        final controller = TextEditingController(
-          text: monthlyTime.totalMinutes > 0
-              ? '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}'
-              : '',
-        );
-        final result = await showDialog<int>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Tempo do mês'),
-            content: TextField(
-              controller: controller,
-              keyboardType: TextInputType.datetime,
-              autofocus: true,
-              decoration: const InputDecoration(
-                labelText: 'Horas e minutos',
-                hintText: 'ex: 08:30',
-                suffixText: 'hh:mm',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(l10n.cancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  final text = controller.text
-                      .trim()
-                      .replaceAll(',', ':')
-                      .replaceAll('.', ':');
-                  int? totalMinutes;
-                  if (text.contains(':')) {
-                    final parts = text.split(':');
-                    final hh = int.tryParse(parts[0]) ?? 0;
-                    final mm =
-                        parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0;
-                    totalMinutes = hh * 60 + mm;
-                  } else {
-                    final hours = double.tryParse(text);
-                    if (hours != null) totalMinutes = (hours * 60).round();
-                  }
-                  Navigator.pop(ctx, totalMinutes);
-                },
-                child: Text(l10n.save),
-              ),
-            ],
-          ),
-        );
-        if (result != null) {
-          await monthlyNotifier.setTime(result);
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          color: statusColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: hasTarget
-              ? Border.all(color: statusColor.withOpacity(0.3))
-              : null,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (hasTarget && statusEmoji.isNotEmpty) ...[
-              Text(statusEmoji, style: const TextStyle(fontSize: 28)),
-              const SizedBox(width: 12),
-            ],
-            Icon(Icons.timer, color: statusColor, size: 24),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      l10n.monthlyTime,
-                      style:
-                          TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                    ),
-                    if (hasTarget) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          isOnTrack ? l10n.onTrack : l10n.behind,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: statusColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      monthlyTime.formattedTime,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'monospace',
-                        color: statusColor,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Icon(Icons.edit, size: 14, color: Colors.grey.shade500),
-                    if (monthlyTime.revisitCount > 0) ...[
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.orange.shade200),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.loop,
-                                size: 12, color: Colors.orange),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${monthlyTime.revisitCount}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange.shade800,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                    if (monthlyTime.bibleStudyCount > 0) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF3E5F5),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFCE93D8)),
-                        ),
-                        child: Row(
-                          children: [
-                            const Text('📖', style: TextStyle(fontSize: 11)),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${monthlyTime.bibleStudyCount}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF6A1B9A),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                if (hasTarget)
-                  Text(
-                    '${l10n.target}: ${profile.effectiveTargetHours}h • ${l10n.expected}: ${progressStatus.expectedHours.toStringAsFixed(1)}h',
-                    style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
-                  ),
-              ],
-            ),
           ],
         ),
       ),
@@ -546,6 +336,371 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             child: Text(l10n.save),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Monthly Time Display ──────────────────────────────────────────────────────
+
+class _MonthlyTimeDisplay extends ConsumerStatefulWidget {
+  const _MonthlyTimeDisplay();
+
+  @override
+  ConsumerState<_MonthlyTimeDisplay> createState() =>
+      _MonthlyTimeDisplayState();
+}
+
+class _MonthlyTimeDisplayState extends ConsumerState<_MonthlyTimeDisplay> {
+  MonthlyServiceTime? _data;
+  DateTime? _loadedMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    final selected = ref.read(selectedCalendarMonthProvider);
+    print('🔵 _MonthlyTimeDisplay.initState: mês selecionado = ${selected.month}/${selected.year}');
+    _loadedMonth = selected;
+    _loadForMonth(selected);
+    
+    // 🔧 CORREÇÃO: Mover listener do build() para initState()
+    // Isso garante que dispare corretamente quando o mês muda
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.listen<DateTime>(selectedCalendarMonthProvider, (prev, next) {
+        print('🟠 Listener disparou! Antes: ${prev?.month}/${prev?.year}, Depois: ${next.month}/${next.year}');
+        if (prev?.year != next.year || prev?.month != next.month) {
+          print('📍 Mudança de mês detectada! Carregando novo mês...');
+          if (mounted) {
+            setState(() {
+              _data = null; // limpa dados do mês anterior na hora
+              _loadedMonth = next;
+            });
+            _loadForMonth(next);
+          }
+        }
+      });
+    });
+  }
+
+  Future<void> _loadForMonth(DateTime month) async {
+    final stats = await ref
+        .read(monthlyServiceTimeProvider.notifier)
+        .getStatsForSpecificMonth(month.year, month.month);
+    // Só atualiza se ainda é o mês que foi pedido
+    if (mounted &&
+        _loadedMonth?.year == month.year &&
+        _loadedMonth?.month == month.month) {
+      setState(() => _data = stats);
+    }
+    // Sincroniza o provider para que updateManualStats salve no mês certo
+    if (mounted) {
+      await ref
+          .read(monthlyServiceTimeProvider.notifier)
+          .loadMonth(month.year, month.month);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final selected = ref.watch(selectedCalendarMonthProvider);
+    // Reage quando dados forem salvos via updateManualStats
+    final providerData = ref.watch(monthlyServiceTimeProvider);
+
+    final MonthlyServiceTime data;
+    if (providerData.year == selected.year &&
+        providerData.month == selected.month) {
+      data = providerData;
+    } else {
+      data = _data ?? MonthlyServiceTime(year: selected.year, month: selected.month);
+    }
+
+    final profile = ref.watch(publisherProfileProvider);
+    final progressStatus = ref.watch(progressStatusProvider);
+    final now = DateTime.now();
+    final isCurrentMonth =
+        selected.year == now.year && selected.month == now.month;
+    final bool hasTarget = isCurrentMonth && profile.effectiveTargetHours > 0;
+    final bool isOnTrack = progressStatus.isOnTrack;
+    final Color statusColor = !hasTarget
+        ? colorScheme.secondary
+        : (isOnTrack ? Colors.blue : Colors.amber.shade700);
+    final String statusEmoji = !hasTarget ? '' : (isOnTrack ? '😊' : '😟');
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () async {
+        final h = data.totalMinutes ~/ 60;
+        final m = data.totalMinutes % 60;
+        final timeController = TextEditingController(
+          text: data.totalMinutes > 0
+              ? '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}'
+              : '',
+        );
+        final revisitController = TextEditingController(
+          text: data.revisitCount > 0 ? '${data.revisitCount}' : '',
+        );
+        final studyController = TextEditingController(
+          text: data.bibleStudyCount > 0 ? '${data.bibleStudyCount}' : '',
+        );
+
+        await showDialog<void>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(
+              l10n.monthlyTimeTitle(
+                l10n.getMonthName(selected.month),
+                selected.year,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: timeController,
+                  keyboardType: TextInputType.datetime,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    labelText: l10n.hoursAndMinutes,
+                    hintText: l10n.exampleTime,
+                    suffixText: l10n.timeFormatHhMm,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.timer),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: revisitController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: l10n.revisits,
+                    hintText: l10n.exampleNumber,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.loop),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: studyController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: l10n.bibleStudies,
+                    hintText: l10n.exampleNumber,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.menu_book),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  final text = timeController.text
+                      .trim()
+                      .replaceAll(',', ':')
+                      .replaceAll('.', ':');
+                  int? totalMinutes;
+                  if (text.contains(':')) {
+                    final parts = text.split(':');
+                    final hh = int.tryParse(parts[0]) ?? 0;
+                    final mm = parts.length > 1
+                        ? (int.tryParse(parts[1]) ?? 0)
+                        : 0;
+                    totalMinutes = hh * 60 + mm;
+                  } else if (text.isNotEmpty) {
+                    final hours = double.tryParse(text);
+                    if (hours != null) totalMinutes = (hours * 60).round();
+                  }
+                  final revisits =
+                      int.tryParse(revisitController.text.trim());
+                  final studies =
+                      int.tryParse(studyController.text.trim());
+                  Navigator.pop(ctx);
+                  // Garante que o provider está no mês correto antes de salvar
+                  await ref
+                      .read(monthlyServiceTimeProvider.notifier)
+                      .loadMonth(selected.year, selected.month);
+                  await ref
+                      .read(monthlyServiceTimeProvider.notifier)
+                      .updateManualStats(
+                        minutes: totalMinutes,
+                        revisits: revisits,
+                        bibleStudies: studies,
+                      );
+                },
+                child: Text(l10n.save),
+              ),
+            ],
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: statusColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: hasTarget
+              ? Border.all(color: statusColor.withOpacity(0.3))
+              : null,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (hasTarget && statusEmoji.isNotEmpty) ...[
+              Text(statusEmoji, style: const TextStyle(fontSize: 28)),
+              const SizedBox(width: 12),
+            ],
+            Icon(Icons.timer, color: statusColor, size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+  children: [
+    Expanded(
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text(
+            l10n.monthlyTime,
+            style: TextStyle(
+              fontSize: 12,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '${l10n.getMonthName(selected.month).substring(0, 3)} ${selected.year}',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: colorScheme.secondary,
+            ),
+          ),
+        ],
+      ),
+    ),
+    if (hasTarget) ...[
+      const SizedBox(width: 8),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+// ...
+                          decoration: BoxDecoration(
+                            color: statusColor.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            isOnTrack ? l10n.onTrack : l10n.behind,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: statusColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        data.formattedTime,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'monospace',
+                          color: statusColor,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(Icons.edit,
+                          size: 14, color: colorScheme.onSurfaceVariant),
+                      if (data.revisitCount > 0) ...[
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                            border:
+                                Border.all(color: Colors.orange.shade200),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.loop,
+                                  size: 12, color: Colors.orange),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${data.revisitCount}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange.shade800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      if (data.bibleStudyCount > 0) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3E5F5),
+                            borderRadius: BorderRadius.circular(12),
+                            border:
+                                Border.all(color: const Color(0xFFCE93D8)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Text('📖',
+                                  style: TextStyle(fontSize: 11)),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${data.bibleStudyCount}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF6A1B9A),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  if (hasTarget) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      '${l10n.target}: ${profile.effectiveTargetHours}h • ${l10n.expected}: ${progressStatus.expectedHours.toStringAsFixed(1)}h',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -12,7 +12,7 @@ class OneDriveService implements BackupService {
   static const String backupFolder = 'Field Ministry Backups';
   static const String _refreshTokenKey = 'onedrive_refresh_token';
   static const String _userDataKey = 'onedrive_user_data';
-  
+
   final FlutterAppAuth _appAuth = const FlutterAppAuth();
   String? _accessToken;
   String? _refreshToken;
@@ -25,13 +25,13 @@ class OneDriveService implements BackupService {
   Future<void> _initialize() async {
     if (_isInitialized) return;
     _isInitialized = true;
-    
+
     try {
       final db = await DatabaseService.getInstance();
-      
+
       // Load saved refresh token
       _refreshToken = db.getSetting<String>(_refreshTokenKey);
-      
+
       // Load saved user data
       final userDataJson = db.getSetting<String>(_userDataKey);
       if (userDataJson != null) {
@@ -43,7 +43,7 @@ class OneDriveService implements BackupService {
           photoUrl: userData['photoUrl'] as String?,
         );
       }
-      
+
       // If we have a refresh token, try to get a new access token
       if (_refreshToken != null && _currentUser != null) {
         debugPrint('Found saved OneDrive credentials, refreshing token...');
@@ -61,11 +61,11 @@ class OneDriveService implements BackupService {
   Future<void> _saveCredentials() async {
     try {
       final db = await DatabaseService.getInstance();
-      
+
       if (_refreshToken != null) {
         await db.saveSetting(_refreshTokenKey, _refreshToken);
       }
-      
+
       if (_currentUser != null) {
         final userData = jsonEncode({
           'id': _currentUser!.id,
@@ -90,7 +90,7 @@ class OneDriveService implements BackupService {
       debugPrint('Error clearing OneDrive credentials: $e');
     }
   }
-  
+
   @override
   Future<void> initialize() async {
     await _initialize();
@@ -105,27 +105,24 @@ class OneDriveService implements BackupService {
     _isSigningIn = true;
     try {
       debugPrint('Starting OneDrive sign-in via Azure AD...');
-      
+
       final result = await _appAuth.authorizeAndExchangeCode(
         AuthorizationTokenRequest(
           OAuthConfig.oneDriveClientId,
           OAuthConfig.oneDriveRedirectUrl,
           serviceConfiguration: const AuthorizationServiceConfiguration(
-            authorizationEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
-            tokenEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+            authorizationEndpoint:
+                'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+            tokenEndpoint:
+                'https://login.microsoftonline.com/common/oauth2/v2.0/token',
           ),
           scopes: OAuthConfig.oneDriveScopes,
         ),
       );
 
-      if (result == null) {
-        debugPrint('OneDrive sign-in cancelled by user');
-        return null;
-      }
-
       _accessToken = result.accessToken;
       _refreshToken = result.refreshToken;
-      
+
       // Decode token to get expiry
       try {
         final decodedToken = JwtDecoder.decode(result.accessToken!);
@@ -147,7 +144,6 @@ class OneDriveService implements BackupService {
 
       debugPrint('OneDrive sign-in successful');
       return _currentUser;
-      
     } on PlatformException catch (e) {
       final message = e.message ?? e.code;
       debugPrint('OneDrive PlatformException: $message');
@@ -177,15 +173,15 @@ class OneDriveService implements BackupService {
           debugPrint('Token revocation failed (non-critical): $e');
         }
       }
-      
+
       _accessToken = null;
       _refreshToken = null;
       _tokenExpiry = null;
       _currentUser = null;
-      
+
       // Clear saved credentials
       await _clearCredentials();
-      
+
       debugPrint('Signed out from OneDrive');
     } catch (e) {
       debugPrint('Error signing out from OneDrive: $e');
@@ -200,12 +196,12 @@ class OneDriveService implements BackupService {
 
     try {
       await _ensureValidToken();
-      
+
       debugPrint('Uploading backup to OneDrive: $fileName');
-      
+
       final uploadUrl = '${OAuthConfig.microsoftGraphApiUrl}/me/drive/root:'
           '/Field%20Ministry%20Backups/$fileName:/content';
-      
+
       final response = await http.put(
         Uri.parse(uploadUrl),
         headers: {
@@ -218,7 +214,8 @@ class OneDriveService implements BackupService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint('OneDrive backup uploaded successfully: $fileName');
       } else {
-        throw Exception('Failed to upload backup (${response.statusCode}): ${response.body}');
+        throw Exception(
+            'Failed to upload backup (${response.statusCode}): ${response.body}');
       }
     } catch (e) {
       debugPrint('Error uploading backup to OneDrive: $e');
@@ -234,12 +231,12 @@ class OneDriveService implements BackupService {
 
     try {
       await _ensureValidToken();
-      
+
       debugPrint('Downloading backup from OneDrive: $fileName');
-      
+
       final downloadUrl = '${OAuthConfig.microsoftGraphApiUrl}/me/drive/root:'
           '/Field%20Ministry%20Backups/$fileName:/content';
-      
+
       final response = await http.get(
         Uri.parse(downloadUrl),
         headers: {
@@ -254,7 +251,8 @@ class OneDriveService implements BackupService {
         debugPrint('Backup not found on OneDrive: $fileName');
         return null;
       } else {
-        throw Exception('Failed to download backup (${response.statusCode}): ${response.body}');
+        throw Exception(
+            'Failed to download backup (${response.statusCode}): ${response.body}');
       }
     } catch (e) {
       debugPrint('Error downloading backup from OneDrive: $e');
@@ -268,10 +266,10 @@ class OneDriveService implements BackupService {
 
     try {
       await _ensureValidToken();
-      
+
       final metadataUrl = '${OAuthConfig.microsoftGraphApiUrl}/me/drive/root:'
           '/Field%20Ministry%20Backups/$fileName';
-      
+
       final response = await http.get(
         Uri.parse(metadataUrl),
         headers: {
@@ -282,12 +280,12 @@ class OneDriveService implements BackupService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final modifiedTime = data['lastModifiedDateTime'] as String?;
-        
+
         if (modifiedTime != null) {
           return DateTime.parse(modifiedTime);
         }
       }
-      
+
       return null;
     } catch (e) {
       debugPrint('Error getting backup info from OneDrive: $e');
@@ -309,12 +307,16 @@ class OneDriveService implements BackupService {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Falha ao obter perfil OneDrive (${response.statusCode}): ${response.body}');
+      throw Exception(
+          'Falha ao obter perfil OneDrive (${response.statusCode}): ${response.body}');
     }
 
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     final id = (data['id'] as String?)?.trim();
-    final email = ((data['mail'] as String?) ?? (data['userPrincipalName'] as String?) ?? '').trim();
+    final email = ((data['mail'] as String?) ??
+            (data['userPrincipalName'] as String?) ??
+            '')
+        .trim();
     final displayName = (data['displayName'] as String?)?.trim();
 
     if (id == null || id.isEmpty || email.isEmpty) {
@@ -339,7 +341,7 @@ class OneDriveService implements BackupService {
     if (_tokenExpiry != null) {
       final now = DateTime.now();
       final timeUntilExpiry = _tokenExpiry!.difference(now);
-      
+
       if (timeUntilExpiry.inMinutes < 5) {
         await _refreshAccessToken();
       }
@@ -354,7 +356,7 @@ class OneDriveService implements BackupService {
 
     try {
       debugPrint('Refreshing OneDrive access token...');
-      
+
       final response = await http.post(
         Uri.parse(OAuthConfig.oneDriveTokenUrl),
         headers: {
@@ -377,21 +379,21 @@ class OneDriveService implements BackupService {
           // Save the new refresh token to persistent storage
           await _saveCredentials();
         }
-        
+
         // Update token expiry
         final expiresIn = data['expires_in'] as int?;
         if (expiresIn != null) {
           _tokenExpiry = DateTime.now().add(Duration(seconds: expiresIn));
         }
-        
+
         debugPrint('OneDrive token refreshed successfully');
       } else {
-        throw Exception('Failed to refresh token (${response.statusCode}): ${response.body}');
+        throw Exception(
+            'Failed to refresh token (${response.statusCode}): ${response.body}');
       }
     } catch (e) {
       debugPrint('Error refreshing OneDrive token: $e');
       rethrow;
     }
   }
-
 }

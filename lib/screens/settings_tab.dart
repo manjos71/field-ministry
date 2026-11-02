@@ -5,13 +5,32 @@ import 'package:intl/intl.dart';
 import '../providers/theme_provider.dart';
 import '../providers/backup_provider.dart';
 import '../providers/territory_provider.dart';
-import '../providers/service_timer_provider.dart';
-import '../providers/publisher_profile_provider.dart';
-import '../models/publisher_profile.dart';
 import '../config/app_localizations.dart';
 
 class SettingsTab extends ConsumerWidget {
   const SettingsTab({super.key});
+
+  String _backupMessage(AppLocalizations l10n, BackupState state) {
+    switch (state.errorKey) {
+      case 'backup_login_canceled':
+        return l10n.backupLoginCanceled;
+      case 'backup_not_found':
+        return l10n.backupNotFound;
+      case 'backup_failed':
+        return l10n.backupFailed(state.errorDetail ?? '');
+      case 'restore_failed':
+        return l10n.restoreFailed(state.errorDetail ?? '');
+    }
+
+    switch (state.successKey) {
+      case 'backup_success':
+        return l10n.backupSuccess;
+      case 'restore_success':
+        return l10n.restoreSuccess;
+    }
+
+    return '';
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,22 +39,25 @@ class SettingsTab extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final themeModeNotifier = ref.read(themeModeProvider.notifier);
 
+    final l10n = AppLocalizations.of(context);
+
     // Listen for backup status
     ref.listen(backupProvider, (prev, next) {
-      if (next.error != null) {
+      final message = _backupMessage(l10n, next);
+      if (message.isEmpty) return;
+
+      if (next.errorKey != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.error!), backgroundColor: Colors.red),
+          SnackBar(content: Text(message), backgroundColor: Colors.red),
         );
       }
-      if (next.successMessage != null) {
+      if (next.successKey != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.successMessage!), backgroundColor: Colors.green),
+          SnackBar(content: Text(message), backgroundColor: Colors.green),
         );
       }
     });
 
-    final l10n = AppLocalizations.of(context);
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.settings),
@@ -96,8 +118,6 @@ class SettingsTab extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-
-
           _SectionHeader(title: l10n.data),
           Card(
             child: Column(
@@ -111,44 +131,51 @@ class SettingsTab extends ConsumerWidget {
                   trailing: DropdownButton<String>(
                     value: ref.watch(selectedBackupServiceProvider),
                     underline: Container(),
+                    selectedItemBuilder: (context) => const [
+                      Text('OneDrive'),
+                      Text('Google Drive'),
+                      Text('Dropbox'),
+                    ],
                     items: const [
-                       DropdownMenuItem(
-                         value: 'onedrive',
-                         child: Row(
-                           mainAxisSize: MainAxisSize.min,
-                           children: [
-                             Icon(Icons.cloud, size: 20),
-                             SizedBox(width: 8),
-                             Text('OneDrive'),
-                           ],
-                         ),
-                       ),
-                       DropdownMenuItem(
-                         value: 'google_drive',
-                         child: Row(
-                           mainAxisSize: MainAxisSize.min,
-                           children: [
-                             Icon(Icons.cloud_upload, size: 20, color: Colors.green),
-                             SizedBox(width: 8),
-                             Text('Google Drive'),
-                           ],
-                         ),
-                       ),
-                       DropdownMenuItem(
-                         value: 'dropbox',
-                         child: Row(
-                           mainAxisSize: MainAxisSize.min,
-                           children: [
-                             Icon(Icons.folder_open, size: 20),
-                             SizedBox(width: 8),
-                             Text('Dropbox'),
-                           ],
-                         ),
-                       ),
+                      DropdownMenuItem(
+                        value: 'onedrive',
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.cloud, size: 20),
+                            SizedBox(width: 8),
+                            Text('OneDrive'),
+                          ],
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'google_drive',
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.cloud_upload,
+                                size: 20, color: Colors.green),
+                            SizedBox(width: 8),
+                            Text('Google Drive'),
+                          ],
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'dropbox',
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.folder_open, size: 20),
+                            SizedBox(width: 8),
+                            Text('Dropbox'),
+                          ],
+                        ),
+                      ),
                     ],
                     onChanged: (value) {
                       if (value != null) {
-                        ref.read(selectedBackupServiceProvider.notifier).state = value;
+                        ref.read(selectedBackupServiceProvider.notifier).state =
+                            value;
                       }
                     },
                   ),
@@ -170,14 +197,18 @@ class SettingsTab extends ConsumerWidget {
                           ? const Icon(Icons.person)
                           : null,
                     ),
-                    title: Text(backupState.currentUser!.email),
-                    subtitle: Text(backupState.lastBackupDate != null 
-                         ? l10n.lastBackupAt(DateFormat('dd/MM HH:mm').format(backupState.lastBackupDate!)) 
-                         : l10n.noBackupFound
+                    title: Text(
+                      backupState.currentUser!.email,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                    subtitle: Text(backupState.lastBackupDate != null
+                        ? l10n.lastBackupAt(DateFormat('dd/MM HH:mm')
+                            .format(backupState.lastBackupDate!))
+                        : l10n.noBackupFound),
                     trailing: IconButton(
-                       icon: const Icon(Icons.logout),
-                       onPressed: () => backupNotifier.signOut(),
+                      icon: const Icon(Icons.logout),
+                      onPressed: () => backupNotifier.signOut(),
                     ),
                   )
                 else
@@ -191,30 +222,47 @@ class SettingsTab extends ConsumerWidget {
                       label: Text(l10n.login),
                     ),
                   ),
-                
                 if (backupState.currentUser != null) ...[
                   const Divider(),
                   Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        if (backupState.isLoading)
-                           const CircularProgressIndicator()
-                        else ...[
-                           ElevatedButton.icon(
-                             onPressed: () => backupNotifier.backup(),
-                             icon: const Icon(Icons.cloud_upload),
-                             label: Text(l10n.backup),
-                           ),
-                           OutlinedButton.icon(
-                             onPressed: () => _showRestoreConfirmDialog(context, backupNotifier),
-                             icon: const Icon(Icons.cloud_download),
-                             label: Text(l10n.restore),
-                           ),
-                        ],
-                      ],
-                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    child: backupState.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () => backupNotifier.backup(),
+                                  icon: const Icon(Icons.cloud_upload),
+                                  label: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(l10n.backup),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 12),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: () => _showRestoreConfirmDialog(
+                                      context, backupNotifier),
+                                  icon: const Icon(Icons.cloud_download),
+                                  label: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(l10n.restore),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 12),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
                 ],
               ],
@@ -237,7 +285,8 @@ class SettingsTab extends ConsumerWidget {
     }
   }
 
-  void _showRestoreConfirmDialog(BuildContext context, BackupNotifier notifier) {
+  void _showRestoreConfirmDialog(
+      BuildContext context, BackupNotifier notifier) {
     final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
@@ -299,29 +348,34 @@ class _ThemeColorPicker extends ConsumerWidget {
       children: [
         // Cores predefinidas
         ...ThemeColors.predefinedColors.map((color) => _ColorButton(
-          color: color,
-          isSelected: color.value == currentColor.value,
-          onTap: () => themeNotifier.setColor(color),
-        )),
-        
+              color: color,
+              isSelected: color.value == currentColor.value,
+              onTap: () => themeNotifier.setColor(color),
+            )),
+
         // Cores personalizadas
         ...customColors.map((color) => _ColorButton(
-          color: color,
-          isSelected: color.value == currentColor.value,
-          onTap: () => themeNotifier.setColor(color),
-          onLongPress: () => _confirmDeleteColor(context, color, customColorsNotifier),
-        )),
+              color: color,
+              isSelected: color.value == currentColor.value,
+              onTap: () => themeNotifier.setColor(color),
+              onLongPress: () =>
+                  _confirmDeleteColor(context, color, customColorsNotifier),
+            )),
 
         // Botão Adicionar
         GestureDetector(
-          onTap: () => _showColorPicker(context, customColorsNotifier, themeNotifier),
+          onTap: () =>
+              _showColorPicker(context, customColorsNotifier, themeNotifier),
           child: Container(
             width: 48,
             height: 48,
             decoration: BoxDecoration(
               color: Colors.grey.withOpacity(0.1),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.grey.shade400, width: 1, style: BorderStyle.solid),
+              border: Border.all(
+                  color: Colors.grey.shade400,
+                  width: 1,
+                  style: BorderStyle.solid),
             ),
             child: const Icon(Icons.add, color: Colors.grey),
           ),
@@ -330,9 +384,10 @@ class _ThemeColorPicker extends ConsumerWidget {
     );
   }
 
-  void _showColorPicker(BuildContext context, CustomColorsNotifier notifier, ThemeNotifier themeNotifier) async {
+  void _showColorPicker(BuildContext context, CustomColorsNotifier notifier,
+      ThemeNotifier themeNotifier) async {
     Color selectedColor = Colors.blue;
-    
+
     final bool confirmed = await ColorPicker(
       color: selectedColor,
       onColorChanged: (Color color) => selectedColor = color,
@@ -372,7 +427,8 @@ class _ThemeColorPicker extends ConsumerWidget {
       },
     ).showPickerDialog(
       context,
-      constraints: const BoxConstraints(minHeight: 460, minWidth: 300, maxWidth: 320),
+      constraints:
+          const BoxConstraints(minHeight: 460, minWidth: 300, maxWidth: 320),
     );
 
     if (confirmed) {
@@ -381,20 +437,27 @@ class _ThemeColorPicker extends ConsumerWidget {
     }
   }
 
-  void _confirmDeleteColor(BuildContext context, Color color, CustomColorsNotifier notifier) {
+  void _confirmDeleteColor(
+      BuildContext context, Color color, CustomColorsNotifier notifier) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Remover cor?'),
         content: Row(
           children: [
-            Container(width: 24, height: 24, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+            Container(
+                width: 24,
+                height: 24,
+                decoration:
+                    BoxDecoration(color: color, shape: BoxShape.circle)),
             const SizedBox(width: 8),
             const Text('Deseja remover esta cor personalizada?'),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar')),
           TextButton(
             onPressed: () {
               notifier.removeColor(color);
@@ -426,8 +489,9 @@ class _ColorButton extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // Usar branco no tema escuro e preto no tema claro para melhor contraste
     final selectedBorderColor = isDark ? Colors.white : Colors.black;
-    final unselectedBorderColor = isDark ? Colors.grey.shade600 : Colors.grey.shade300;
-    
+    final unselectedBorderColor =
+        isDark ? Colors.grey.shade600 : Colors.grey.shade300;
+
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
@@ -493,25 +557,27 @@ class _LanguageSelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedLanguage = ref.watch(languageProvider);
     final languageNotifier = ref.read(languageProvider.notifier);
-    
+
     // Find current selection
-    final currentIndex = _languageCodes.indexWhere(
-      (lang) => lang.code == selectedLanguage?.languageCode
-    );
-    final current = currentIndex >= 0 ? _languageCodes[currentIndex] : _languageCodes[0];
+    final currentIndex = _languageCodes
+        .indexWhere((lang) => lang.code == selectedLanguage?.languageCode);
+    final current =
+        currentIndex >= 0 ? _languageCodes[currentIndex] : _languageCodes[0];
 
     final l10n = AppLocalizations.of(context);
-    
+
     return ListTile(
       leading: const Icon(Icons.language),
       title: Text(l10n.language),
       subtitle: Text('${current.flag} ${_getLangLabel(current.code, l10n)}'),
       trailing: const Icon(Icons.chevron_right),
-      onTap: () => _showLanguageDialog(context, selectedLanguage, languageNotifier, l10n),
+      onTap: () => _showLanguageDialog(
+          context, selectedLanguage, languageNotifier, l10n),
     );
   }
 
-  void _showLanguageDialog(BuildContext context, Locale? current, LanguageNotifier notifier, AppLocalizations l10n) {
+  void _showLanguageDialog(BuildContext context, Locale? current,
+      LanguageNotifier notifier, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -523,17 +589,18 @@ class _LanguageSelector extends ConsumerWidget {
             itemCount: _languageCodes.length,
             itemBuilder: (context, index) {
               final lang = _languageCodes[index];
-              final isSelected = current?.languageCode == lang.code || 
-                                 (current == null && lang.code == null);
-              
+              final isSelected = current?.languageCode == lang.code ||
+                  (current == null && lang.code == null);
+
               return ListTile(
                 leading: Text(lang.flag, style: const TextStyle(fontSize: 24)),
                 title: Text(_getLangLabel(lang.code, l10n)),
-                trailing: isSelected 
+                trailing: isSelected
                     ? Icon(Icons.check, color: Theme.of(context).primaryColor)
                     : null,
                 onTap: () {
-                  notifier.setLanguage(lang.code != null ? Locale(lang.code!) : null);
+                  notifier.setLanguage(
+                      lang.code != null ? Locale(lang.code!) : null);
                   Navigator.pop(context);
                 },
               );
@@ -597,7 +664,8 @@ class _CsvSettingsCardState extends ConsumerState<_CsvSettingsCard> {
 
   Future<void> _saveSettings() async {
     final db = await ref.read(databaseServiceProvider.future);
-    final enabled = _fields.entries.where((e) => e.value).map((e) => e.key).toList();
+    final enabled =
+        _fields.entries.where((e) => e.value).map((e) => e.key).toList();
     await db.saveSetting('csv_export_fields', enabled);
   }
 
@@ -611,7 +679,7 @@ class _CsvSettingsCardState extends ConsumerState<_CsvSettingsCard> {
         title: Text(l10n.exportCsv),
         subtitle: Text(l10n.configureColumns),
         children: _fields.keys.map((key) {
-           return CheckboxListTile(
+          return CheckboxListTile(
             title: Text(_labelFor(key, l10n)),
             value: _fields[key],
             onChanged: (val) {
@@ -626,14 +694,20 @@ class _CsvSettingsCardState extends ConsumerState<_CsvSettingsCard> {
 
   String _labelFor(String key, AppLocalizations l10n) {
     switch (key) {
-      case 'territory': return l10n.territory;
-      case 'street': return l10n.street;
-      case 'number': return l10n.addressNumber;
-      case 'date': return l10n.date;
-      case 'time': return l10n.hour;
-      case 'notes': return l10n.notes;
-      default: return key;
+      case 'territory':
+        return l10n.territory;
+      case 'street':
+        return l10n.street;
+      case 'number':
+        return l10n.addressNumber;
+      case 'date':
+        return l10n.date;
+      case 'time':
+        return l10n.hour;
+      case 'notes':
+        return l10n.notes;
+      default:
+        return key;
     }
   }
 }
-

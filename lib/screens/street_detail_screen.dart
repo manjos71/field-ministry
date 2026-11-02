@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:add_2_calendar/add_2_calendar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as contacts;
@@ -7,7 +7,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../config/app_localizations.dart';
 import '../providers/territory_provider.dart';
 import '../models/models.dart';
-import '../providers/service_timer_provider.dart';
 import '../widgets/visit_history_accordion.dart';
 import '../widgets/status_selector.dart';
 
@@ -32,258 +31,6 @@ class StreetDetailScreen extends ConsumerStatefulWidget {
 }
 
 // Widget para agendamento de revisitas — máximo 2 revisitas + Estudo Bíblico
-class RecursiveRevisitScheduler extends ConsumerStatefulWidget {
-  final String personName;
-  final String location;
-  final void Function(bool)? onRevisitToggled;
-  // Contexto para criar a visita de Estudo Bíblico automaticamente
-  final String? territoryId;
-  final String? streetId;
-  final String? addressId;
-  final PersonCategory? personCategory;
-  final Gender? personGender;
-
-  const RecursiveRevisitScheduler({
-    Key? key,
-    required this.personName,
-    required this.location,
-    this.onRevisitToggled,
-    this.territoryId,
-    this.streetId,
-    this.addressId,
-    this.personCategory,
-    this.personGender,
-  }) : super(key: key);
-
-  @override
-  ConsumerState<RecursiveRevisitScheduler> createState() =>
-      _RecursiveRevisitSchedulerState();
-}
-
-class _RecursiveRevisitSchedulerState
-    extends ConsumerState<RecursiveRevisitScheduler> {
-  // Revisita 1
-  bool _revisit1Checked = false;
-  DateTime? _revisit1Date;
-  final _note1Ctrl = TextEditingController();
-
-  // Revisita 2 (visível apenas quando revisita 1 está marcada)
-  bool _revisit2Checked = false;
-  DateTime? _revisit2Date;
-  final _note2Ctrl = TextEditingController();
-
-  // Estudo Bíblico (visível apenas quando revisita 2 está marcada)
-  bool _bibleStudyChecked = false;
-
-  @override
-  void dispose() {
-    _note1Ctrl.dispose();
-    _note2Ctrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickDate(int slot) async {
-    final now = DateTime.now();
-    final initial = slot == 1
-        ? (_revisit1Date ?? now.add(const Duration(days: 7)))
-        : (_revisit2Date ?? now.add(const Duration(days: 14)));
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: initial,
-      firstDate: now,
-      lastDate: now.add(const Duration(days: 730)),
-    );
-    if (picked == null) return;
-    setState(() {
-      if (slot == 1) {
-        _revisit1Checked = true;
-        _revisit1Date = picked;
-        widget.onRevisitToggled?.call(true);
-      } else {
-        _revisit2Checked = true;
-        _revisit2Date = picked;
-      }
-    });
-    final noteCtrl = slot == 1 ? _note1Ctrl : _note2Ctrl;
-    final label = slot == 1 ? 'Revisita 1' : 'Revisita 2';
-    final event = Event(
-      title: '$label de ${widget.personName}',
-      description: noteCtrl.text.isNotEmpty
-          ? noteCtrl.text
-          : '$label - ${widget.location}',
-      location: widget.location,
-      startDate: picked,
-      endDate: picked.add(const Duration(hours: 1)),
-    );
-    await Add2Calendar.addEvent2Cal(event);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '$label agendada para ${picked.day}/${picked.month}/${picked.year}!',
-          ),
-        ),
-      );
-    }
-  }
-
-  String _dateLabel(DateTime? d) => d != null
-      ? '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}'
-      : '';
-
-  Widget _buildRevisitRow({
-    required int slot,
-    required bool checked,
-    required DateTime? date,
-    required TextEditingController noteCtrl,
-    required ValueChanged<bool> onChanged,
-  }) {
-    final label = _dateLabel(date);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Checkbox(
-              value: checked,
-              onChanged: (v) => onChanged(v ?? false),
-            ),
-            Expanded(
-              child: Text(
-                label.isNotEmpty ? 'Revisita $slot: $label' : 'Revisita $slot',
-                style: const TextStyle(fontSize: 15),
-              ),
-            ),
-            IconButton(
-              icon: Icon(Icons.calendar_month,
-                  color: Theme.of(context).primaryColor),
-              tooltip: 'Agendar no calendário',
-              onPressed: () => _pickDate(slot),
-            ),
-          ],
-        ),
-        if (checked)
-          Padding(
-            padding: const EdgeInsets.only(left: 12, right: 4, bottom: 8),
-            child: TextField(
-              controller: noteCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Nota da revisita',
-                prefixIcon: Icon(Icons.notes),
-                border: OutlineInputBorder(),
-                isDense: true,
-              ),
-              maxLines: 2,
-            ),
-          ),
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // ── Revisita 1 ────────────────────────────────────────
-        _buildRevisitRow(
-          slot: 1,
-          checked: _revisit1Checked,
-          date: _revisit1Date,
-          noteCtrl: _note1Ctrl,
-          onChanged: (v) {
-            setState(() {
-              _revisit1Checked = v;
-              if (!v) {
-                // Se desmarcou a 1a, limpa as demais
-                _revisit2Checked = false;
-                _revisit2Date = null;
-                _bibleStudyChecked = false;
-              }
-            });
-            widget.onRevisitToggled?.call(v);
-          },
-        ),
-
-        // ── Revisita 2 (visível apenas quando a 1a está marcada) ──
-        if (_revisit1Checked) ...[
-          _buildRevisitRow(
-            slot: 2,
-            checked: _revisit2Checked,
-            date: _revisit2Date,
-            noteCtrl: _note2Ctrl,
-            onChanged: (v) {
-              setState(() {
-                _revisit2Checked = v;
-                if (!v) {
-                  _revisit2Date = null;
-                  _bibleStudyChecked = false;
-                }
-              });
-            },
-          ),
-
-          // ── Estudo Bíblico (visível apenas quando a 2a está marcada) ──
-          if (_revisit2Checked)
-            Row(
-              children: [
-                Checkbox(
-                  value: _bibleStudyChecked,
-                  activeColor: const Color(0xFF673AB7),
-                  onChanged: (v) async {
-                    final checked = v ?? false;
-                    setState(() => _bibleStudyChecked = checked);
-                    if (checked) {
-                      // Contar no total mensal
-                      ref
-                          .read(monthlyServiceTimeProvider.notifier)
-                          .incrementBibleStudyCount();
-                      // Criar visita bibleStudy para aparecer na aba Cards
-                      final tId = widget.territoryId;
-                      final sId = widget.streetId;
-                      final aId = widget.addressId;
-                      if (tId != null && sId != null && aId != null) {
-                        await ref.read(territoriesProvider.notifier).addVisit(
-                              territoryId: tId,
-                              streetId: sId,
-                              addressId: aId,
-                              status: VisitStatus.bibleStudy,
-                              personName: widget.personName.isEmpty
-                                  ? null
-                                  : widget.personName,
-                              date: DateTime.now(),
-                              personCategory: widget.personCategory,
-                              gender: widget.personGender,
-                            );
-                      }
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content:
-                                Text('📖 Estudo Bíblico criado na aba Cards!'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      }
-                    }
-                  },
-                ),
-                const Text(
-                  '📖 Estudo Bíblico',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF673AB7),
-                  ),
-                ),
-              ],
-            ),
-        ],
-      ],
-    );
-  }
-}
-
 class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
   bool _isGenerating = false;
   AddressFilter _filter = AddressFilter.all;
@@ -438,6 +185,16 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                     street,
                     address,
                   ),
+                  onAddChildVisit: (parentVisit, childStatus) {
+                    _showAddVisitDialog(
+                      context,
+                      territory,
+                      street,
+                      address,
+                      childStatus,
+                      parentVisit.id,
+                    );
+                  },
                 );
               },
             ),
@@ -559,25 +316,6 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                OutlinedButton.icon(
-                  onPressed: () =>
-                      _showGenerateDialog(context, territory, street),
-                  icon: const Icon(Icons.auto_awesome),
-                  label: Text(l10n.generate),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton.icon(
-                  onPressed: () =>
-                      _showAddAddressDialog(context, territory, street),
-                  icon: const Icon(Icons.add),
-                  label: Text(l10n.add),
-                ),
-              ],
-            ),
           ],
         ),
       ),
@@ -641,8 +379,9 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(l10n.newNumber),
+        scrollable: true,
         content: TextField(
           controller: numberController,
           autofocus: true,
@@ -653,28 +392,34 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
           keyboardType: TextInputType.text,
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () async {
-              if (numberController.text.trim().isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.enterNumber)),
-                );
-                return;
-              }
+          OverflowBar(
+            alignment: MainAxisAlignment.end,
+            spacing: 8,
+            children: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  if (numberController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.enterNumber)),
+                    );
+                    return;
+                  }
 
-              Navigator.pop(context);
+                  Navigator.pop(dialogContext);
 
-              await ref.read(territoriesProvider.notifier).addAddress(
-                    territoryId: territory.id,
-                    streetId: street.id,
-                    number: numberController.text.trim(),
-                  );
-            },
-            child: Text(l10n.add),
+                  await ref.read(territoriesProvider.notifier).addAddress(
+                        territoryId: territory.id,
+                        streetId: street.id,
+                        number: numberController.text.trim(),
+                      );
+                },
+                child: Text(l10n.add),
+              ),
+            ],
           ),
         ],
       ),
@@ -765,12 +510,11 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                             evenOnly: filter == 'even',
                           );
 
-                      if (mounted) {
-                        setState(() => _isGenerating = false);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.numbersGenerated)),
-                        );
-                      }
+                      if (!context.mounted) return;
+                      setState(() => _isGenerating = false);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.numbersGenerated)),
+                      );
                     },
               child: Text(l10n.generate),
             ),
@@ -784,9 +528,11 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
     BuildContext context,
     Territory territory,
     Street street,
-    Address address,
-  ) {
-    VisitStatus? selectedStatus;
+    Address address, [
+    VisitStatus? initialStatus,
+    String? parentId,
+  ]) {
+    VisitStatus? selectedStatus = initialStatus;
     final notesController = TextEditingController();
     final personNameController = TextEditingController();
     final phoneController = TextEditingController();
@@ -794,9 +540,19 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
     PersonCategory? selectedCategory;
     SkinTone? selectedSkinTone;
     Gender? selectedGender;
-    bool revisitScheduled = false;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
+
+    // Se for um child, buscar dados do pai para pré-preencher
+    if (parentId != null) {
+      try {
+        final parent = address.visits.firstWhere((v) => v.id == parentId);
+        personNameController.text = parent.personName ?? '';
+        selectedCategory = parent.personCategory;
+        selectedGender = parent.gender;
+        selectedSkinTone = parent.personSkinTone;
+        phoneController.text = parent.phoneNumber ?? '';
+      } catch (_) {}
+    }
 
     showModalBottomSheet(
       context: context,
@@ -835,6 +591,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                       onStatusSelected: (status) {
                         setState(() => selectedStatus = status);
                       },
+                      isChild: parentId != null,
                     ),
                     const SizedBox(height: 16),
                     InkWell(
@@ -896,7 +653,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                       ),
                     ),
 
-                    if (selectedStatus == VisitStatus.interested) ...[
+                    if (parentId == null && (selectedStatus == VisitStatus.interested || selectedStatus == VisitStatus.returnVisit || selectedStatus == VisitStatus.notAtHome || selectedStatus == VisitStatus.bibleStudy)) ...[
                       const SizedBox(height: 12),
                       TextField(
                         controller: personNameController,
@@ -986,18 +743,6 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                       maxLines: 2,
                     ),
                     const SizedBox(height: 12),
-                    if (selectedStatus == VisitStatus.interested)
-                      RecursiveRevisitScheduler(
-                        personName: personNameController.text,
-                        location:
-                            '${street.name}, ${address.number} — ${territory.name}',
-                        onRevisitToggled: (v) => revisitScheduled = v,
-                        territoryId: territory.id,
-                        streetId: street.id,
-                        addressId: address.id,
-                        personCategory: selectedCategory,
-                        personGender: selectedGender,
-                      ),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -1014,29 +759,6 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                                   Navigator.pop(context);
 
                                   VisitStatus finalStatus = selectedStatus!;
-                                  if (selectedStatus ==
-                                          VisitStatus.interested ||
-                                      selectedStatus ==
-                                          VisitStatus.returnVisit) {
-                                    int positiveCount = address.visits
-                                        .where((v) =>
-                                            v.status ==
-                                                VisitStatus.interested ||
-                                            v.status ==
-                                                VisitStatus.returnVisit ||
-                                            v.status == VisitStatus.bibleStudy)
-                                        .length;
-                                    if (positiveCount >= 2) {
-                                      finalStatus = VisitStatus.bibleStudy;
-                                    }
-                                  }
-
-                                  if (revisitScheduled) {
-                                    ref
-                                        .read(
-                                            monthlyServiceTimeProvider.notifier)
-                                        .incrementRevisitCount();
-                                  }
 
                                   await ref
                                       .read(territoriesProvider.notifier)
@@ -1062,6 +784,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                                         personCategory: selectedCategory,
                                         personSkinTone: selectedSkinTone,
                                         gender: selectedGender,
+                                        parentId: parentId,
                                       );
 
                                   if (context.mounted) {
@@ -1100,8 +823,6 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
     PersonCategory? selectedCategory = visit.personCategory;
     SkinTone? selectedSkinTone = visit.personSkinTone;
     Gender? selectedGender = visit.gender;
-    bool revisitScheduled = false;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
 
     showModalBottomSheet(
@@ -1146,6 +867,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                       onStatusSelected: (status) {
                         setState(() => selectedStatus = status);
                       },
+                      isChild: visit.parentId != null,
                     ),
                     const SizedBox(height: 16),
                     InkWell(
@@ -1207,7 +929,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                       ),
                     ),
 
-                    if (selectedStatus == VisitStatus.interested) ...[
+                    if (visit.parentId == null && (selectedStatus == VisitStatus.interested || selectedStatus == VisitStatus.returnVisit || selectedStatus == VisitStatus.notAtHome || selectedStatus == VisitStatus.bibleStudy)) ...[
                       const SizedBox(height: 12),
                       TextField(
                         controller: personNameController,
@@ -1280,28 +1002,23 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                                 style: const TextStyle(color: Colors.green)),
                           ),
                         ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: notesController,
-                        decoration: InputDecoration(
-                          labelText: l10n.notes,
-                          prefixIcon: Icon(Icons.notes),
+                    ],
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: notesController,
+                      decoration: InputDecoration(
+                        labelText: l10n.notes,
+                        prefixIcon: const Icon(Icons.notes),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        maxLines: 2,
+                        filled: true,
+                        fillColor:
+                            Theme.of(context).inputDecorationTheme.fillColor,
                       ),
-                      const SizedBox(height: 12),
-                      RecursiveRevisitScheduler(
-                        personName: personNameController.text,
-                        location:
-                            '${street.name}, ${address.number} — ${territory.name}',
-                        onRevisitToggled: (v) => revisitScheduled = v,
-                        territoryId: territory.id,
-                        streetId: street.id,
-                        addressId: address.id,
-                        personCategory: selectedCategory,
-                        personGender: selectedGender,
-                      ),
-                    ], // Spread list end
+                      maxLines: 2,
+                    ),
+                    const SizedBox(height: 12),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -1316,35 +1033,6 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                             Navigator.pop(context);
 
                             VisitStatus finalStatus = selectedStatus;
-                            if (selectedStatus == VisitStatus.interested ||
-                                selectedStatus == VisitStatus.returnVisit) {
-                              int positiveCount = address.visits
-                                  .where((v) =>
-                                      v.status == VisitStatus.interested ||
-                                      v.status == VisitStatus.returnVisit ||
-                                      v.status == VisitStatus.bibleStudy)
-                                  .length;
-                              // If this visit is ALREADY in the list, we don't count it twice.
-                              // But just to be safe, if the total positive is >= 3 (including this one if it was already positive),
-                              // or if it was NOT positive before and now is (so total will be >= 3), we promote.
-                              // The simpliest is: if total positive considering current state >= 3.
-                              bool wasPositive =
-                                  visit.status == VisitStatus.interested ||
-                                      visit.status == VisitStatus.returnVisit ||
-                                      visit.status == VisitStatus.bibleStudy;
-                              int effectiveCount = wasPositive
-                                  ? positiveCount
-                                  : positiveCount + 1;
-                              if (effectiveCount >= 3) {
-                                finalStatus = VisitStatus.bibleStudy;
-                              }
-                            }
-
-                            if (revisitScheduled) {
-                              ref
-                                  .read(monthlyServiceTimeProvider.notifier)
-                                  .incrementRevisitCount();
-                            }
 
                             final updatedVisit = Visit(
                               id: visit.id,
@@ -1363,6 +1051,7 @@ class _StreetDetailScreenState extends ConsumerState<StreetDetailScreen> {
                               personCategory: selectedCategory,
                               personSkinTone: selectedSkinTone,
                               gender: selectedGender,
+                              parentId: visit.parentId,
                             );
 
                             await ref

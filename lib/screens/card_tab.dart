@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/app_localizations.dart';
 import '../providers/territory_provider.dart';
-import '../providers/service_timer_provider.dart';
 import '../models/models.dart';
 import '../widgets/stats_grid.dart';
 import 'street_detail_screen.dart';
@@ -17,6 +16,105 @@ class CardTab extends ConsumerStatefulWidget {
 
 class _CardTabState extends ConsumerState<CardTab> {
   String? _expandedAddressId;
+
+  bool _isRevisitAnchorStatus(VisitStatus status) {
+    return status == VisitStatus.interested ||
+        status == VisitStatus.returnVisit ||
+        status == VisitStatus.bibleStudy;
+  }
+
+  bool _isNonInteractionStatus(VisitStatus status) {
+    return status == VisitStatus.notHome ||
+        status == VisitStatus.notAnswered ||
+        status == VisitStatus.emptyHouse;
+  }
+
+  bool _isInteractionStatus(VisitStatus status) {
+    return status != VisitStatus.unvisited && !_isNonInteractionStatus(status);
+  }
+
+  bool _visitHadInteraction(Visit visit) {
+    return visit.hadInteraction ?? _isInteractionStatus(visit.status);
+  }
+
+  int _completedRevisits(Address address) {
+    final visits = [...address.visits]
+      ..sort((a, b) => a.date.compareTo(b.date));
+    final firstAnchorIndex =
+        visits.indexWhere((v) => _isRevisitAnchorStatus(v.status));
+    if (firstAnchorIndex == -1) return 0;
+
+    var completed = 0;
+    for (int i = firstAnchorIndex + 1; i < visits.length; i++) {
+      if (_visitHadInteraction(visits[i])) {
+        completed++;
+      }
+    }
+    return completed;
+  }
+
+  Visit? _interestAnchorVisit(Address address) {
+    if (address.visits.isEmpty) return null;
+    final visits = [...address.visits]
+      ..sort((a, b) => a.date.compareTo(b.date));
+    final anchorIndex =
+        visits.indexWhere((v) => _isRevisitAnchorStatus(v.status));
+    if (anchorIndex == -1) return null;
+    return visits[anchorIndex];
+  }
+
+  Visit? _promotedBibleStudyChild(Address address) {
+    if (address.visits.isEmpty) return null;
+
+    final visits = [...address.visits]
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    for (int i = visits.length - 1; i >= 0; i--) {
+      final child = visits[i];
+      if (child.status != VisitStatus.bibleStudy) continue;
+      if (child.parentId == null) continue;
+
+      final parentIndex =
+          visits.indexWhere((v) => v.id == child.parentId);
+      if (parentIndex == -1) continue;
+      final parent = visits[parentIndex];
+      if (parent.status != VisitStatus.interested &&
+          parent.status != VisitStatus.returnVisit) {
+        continue;
+      }
+
+      return child;
+    }
+
+    return null;
+  }
+
+  bool _isPromotedToBibleStudy(Address address) {
+    return _promotedBibleStudyChild(address) != null;
+  }
+
+  Visit? _lastRelevantVisitForInterested(Address address) {
+    if (address.visits.isEmpty) return null;
+    final visits = [...address.visits]
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    final anchorIndex =
+        visits.indexWhere((v) => _isRevisitAnchorStatus(v.status));
+    if (anchorIndex == -1) return address.lastVisit;
+
+    for (int i = visits.length - 1; i >= anchorIndex; i--) {
+      if (_visitHadInteraction(visits[i])) return visits[i];
+    }
+
+    return visits[anchorIndex];
+  }
+
+  String _currentRevisitStageLabel(Address address, AppLocalizations l10n) {
+    final completed = _completedRevisits(address);
+    if (completed <= 0) return l10n.revisitStage1;
+    if (completed == 1) return l10n.revisitStage2;
+    return l10n.revisitStageCompleted;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +146,8 @@ class _CardTabState extends ConsumerState<CardTab> {
             }
           }
 
-          final interestedItems = _getInterestedItems(territories);
-          final bibleStudyItems = _getBibleStudyItems(territories);
+          final interestedItems = _getInterestedItems(territories, l10n);
+          final bibleStudyItems = _getBibleStudyItems(territories, l10n);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -66,7 +164,7 @@ class _CardTabState extends ConsumerState<CardTab> {
 
                 // Título da seção de interessados
                 Text(
-                  l10n.interested,
+                  l10n.interestedPlural,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -97,9 +195,9 @@ class _CardTabState extends ConsumerState<CardTab> {
                 if (bibleStudyItems.isNotEmpty) ...[
                   const SizedBox(height: 24),
                   // Título da seção de Estudos Bíblicos
-                  const Text(
-                    'Estudos Bíblicos 📖',
-                    style: TextStyle(
+                  Text(
+                    l10n.bibleStudiesTitle,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -177,24 +275,33 @@ class _CardTabState extends ConsumerState<CardTab> {
     }).toList();
   }
 
-  List<_InterestedItem> _getInterestedItems(List<Territory> territories) {
+  List<_InterestedItem> _getInterestedItems(
+    List<Territory> territories,
+    AppLocalizations l10n,
+  ) {
     final items = <_InterestedItem>[];
 
     for (var t in territories) {
       if (t.isArchived) continue;
       for (var s in t.streets) {
         for (var a in s.addresses) {
-          final lastVisit = a.lastVisit;
-          if (lastVisit != null &&
-              (lastVisit.status == VisitStatus.interested ||
-                  lastVisit.status == VisitStatus.returnVisit)) {
+          final anchor = _interestAnchorVisit(a);
+          if (anchor == null) continue;
+          if (anchor.status != VisitStatus.interested &&
+              anchor.status != VisitStatus.returnVisit) {
+            continue;
+          }
+
+          final lastVisit = _lastRelevantVisitForInterested(a) ?? a.lastVisit;
+          if (lastVisit == null) continue;
+
             items.add(_InterestedItem(
               territory: t,
               street: s,
               address: a,
               lastVisit: lastVisit,
+              revisitStage: _currentRevisitStageLabel(a, l10n),
             ));
-          }
         }
       }
     }
@@ -204,22 +311,30 @@ class _CardTabState extends ConsumerState<CardTab> {
     return items;
   }
 
-  List<_InterestedItem> _getBibleStudyItems(List<Territory> territories) {
+  List<_InterestedItem> _getBibleStudyItems(
+    List<Territory> territories,
+    AppLocalizations l10n,
+  ) {
     final items = <_InterestedItem>[];
 
     for (var t in territories) {
       if (t.isArchived) continue;
       for (var s in t.streets) {
         for (var a in s.addresses) {
-          final lastVisit = a.lastVisit;
-          if (lastVisit != null && lastVisit.status == VisitStatus.bibleStudy) {
+          final anchor = _interestAnchorVisit(a);
+          if (anchor == null) continue;
+          if (anchor.status != VisitStatus.bibleStudy) continue;
+
+          final lastVisit = _lastRelevantVisitForInterested(a) ?? a.lastVisit;
+          if (lastVisit == null) continue;
+
             items.add(_InterestedItem(
               territory: t,
               street: s,
               address: a,
               lastVisit: lastVisit,
+              revisitStage: _currentRevisitStageLabel(a, l10n),
             ));
-          }
         }
       }
     }
@@ -256,8 +371,33 @@ class _InterestedStackCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final days = DateTime.now().difference(item.lastVisit.date).inDays;
-    final catIconPath =
-        item.lastVisit.personCategory?.getIconPath(item.lastVisit.gender);
+    
+    // Herdar metadados (categoria e gênero) do pai ou de outros registros no endereço
+    final personCategory = item.lastVisit.personCategory ?? () {
+      if (item.lastVisit.parentId != null) {
+        try {
+          return item.address.visits.firstWhere((v) => v.id == item.lastVisit.parentId).personCategory;
+        } catch (_) {}
+      }
+      try {
+        return item.address.visits.firstWhere((v) => v.personCategory != null).personCategory;
+      } catch (_) {}
+      return null;
+    }();
+
+    final gender = item.lastVisit.gender ?? () {
+      if (item.lastVisit.parentId != null) {
+        try {
+          return item.address.visits.firstWhere((v) => v.id == item.lastVisit.parentId).gender;
+        } catch (_) {}
+      }
+      try {
+        return item.address.visits.firstWhere((v) => v.gender != null).gender;
+      } catch (_) {}
+      return null;
+    }();
+
+    final catIconPath = personCategory?.getIconPath(gender);
 
     return GestureDetector(
       onTap: onTap,
@@ -346,9 +486,30 @@ class _InterestedStackCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.lastVisit.personName?.isNotEmpty == true
-                              ? item.lastVisit.personName!
-                              : 'Sem nome',
+                          () {
+                            if (item.lastVisit.personName?.isNotEmpty == true) {
+                              return item.lastVisit.personName!;
+                            }
+                            // Se for um child, buscar nome do pai
+                            if (item.lastVisit.parentId != null) {
+                              try {
+                                final parent = item.address.visits.firstWhere(
+                                    (v) => v.id == item.lastVisit.parentId);
+                                if (parent.personName?.isNotEmpty == true) {
+                                  return parent.personName!;
+                                }
+                              } catch (_) {}
+                            }
+                            // Se não achou por ID, pegar o primeiro que tiver nome no endereço
+                            try {
+                              return item.address.visits
+                                  .firstWhere((v) =>
+                                      v.personName?.isNotEmpty == true)
+                                  .personName!;
+                            } catch (_) {}
+
+                            return l10n.noName;
+                          }(),
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -378,6 +539,25 @@ class _InterestedStackCard extends ConsumerWidget {
                                 color: _getUrgencyColor(days),
                               ),
                             ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(999),
+                                border: Border.all(
+                                    color: Colors.blue.withOpacity(0.3)),
+                              ),
+                              child: Text(
+                                item.revisitStage,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -389,7 +569,7 @@ class _InterestedStackCard extends ConsumerWidget {
                       isExpanded ? Icons.expand_less : Icons.expand_more,
                     ),
                     tooltip:
-                        isExpanded ? 'Recolher detalhes' : 'Expandir detalhes',
+                        isExpanded ? l10n.collapseDetails : l10n.expandDetails,
                   ),
                 ],
               ),
@@ -407,7 +587,7 @@ class _InterestedStackCard extends ConsumerWidget {
                     if (item.lastVisit.notes?.isNotEmpty == true) ...[
                       const SizedBox(height: 8),
                       Text(
-                        'Notas:',
+                        l10n.notesLabel,
                         style: theme.textTheme.labelSmall
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
@@ -433,74 +613,6 @@ class _InterestedStackCard extends ConsumerWidget {
                       const SizedBox(height: 16),
                     ],
 
-                    // ── Checkbox Estudo Bíblico (só para Interessados) ──
-                    if (!isBibleStudy) ...[
-                      const Divider(),
-                      InkWell(
-                        onTap: () async {
-                          await ref.read(territoriesProvider.notifier).addVisit(
-                                territoryId: item.territory.id,
-                                streetId: item.street.id,
-                                addressId: item.address.id,
-                                status: VisitStatus.bibleStudy,
-                                personName: item.lastVisit.personName,
-                                date: DateTime.now(),
-                                personCategory: item.lastVisit.personCategory,
-                                gender: item.lastVisit.gender,
-                              );
-                          ref
-                              .read(monthlyServiceTimeProvider.notifier)
-                              .incrementBibleStudyCount();
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  '📖 Movido para Estudos Bíblicos!',
-                                ),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
-                          }
-                        },
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 4,
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: const Color(0xFF673AB7),
-                                    width: 2,
-                                  ),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: const Center(
-                                  child: Text('📖',
-                                      style: TextStyle(fontSize: 12)),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              const Text(
-                                'Promover a Estudo Bíblico',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF673AB7),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -512,7 +624,7 @@ class _InterestedStackCard extends ConsumerWidget {
                             ));
                           },
                           icon: const Icon(Icons.map_outlined),
-                          tooltip: 'Abrir mapa',
+                          tooltip: l10n.openMaps,
                         ),
                         const SizedBox(width: 8),
                         IconButton(
@@ -525,7 +637,7 @@ class _InterestedStackCard extends ConsumerWidget {
                             ));
                           },
                           icon: const Icon(Icons.navigation_outlined),
-                          tooltip: 'Ir',
+                          tooltip: l10n.navigate,
                         ),
                       ],
                     ),
@@ -544,11 +656,13 @@ class _InterestedItem {
   final Street street;
   final Address address;
   final Visit lastVisit;
+  final String revisitStage;
 
   _InterestedItem({
     required this.territory,
     required this.street,
     required this.address,
     required this.lastVisit,
+    required this.revisitStage,
   });
 }

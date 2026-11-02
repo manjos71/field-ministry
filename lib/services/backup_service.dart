@@ -17,22 +17,22 @@ class BackupUser {
 abstract class BackupService {
   /// Initialize the service (load saved credentials)
   Future<void> initialize();
-  
+
   /// Sign in to the backup service
   Future<BackupUser?> signIn();
-  
+
   /// Sign out from the backup service
   Future<void> signOut();
-  
+
   /// Upload backup file to cloud storage
   Future<void> uploadBackup(String jsonData, String fileName);
-  
+
   /// Download backup file from cloud storage
   Future<String?> downloadBackup(String fileName);
-  
+
   /// Get the last modification time of the backup file
   Future<DateTime?> getLastBackupTime(String fileName);
-  
+
   /// Get the current user account
   BackupUser? get currentUser;
 }

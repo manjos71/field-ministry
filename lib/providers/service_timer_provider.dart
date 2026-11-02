@@ -41,6 +41,7 @@ class MonthlyServiceTime {
   final int totalMinutes;
   final int revisitCount;
   final int bibleStudyCount;
+  final Set<String> bibleStudyPersonIds;
 
   MonthlyServiceTime({
     required this.year,
@@ -48,6 +49,7 @@ class MonthlyServiceTime {
     this.totalMinutes = 0,
     this.revisitCount = 0,
     this.bibleStudyCount = 0,
+    this.bibleStudyPersonIds = const {},
   });
 
   MonthlyServiceTime copyWith({
@@ -56,6 +58,7 @@ class MonthlyServiceTime {
     int? totalMinutes,
     int? revisitCount,
     int? bibleStudyCount,
+    Set<String>? bibleStudyPersonIds,
   }) {
     return MonthlyServiceTime(
       year: year ?? this.year,
@@ -63,6 +66,7 @@ class MonthlyServiceTime {
       totalMinutes: totalMinutes ?? this.totalMinutes,
       revisitCount: revisitCount ?? this.revisitCount,
       bibleStudyCount: bibleStudyCount ?? this.bibleStudyCount,
+      bibleStudyPersonIds: bibleStudyPersonIds ?? this.bibleStudyPersonIds,
     );
   }
 
@@ -99,98 +103,166 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
     return 'monthly_bible_study_count_${year}_$month';
   }
 
-  Future<void> _loadMonthlyTime() async {
+  String _getBibleStudyPersonsKey(int year, int month) {
+    return 'monthly_bible_study_persons_${year}_$month';
+  }
+
+  Future<void> _loadMonthlyTime([int? year, int? month]) async {
     try {
       final now = DateTime.now();
+      final targetYear = year ?? state.year;
+      final targetMonth = month ?? state.month;
+      
       final db = await DatabaseService.getInstance();
-      final key = _getStorageKey(now.year, now.month);
-      final savedMinutes = db.getSetting<int>(key) ?? 0;
-      final revisitKey = _getRevisitKey(now.year, now.month);
-      final savedRevisits = db.getSetting<int>(revisitKey) ?? 0;
-      final bibleStudyKey = _getBibleStudyKey(now.year, now.month);
-      final savedBibleStudies = db.getSetting<int>(bibleStudyKey) ?? 0;
+      final stats = await _getStatsForMonth(db, targetYear, targetMonth);
 
-      state = MonthlyServiceTime(
-        year: now.year,
-        month: now.month,
-        totalMinutes: savedMinutes,
-        revisitCount: savedRevisits,
-        bibleStudyCount: savedBibleStudies,
-      );
+      state = stats;
     } catch (_) {
-      // Keep default
+      // Keep current
     }
+  }
+
+  Future<MonthlyServiceTime> getStatsForSpecificMonth(int year, int month) async {
+    final db = await DatabaseService.getInstance();
+    return _getStatsForMonth(db, year, month);
+  }
+
+  Future<MonthlyServiceTime> _getStatsForMonth(DatabaseService db, int year, int month) async {
+    final key = _getStorageKey(year, month);
+    final savedMinutes = db.getSetting<int>(key) ?? 0;
+    final revisitKey = _getRevisitKey(year, month);
+    final savedRevisits = db.getSetting<int>(revisitKey) ?? 0;
+    final bibleStudyKey = _getBibleStudyKey(year, month);
+    final savedBibleStudies = db.getSetting<int>(bibleStudyKey) ?? 0;
+
+    final bibleStudyPersonsKey = _getBibleStudyPersonsKey(year, month);
+    final savedPersons = db.getSetting<List<dynamic>>(bibleStudyPersonsKey) ?? [];
+    final bibleStudyPersonIds = savedPersons.map((e) => e.toString()).toSet();
+
+    return MonthlyServiceTime(
+      year: year,
+      month: month,
+      totalMinutes: savedMinutes,
+      revisitCount: savedRevisits,
+      bibleStudyCount: savedBibleStudies,
+      bibleStudyPersonIds: bibleStudyPersonIds,
+    );
+  }
+
+  Future<void> loadMonth(int year, int month) async {
+    await _loadFuture;
+    await _loadMonthlyTime(year, month);
+  }
+
+  Future<void> setMonth(int year, int month) async {
+    state = state.copyWith(year: year, month: month);
+    await _loadMonthlyTime(year, month);
+  }
+
+  Future<void> updateManualStats({
+    int? minutes,
+    int? revisits,
+    int? bibleStudies,
+    int territoryRevisits = 0,
+  }) async {
+    await _loadFuture;
+    
+    // For revisits, we store the MANUAL OVERRIDE (Total - Territory)
+    int? newRevisitOverride;
+    if (revisits != null) {
+      newRevisitOverride = (revisits - territoryRevisits).clamp(0, 999);
+    }
+
+    state = state.copyWith(
+      totalMinutes: minutes ?? state.totalMinutes,
+      revisitCount: newRevisitOverride ?? state.revisitCount,
+      bibleStudyCount: bibleStudies ?? state.bibleStudyCount,
+    );
+
+    try {
+      final db = await DatabaseService.getInstance();
+      if (minutes != null) {
+        await db.saveSetting(_getStorageKey(state.year, state.month), state.totalMinutes);
+      }
+      if (newRevisitOverride != null) {
+        await db.saveSetting(_getRevisitKey(state.year, state.month), state.revisitCount);
+      }
+      if (bibleStudies != null) {
+        await db.saveSetting(_getBibleStudyKey(state.year, state.month), state.bibleStudyCount);
+      }
+    } catch (_) {}
   }
 
   Future<void> addTime(Duration duration) async {
     await _loadFuture;
     final now = DateTime.now();
-    final addedMinutes =
-        duration.inSeconds <= 0 ? 0 : ((duration.inSeconds + 59) ~/ 60);
-    if (addedMinutes == 0) return;
+    final addedMinutes = duration.inMinutes;
+    if (addedMinutes <= 0) return;
 
-    // Check if we need to reset for a new month
-    if (state.year != now.year || state.month != now.month) {
-      state = MonthlyServiceTime(
-        year: now.year,
-        month: now.month,
-        totalMinutes: addedMinutes,
-        revisitCount: 0,
-        bibleStudyCount: 0,
-      );
-    } else {
-      state = state.copyWith(
-        totalMinutes: state.totalMinutes + addedMinutes,
-      );
+    final db = await DatabaseService.getInstance();
+    final currentStats = await _getStatsForMonth(db, now.year, now.month);
+    final updatedMinutes = currentStats.totalMinutes + addedMinutes;
+    
+    await db.saveSetting(_getStorageKey(now.year, now.month), updatedMinutes);
+
+    // Se estivermos visualizando o mês atual, atualiza o estado
+    if (state.year == now.year && state.month == now.month) {
+      state = state.copyWith(totalMinutes: updatedMinutes);
     }
-
-    await _saveMonthlyTime();
   }
 
   Future<void> setTime(int minutes) async {
     await _loadFuture;
     final now = DateTime.now();
-    state = MonthlyServiceTime(
-      year: now.year,
-      month: now.month,
-      totalMinutes: minutes,
-      revisitCount: state.revisitCount,
-      bibleStudyCount: state.bibleStudyCount,
-    );
-    await _saveMonthlyTime();
+    final db = await DatabaseService.getInstance();
+    
+    await db.saveSetting(_getStorageKey(now.year, now.month), minutes);
+
+    if (state.year == now.year && state.month == now.month) {
+      state = state.copyWith(totalMinutes: minutes);
+    }
   }
 
   Future<void> incrementRevisitCount() async {
     await _loadFuture;
     final now = DateTime.now();
-    // Reset if new month
-    if (state.year != now.year || state.month != now.month) {
-      await _loadMonthlyTime();
+    final db = await DatabaseService.getInstance();
+    final currentStats = await _getStatsForMonth(db, now.year, now.month);
+    final newCount = currentStats.revisitCount + 1;
+
+    await db.saveSetting(_getRevisitKey(now.year, now.month), newCount);
+
+    if (state.year == now.year && state.month == now.month) {
+      state = state.copyWith(revisitCount: newCount);
     }
-    state = state.copyWith(revisitCount: state.revisitCount + 1);
-    try {
-      final db = await DatabaseService.getInstance();
-      await db.saveSetting(
-        _getRevisitKey(state.year, state.month),
-        state.revisitCount,
-      );
-    } catch (_) {}
   }
 
-  Future<void> incrementBibleStudyCount() async {
+  Future<void> recordBibleStudyVisit(String personId) async {
     await _loadFuture;
     final now = DateTime.now();
-    if (state.year != now.year || state.month != now.month) {
-      await _loadMonthlyTime();
+    final db = await DatabaseService.getInstance();
+    final currentStats = await _getStatsForMonth(db, now.year, now.month);
+
+    int newRevisitCount = currentStats.revisitCount + 1;
+    int newStudyCount = currentStats.bibleStudyCount;
+    final newPersons = Set<String>.from(currentStats.bibleStudyPersonIds);
+    
+    if (!newPersons.contains(personId)) {
+      newPersons.add(personId);
+      newStudyCount++;
     }
-    state = state.copyWith(bibleStudyCount: state.bibleStudyCount + 1);
-    try {
-      final db = await DatabaseService.getInstance();
-      await db.saveSetting(
-        _getBibleStudyKey(state.year, state.month),
-        state.bibleStudyCount,
+
+    await db.saveSetting(_getRevisitKey(now.year, now.month), newRevisitCount);
+    await db.saveSetting(_getBibleStudyKey(now.year, now.month), newStudyCount);
+    await db.saveSetting(_getBibleStudyPersonsKey(now.year, now.month), newPersons.toList());
+
+    if (state.year == now.year && state.month == now.month) {
+      state = state.copyWith(
+        revisitCount: newRevisitCount,
+        bibleStudyCount: newStudyCount,
+        bibleStudyPersonIds: newPersons,
       );
-    } catch (_) {}
+    }
   }
 
   Future<void> _saveMonthlyTime() async {
@@ -221,13 +293,22 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
 
       for (int i = 0; i < months; i++) {
         final date = DateTime(now.year, now.month - i, 1);
+        
         final key = _getStorageKey(date.year, date.month);
         final savedMinutes = db.getSetting<int>(key) ?? 0;
+        
+        final revisitKey = _getRevisitKey(date.year, date.month);
+        final savedRevisits = db.getSetting<int>(revisitKey) ?? 0;
+        
+        final bibleStudyKey = _getBibleStudyKey(date.year, date.month);
+        final savedBibleStudies = db.getSetting<int>(bibleStudyKey) ?? 0;
 
         history.add(MonthlyServiceTime(
           year: date.year,
           month: date.month,
           totalMinutes: savedMinutes,
+          revisitCount: savedRevisits,
+          bibleStudyCount: savedBibleStudies,
         ));
       }
     } catch (_) {
@@ -307,4 +388,11 @@ final monthlyServiceTimeProvider =
     StateNotifierProvider<MonthlyServiceTimeNotifier, MonthlyServiceTime>(
         (ref) {
   return MonthlyServiceTimeNotifier();
+});
+
+/// Mês selecionado no calendário da Home.
+/// Fonte única de verdade compartilhada entre o calendário e o bloco "Tempo do Mês".
+final selectedCalendarMonthProvider = StateProvider<DateTime>((ref) {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month);
 });

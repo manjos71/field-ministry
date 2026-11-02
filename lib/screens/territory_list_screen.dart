@@ -5,11 +5,18 @@ import '../models/models.dart';
 import 'territory_detail_screen.dart';
 import '../config/app_localizations.dart';
 
-class TerritoryListScreen extends ConsumerWidget {
+class TerritoryListScreen extends ConsumerStatefulWidget {
   const TerritoryListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TerritoryListScreen> createState() => _TerritoryListScreenState();
+}
+
+class _TerritoryListScreenState extends ConsumerState<TerritoryListScreen> {
+  bool _isAscending = true;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final territoriesAsync = ref.watch(territoriesProvider);
 
@@ -18,9 +25,9 @@ class TerritoryListScreen extends ConsumerWidget {
         title: Text(l10n.territories),
         actions: [
           IconButton(
-            icon: const Icon(Icons.archive_outlined),
-            onPressed: () => _showArchivedTerritories(context, ref),
-            tooltip: l10n.archived,
+            icon: const Icon(Icons.add),
+            onPressed: () => _showAddTerritoryDialog(context, ref),
+            tooltip: l10n.createTerritory,
           ),
         ],
       ),
@@ -34,15 +41,19 @@ class TerritoryListScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               Text(l10n.errorLoading(error.toString())),
               ElevatedButton(
-                onPressed: () => ref.read(territoriesProvider.notifier).refresh(),
+                onPressed: () =>
+                    ref.read(territoriesProvider.notifier).refresh(),
                 child: Text(l10n.tryAgain),
               ),
             ],
           ),
         ),
         data: (territories) {
-          final active = territories.where((t) => !t.isArchived).toList();
-          
+          final active = territories.toList();
+          active.sort((a, b) => _isAscending
+              ? a.name.toLowerCase().compareTo(b.name.toLowerCase())
+              : b.name.toLowerCase().compareTo(a.name.toLowerCase()));
+
           if (active.isEmpty) {
             return _buildEmptyState(context, ref);
           }
@@ -59,10 +70,20 @@ class TerritoryListScreen extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddTerritoryDialog(context, ref),
-        icon: const Icon(Icons.add),
-        label: Text(l10n.territory),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.small(
+            heroTag: 'sort_territories',
+            onPressed: () {
+              setState(() {
+                _isAscending = !_isAscending;
+              });
+            },
+            child: Icon(_isAscending ? Icons.arrow_downward : Icons.arrow_upward),
+            tooltip: l10n.sort,
+          ),
+        ],
       ),
     );
   }
@@ -91,12 +112,6 @@ class TerritoryListScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () => _showAddTerritoryDialog(context, ref),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.createTerritory),
-            ),
           ],
         ),
       ),
@@ -120,7 +135,7 @@ class TerritoryListScreen extends ConsumerWidget {
               autofocus: true,
               decoration: InputDecoration(
                 labelText: l10n.territoryName,
-                hintText: 'Ex: Territory 01',
+                hintText: l10n.territoryNameHint,
               ),
               textCapitalization: TextCapitalization.words,
             ),
@@ -129,7 +144,7 @@ class TerritoryListScreen extends ConsumerWidget {
               controller: neighborhoodController,
               decoration: InputDecoration(
                 labelText: l10n.neighborhoodOptional,
-                hintText: 'Ex: Downtown',
+                hintText: l10n.neighborhoodHint,
               ),
               textCapitalization: TextCapitalization.words,
             ),
@@ -150,13 +165,13 @@ class TerritoryListScreen extends ConsumerWidget {
               }
 
               Navigator.pop(context);
-              
+
               await ref.read(territoriesProvider.notifier).addTerritory(
-                name: nameController.text.trim(),
-                neighborhood: neighborhoodController.text.trim().isEmpty
-                    ? null
-                    : neighborhoodController.text.trim(),
-              );
+                    name: nameController.text.trim(),
+                    neighborhood: neighborhoodController.text.trim().isEmpty
+                        ? null
+                        : neighborhoodController.text.trim(),
+                  );
 
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -170,69 +185,6 @@ class TerritoryListScreen extends ConsumerWidget {
       ),
     );
   }
-
-  void _showArchivedTerritories(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final archived = ref.read(archivedTerritoriesProvider);
-    
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.5,
-        minChildSize: 0.3,
-        maxChildSize: 0.9,
-        expand: false,
-        builder: (context, scrollController) => Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  const Icon(Icons.archive),
-                  const SizedBox(width: 8),
-                  Text(
-                    l10n.archivedTerritories,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1),
-            Expanded(
-              child: archived.isEmpty
-                  ? Center(child: Text(l10n.noArchivedTerritories))
-                  : ListView.builder(
-                      controller: scrollController,
-                      itemCount: archived.length,
-                      itemBuilder: (context, index) {
-                        final territory = archived[index];
-                        return ListTile(
-                          title: Text(territory.name),
-                          subtitle: territory.neighborhood != null
-                              ? Text(territory.neighborhood!)
-                              : null,
-                          trailing: IconButton(
-                            icon: const Icon(Icons.unarchive),
-                            onPressed: () {
-                              ref
-                                  .read(territoriesProvider.notifier)
-                                  .toggleArchive(territory.id);
-                              Navigator.pop(context);
-                            },
-                            tooltip: l10n.unarchive,
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-
 }
 
 class _TerritoryCard extends ConsumerWidget {
@@ -244,13 +196,13 @@ class _TerritoryCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final progress = territory.progress;
-    
+
     // Calculate statistics
     int totalAddresses = territory.totalAddresses;
     int visitedAddresses = territory.totalVisited;
     int remainingAddresses = totalAddresses - visitedAddresses;
     int interestedCount = 0;
-    
+
     for (var street in territory.streets) {
       for (var address in street.addresses) {
         if (address.currentStatus == VisitStatus.interested) {
@@ -267,7 +219,8 @@ class _TerritoryCard extends ConsumerWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => TerritoryDetailScreen(territoryId: territory.id),
+              builder: (context) =>
+                  TerritoryDetailScreen(territoryId: territory.id),
             ),
           );
         },
@@ -286,22 +239,27 @@ class _TerritoryCard extends ConsumerWidget {
                       children: [
                         Text(
                           territory.name,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         if (territory.neighborhood != null)
                           Text(
                             territory.neighborhood!,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey.shade600,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Colors.grey.shade600,
+                                ),
                           ),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.secondaryContainer,
                       borderRadius: BorderRadius.circular(16),
@@ -311,13 +269,17 @@ class _TerritoryCard extends ConsumerWidget {
                         Icon(
                           Icons.location_on,
                           size: 16,
-                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSecondaryContainer,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           l10n.streetsCount(territory.streetCount),
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                           ),
@@ -328,7 +290,7 @@ class _TerritoryCard extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              
+
               // Statistics Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -363,9 +325,9 @@ class _TerritoryCard extends ConsumerWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Progress bar with percentage
               Row(
                 children: [
@@ -421,16 +383,9 @@ class _TerritoryCard extends ConsumerWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.archive),
-              title: Text(l10n.archive),
-              onTap: () {
-                Navigator.pop(context);
-                ref.read(territoriesProvider.notifier).toggleArchive(territory.id);
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+              title:
+                  Text(l10n.delete, style: const TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 _confirmDelete(context, ref);
@@ -509,7 +464,9 @@ class _TerritoryCard extends ConsumerWidget {
               backgroundColor: Colors.red,
             ),
             onPressed: () {
-              ref.read(territoriesProvider.notifier).deleteTerritory(territory.id);
+              ref
+                  .read(territoriesProvider.notifier)
+                  .deleteTerritory(territory.id);
               Navigator.pop(context);
             },
             child: Text(l10n.delete),
@@ -556,8 +513,8 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Colors.grey.shade600,
-          ),
+                color: Colors.grey.shade600,
+              ),
         ),
       ],
     );

@@ -86,6 +86,7 @@ class GoogleDriveService implements BackupService {
     _driveApi = null;
   }
 
+  @override
   Future<void> uploadBackup(String jsonData, String fileName) async {
     if (_driveApi == null) await signIn();
     if (_driveApi == null) throw Exception('Not signed in');
@@ -97,7 +98,7 @@ class GoogleDriveService implements BackupService {
       await localFile.writeAsString(jsonData);
 
       final media = drive.Media(localFile.openRead(), localFile.lengthSync());
-      
+
       // Check if file exists to update or create new
       final fileList = await _driveApi!.files.list(
         q: "name = '$fileName' and trashed = false",
@@ -107,7 +108,8 @@ class GoogleDriveService implements BackupService {
       if (fileList.files != null && fileList.files!.isNotEmpty) {
         // Update existing file
         final fileId = fileList.files!.first.id!;
-        final driveFile = drive.File(); // Empty metadata implies no change to name/parents
+        final driveFile =
+            drive.File(); // Empty metadata implies no change to name/parents
         await _driveApi!.files.update(driveFile, fileId, uploadMedia: media);
         debugPrint('Backup updated: $fileId');
       } else {
@@ -125,6 +127,7 @@ class GoogleDriveService implements BackupService {
     }
   }
 
+  @override
   Future<String?> downloadBackup(String fileName) async {
     if (_driveApi == null) await signIn();
     if (_driveApi == null) throw Exception('Not signed in');
@@ -156,7 +159,8 @@ class GoogleDriveService implements BackupService {
       rethrow;
     }
   }
-  
+
+  @override
   Future<DateTime?> getLastBackupTime(String fileName) async {
     if (_driveApi == null) await signIn();
     if (_driveApi == null) return null;
@@ -177,7 +181,7 @@ class GoogleDriveService implements BackupService {
       return null;
     }
   }
-  
+
   @override
   BackupUser? get currentUser => _currentUser;
 }

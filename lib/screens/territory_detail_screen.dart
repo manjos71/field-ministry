@@ -8,15 +8,22 @@ import '../models/models.dart';
 import 'street_detail_screen.dart';
 import '../config/app_localizations.dart';
 
-class TerritoryDetailScreen extends ConsumerWidget {
+class TerritoryDetailScreen extends ConsumerStatefulWidget {
   final String territoryId;
 
   const TerritoryDetailScreen({super.key, required this.territoryId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TerritoryDetailScreen> createState() => _TerritoryDetailScreenState();
+}
+
+class _TerritoryDetailScreenState extends ConsumerState<TerritoryDetailScreen> {
+  bool _isAscending = true;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final territory = ref.watch(territoryProvider(territoryId));
+    final territory = ref.watch(territoryProvider(widget.territoryId));
 
     if (territory == null) {
       return Scaffold(
@@ -25,14 +32,24 @@ class TerritoryDetailScreen extends ConsumerWidget {
       );
     }
 
+    final sortedStreets = List.from(territory.streets);
+    sortedStreets.sort((a, b) => _isAscending 
+        ? a.name.toLowerCase().compareTo(b.name.toLowerCase()) 
+        : b.name.toLowerCase().compareTo(a.name.toLowerCase()));
+
     return Scaffold(
       appBar: AppBar(
         title: Text(territory.name),
         actions: [
           IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => _showAddStreetDialog(context, ref, territory),
+            tooltip: l10n.addStreet,
+          ),
+          IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () => _showEditDialog(context, ref, territory),
-            tooltip: 'Editar',
+            tooltip: l10n.edit,
           ),
         ],
       ),
@@ -43,7 +60,7 @@ class TerritoryDetailScreen extends ConsumerWidget {
             child: _TerritoryMapHeader(territory: territory),
           ),
           // Lista de ruas
-          if (territory.streets.isEmpty)
+          if (sortedStreets.isEmpty)
             SliverFillRemaining(
               child: _buildEmptyState(context, ref, territory),
             )
@@ -54,18 +71,23 @@ class TerritoryDetailScreen extends ConsumerWidget {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => _StreetCard(
                     territory: territory,
-                    street: territory.streets[index],
+                    street: sortedStreets[index],
                   ),
-                  childCount: territory.streets.length,
+                  childCount: sortedStreets.length,
                 ),
               ),
             ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddStreetDialog(context, ref, territory),
-        icon: const Icon(Icons.add),
-        label: Text(l10n.street),
+      floatingActionButton: FloatingActionButton.small(
+        heroTag: 'sort_streets',
+        onPressed: () {
+          setState(() {
+            _isAscending = !_isAscending;
+          });
+        },
+        child: Icon(_isAscending ? Icons.arrow_downward : Icons.arrow_upward),
+        tooltip: l10n.sort,
       ),
     );
   }
@@ -95,12 +117,6 @@ class TerritoryDetailScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () => _showAddStreetDialog(context, ref, territory),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.addStreet),
-            ),
           ],
         ),
       ),
@@ -114,45 +130,52 @@ class TerritoryDetailScreen extends ConsumerWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(l10n.newStreet),
+        scrollable: true,
         content: TextField(
           controller: nameController,
           autofocus: true,
           decoration: InputDecoration(
             labelText: l10n.streetName,
-            hintText: 'Ex: Main Street',
+            hintText: l10n.streetNameHint,
           ),
           textCapitalization: TextCapitalization.words,
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () async {
-              if (nameController.text.trim().isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.enterStreetName)),
-                );
-                return;
-              }
+          OverflowBar(
+            alignment: MainAxisAlignment.end,
+            spacing: 8,
+            children: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  if (nameController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.enterStreetName)),
+                    );
+                    return;
+                  }
 
-              Navigator.pop(context);
+                  Navigator.pop(dialogContext);
 
-              await ref.read(territoriesProvider.notifier).addStreet(
-                    territoryId: territory.id,
-                    name: nameController.text.trim(),
-                  );
+                  await ref.read(territoriesProvider.notifier).addStreet(
+                        territoryId: territory.id,
+                        name: nameController.text.trim(),
+                      );
 
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.streetAdded)),
-                );
-              }
-            },
-            child: Text(l10n.add),
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.streetAdded)),
+                    );
+                  }
+                },
+                child: Text(l10n.add),
+              ),
+            ],
           ),
         ],
       ),

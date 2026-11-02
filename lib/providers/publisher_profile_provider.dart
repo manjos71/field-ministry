@@ -92,11 +92,12 @@ class PublisherProfileNotifier extends StateNotifier<PublisherProfile> {
 /// Notifier para o planejamento mensal
 class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
   final Ref _ref;
-  
-  MonthlyPlanNotifier(this._ref) : super(MonthlyPlanState(
-    year: DateTime.now().year,
-    month: DateTime.now().month,
-  )) {
+
+  MonthlyPlanNotifier(this._ref)
+      : super(MonthlyPlanState(
+          year: DateTime.now().year,
+          month: DateTime.now().month,
+        )) {
     _loadPlan();
   }
 
@@ -112,7 +113,7 @@ class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
     try {
       final now = DateTime.now();
       final db = await DatabaseService.getInstance();
-      
+
       // Carregar planejamento
       final planKey = _getStorageKey(now.year, now.month);
       final planJson = db.getSetting<String>(planKey);
@@ -123,7 +124,7 @@ class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
           plans[int.parse(key)] = (value as num).toDouble();
         });
       }
-      
+
       // Carregar horas realizadas
       final actualKey = _getActualStorageKey(now.year, now.month);
       final actualJson = db.getSetting<String>(actualKey);
@@ -134,7 +135,7 @@ class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
           actual[int.parse(key)] = (value as num).toDouble();
         });
       }
-      
+
       state = MonthlyPlanState(
         year: now.year,
         month: now.month,
@@ -147,9 +148,10 @@ class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
   }
 
   Future<void> setPlanForDay(int day, double hours) async {
+    final roundedHours = double.parse(hours.toStringAsFixed(2));
     final newPlans = Map<int, double>.from(state.dailyPlans);
-    if (hours > 0) {
-      newPlans[day] = hours;
+    if (roundedHours > 0) {
+      newPlans[day] = roundedHours;
     } else {
       newPlans.remove(day);
     }
@@ -157,24 +159,27 @@ class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
     await _savePlan();
   }
 
-  Future<void> setActualForDay(int day, double hours, {bool updateMonthlyTotal = false}) async {
+  Future<void> setActualForDay(int day, double hours,
+      {bool updateMonthlyTotal = false}) async {
+    final roundedHours = double.parse(hours.toStringAsFixed(2));
     final oldHours = state.dailyActual[day] ?? 0;
     final newActual = Map<int, double>.from(state.dailyActual);
-    if (hours > 0) {
-      newActual[day] = hours;
+    if (roundedHours > 0) {
+      newActual[day] = roundedHours;
     } else {
       newActual.remove(day);
     }
     state = state.copyWith(dailyActual: newActual);
     await _saveActual();
-    
+
     // Se solicitado, atualizar o total mensal com a diferença
     if (updateMonthlyTotal) {
-      final difference = hours - oldHours;
+      final difference = roundedHours - oldHours;
       if (difference != 0) {
         final monthlyNotifier = _ref.read(monthlyServiceTimeProvider.notifier);
         final currentMonthly = _ref.read(monthlyServiceTimeProvider);
-        final newMinutes = currentMonthly.totalMinutes + (difference * 60).round();
+        final newMinutes =
+            currentMonthly.totalMinutes + (difference * 60).round();
         await monthlyNotifier.setTime(newMinutes > 0 ? newMinutes : 0);
       }
     }
@@ -187,13 +192,14 @@ class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
     await _savePlan();
   }
 
-  Future<void> removeActualForDay(int day, {bool updateMonthlyTotal = false}) async {
+  Future<void> removeActualForDay(int day,
+      {bool updateMonthlyTotal = false}) async {
     final oldHours = state.dailyActual[day] ?? 0;
     final newActual = Map<int, double>.from(state.dailyActual);
     newActual.remove(day);
     state = state.copyWith(dailyActual: newActual);
     await _saveActual();
-    
+
     // Se solicitado, remover do total mensal
     if (updateMonthlyTotal && oldHours > 0) {
       final monthlyNotifier = _ref.read(monthlyServiceTimeProvider.notifier);
@@ -231,6 +237,43 @@ class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
     }
   }
 
+  Future<void> loadMonth(int year, int month) async {
+    try {
+      final db = await DatabaseService.getInstance();
+
+      // Carregar planejamento do mês solicitado
+      final planKey = _getStorageKey(year, month);
+      final planJson = db.getSetting<String>(planKey);
+      Map<int, double> plans = {};
+      if (planJson != null) {
+        final Map<String, dynamic> data = jsonDecode(planJson);
+        data.forEach((key, value) {
+          plans[int.parse(key)] = (value as num).toDouble();
+        });
+      }
+
+      // Carregar horas realizadas do mês solicitado
+      final actualKey = _getActualStorageKey(year, month);
+      final actualJson = db.getSetting<String>(actualKey);
+      Map<int, double> actual = {};
+      if (actualJson != null) {
+        final Map<String, dynamic> data = jsonDecode(actualJson);
+        data.forEach((key, value) {
+          actual[int.parse(key)] = (value as num).toDouble();
+        });
+      }
+
+      state = MonthlyPlanState(
+        year: year,
+        month: month,
+        dailyPlans: plans,
+        dailyActual: actual,
+      );
+    } catch (_) {
+      // Mantém o padrão
+    }
+  }
+
   Future<void> checkAndLoadForCurrentMonth() async {
     final now = DateTime.now();
     if (state.year != now.year || state.month != now.month) {
@@ -240,11 +283,13 @@ class MonthlyPlanNotifier extends StateNotifier<MonthlyPlanState> {
 }
 
 // Providers
-final publisherProfileProvider = StateNotifierProvider<PublisherProfileNotifier, PublisherProfile>((ref) {
+final publisherProfileProvider =
+    StateNotifierProvider<PublisherProfileNotifier, PublisherProfile>((ref) {
   return PublisherProfileNotifier();
 });
 
-final monthlyPlanProvider = StateNotifierProvider<MonthlyPlanNotifier, MonthlyPlanState>((ref) {
+final monthlyPlanProvider =
+    StateNotifierProvider<MonthlyPlanNotifier, MonthlyPlanState>((ref) {
   return MonthlyPlanNotifier(ref);
 });
 
@@ -254,17 +299,17 @@ final progressStatusProvider = Provider<ProgressStatus>((ref) {
   final monthlyTime = ref.watch(monthlyServiceTimeProvider);
   // Trigger rebuild when plan changes (for future use)
   ref.watch(monthlyPlanProvider);
-  
+
   final now = DateTime.now();
   final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
   final currentDay = now.day;
-  
+
   // Horas realizadas (em horas, não minutos)
   final completedHours = monthlyTime.totalMinutes / 60.0;
-  
+
   // Alvo total do mês
   final targetHours = profile.effectiveTargetHours.toDouble();
-  
+
   if (targetHours <= 0) {
     return ProgressStatus(
       isOnTrack: true,
@@ -274,10 +319,10 @@ final progressStatusProvider = Provider<ProgressStatus>((ref) {
       daysRemaining: daysInMonth - currentDay,
     );
   }
-  
+
   // Horas esperadas até hoje (proporcional)
   final expectedHours = (targetHours / daysInMonth) * currentDay;
-  
+
   return ProgressStatus(
     isOnTrack: completedHours >= expectedHours,
     completedHours: completedHours,
@@ -304,11 +349,13 @@ class ProgressStatus {
   });
 
   /// Horas restantes para atingir a meta
-  double get remainingHours => (targetHours - completedHours).clamp(0, double.infinity);
-  
+  double get remainingHours =>
+      (targetHours - completedHours).clamp(0, double.infinity);
+
   /// Porcentagem de conclusão
-  double get completionPercentage => targetHours > 0 ? (completedHours / targetHours * 100).clamp(0, 100) : 0;
-  
+  double get completionPercentage =>
+      targetHours > 0 ? (completedHours / targetHours * 100).clamp(0, 100) : 0;
+
   /// Horas em atraso (negativo se adiantado)
   double get hoursBehind => expectedHours - completedHours;
 }

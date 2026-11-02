@@ -22,9 +22,10 @@ class GoogleAuthClient extends http.BaseClient {
 
 class GoogleDriveService implements BackupService {
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    // ATENÇÃO: Aqui DEVE ser o ID do cliente WEB, não o do Android. 
+    // ATENÇÃO: Aqui DEVE ser o ID do cliente WEB, não o do Android.
     // Estou usando o ID Web que você enviou na mensagem anterior.
-    serverClientId: '618817240736-4a3m7k0hqkqlvjt1otg8pvqbivf76e5g.apps.googleusercontent.com',
+    serverClientId:
+        '618817240736-4a3m7k0hqkqlvjt1otg8pvqbivf76e5g.apps.googleusercontent.com',
     scopes: [
       drive.DriveApi.driveAppdataScope,
       drive.DriveApi.driveFileScope,
@@ -50,7 +51,8 @@ class GoogleDriveService implements BackupService {
           displayName: _googleUser!.displayName,
           photoUrl: _googleUser!.photoUrl,
         );
-        debugPrint('Google Drive: Sessão restaurada para ${_currentUser!.email}');
+        debugPrint(
+            'Google Drive: Sessão restaurada para ${_currentUser!.email}');
       }
     } catch (e) {
       debugPrint('Google Drive login silencioso falhou: $e');
@@ -101,12 +103,13 @@ class GoogleDriveService implements BackupService {
   @override
   Future<void> uploadBackup(String jsonData, String fileName) async {
     if (_driveApi == null) await signIn();
-    if (_driveApi == null) throw Exception('Drive API não inicializada. Faça login.');
+    if (_driveApi == null)
+      throw Exception('Drive API não inicializada. Faça login.');
 
     try {
       final bytes = utf8.encode(jsonData);
       final media = drive.Media(Stream.value(bytes), bytes.length);
-      
+
       final fileList = await _driveApi!.files.list(
         q: "name = '$fileName' and trashed = false",
         spaces: 'appDataFolder',
@@ -134,7 +137,8 @@ class GoogleDriveService implements BackupService {
   @override
   Future<String?> downloadBackup(String fileName) async {
     if (_driveApi == null) await signIn();
-    if (_driveApi == null) throw Exception('Drive API não inicializada. Faça login.');
+    if (_driveApi == null)
+      throw Exception('Drive API não inicializada. Faça login.');
 
     try {
       final fileList = await _driveApi!.files.list(
@@ -157,10 +161,10 @@ class GoogleDriveService implements BackupService {
       final contents = StringBuffer();
 
       media.stream.transform(utf8.decoder).listen(
-        (data) => contents.write(data),
-        onDone: () => completer.complete(contents.toString()),
-        onError: (e) => completer.completeError(e),
-      );
+            (data) => contents.write(data),
+            onDone: () => completer.complete(contents.toString()),
+            onError: (e) => completer.completeError(e),
+          );
 
       return await completer.future;
     } catch (e) {
@@ -168,7 +172,7 @@ class GoogleDriveService implements BackupService {
       rethrow;
     }
   }
-  
+
   @override
   Future<DateTime?> getLastBackupTime(String fileName) async {
     if (_driveApi == null) await signIn();
@@ -190,7 +194,7 @@ class GoogleDriveService implements BackupService {
       return null;
     }
   }
-  
+
   @override
   BackupUser? get currentUser => _currentUser;
 }

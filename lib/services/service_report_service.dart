@@ -25,7 +25,7 @@ class ServiceReportService {
   }) {
     final hours = workTime.inHours;
     final minutes = workTime.inMinutes.remainder(60);
-    
+
     final buffer = StringBuffer();
     buffer.writeln('📊 *$fieldServiceReportLabel*');
     buffer.writeln('');
@@ -38,50 +38,68 @@ class ServiceReportService {
     buffer.writeln('  • $othersLabel: $otherStatusCount');
     buffer.writeln('');
     buffer.writeln('_${generatedAtLabel}_');
-    
+
     return buffer.toString();
   }
 
   // Generate CSV for "not home" addresses with configurable fields
-  static String generateNotHomeCSV(List<NotHomeAddress> addresses, List<String> enabledFields) {
+  static String generateNotHomeCSV(
+      List<NotHomeAddress> addresses, List<String> enabledFields) {
     if (enabledFields.isEmpty) {
       // Default fallback
       enabledFields = ['territory', 'street', 'number', 'date'];
     }
 
     final buffer = StringBuffer();
-    
+
     // Header
-    final header = enabledFields.map((field) {
-      switch (field) {
-        case 'territory': return 'Território';
-        case 'street': return 'Rua';
-        case 'number': return 'Número';
-        case 'date': return 'Data';
-        case 'time': return 'Hora';
-        case 'notes': return 'Notas';
-        default: return '';
-      }
-    }).where((h) => h.isNotEmpty).join(',');
-    
+    final header = enabledFields
+        .map((field) {
+          switch (field) {
+            case 'territory':
+              return 'Território';
+            case 'street':
+              return 'Rua';
+            case 'number':
+              return 'Número';
+            case 'date':
+              return 'Data';
+            case 'time':
+              return 'Hora';
+            case 'notes':
+              return 'Notas';
+            default:
+              return '';
+          }
+        })
+        .where((h) => h.isNotEmpty)
+        .join(',');
+
     buffer.writeln(header);
-    
+
     // Data
     for (var addr in addresses) {
       final row = enabledFields.map((field) {
         switch (field) {
-          case 'territory': return _escapeCsv(addr.territoryName);
-          case 'street': return _escapeCsv(addr.streetName);
-          case 'number': return _escapeCsv(addr.addressNumber);
-          case 'date': return addr.date;
-          case 'time': return addr.time;
-          case 'notes': return _escapeCsv(addr.notes ?? '');
-          default: return '';
+          case 'territory':
+            return _escapeCsv(addr.territoryName);
+          case 'street':
+            return _escapeCsv(addr.streetName);
+          case 'number':
+            return _escapeCsv(addr.addressNumber);
+          case 'date':
+            return addr.date;
+          case 'time':
+            return addr.time;
+          case 'notes':
+            return _escapeCsv(addr.notes ?? '');
+          default:
+            return '';
         }
       }).join(',');
       buffer.writeln(row);
     }
-    
+
     return buffer.toString();
   }
 
@@ -95,8 +113,10 @@ class ServiceReportService {
   /// Parse a CSV string (previously exported by generateNotHomeCSV) back to a list.
   /// Returns a map with keys matching the header row, and a list of rows.
   static Map<String, dynamic> parseNotHomeCSV(String csvContent) {
-    final lines = csvContent.split('\n').where((l) => l.trim().isNotEmpty).toList();
-    if (lines.isEmpty) return {'headers': <String>[], 'rows': <Map<String, String>>[]};
+    final lines =
+        csvContent.split('\n').where((l) => l.trim().isNotEmpty).toList();
+    if (lines.isEmpty)
+      return {'headers': <String>[], 'rows': <Map<String, String>>[]};
 
     final headers = _parseCsvRow(lines.first);
     final rows = <Map<String, String>>[];
@@ -143,11 +163,11 @@ class ServiceReportService {
     // Clean phone number
     final cleanPhone = phoneNumber.replaceAll(RegExp(r'\D'), '');
     final finalPhone = cleanPhone.length <= 11 ? '55$cleanPhone' : cleanPhone;
-    
+
     // URL encode the message
     final encodedMessage = Uri.encodeComponent(message);
     final uri = Uri.parse("https://wa.me/$finalPhone?text=$encodedMessage");
-    
+
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
@@ -165,7 +185,7 @@ class ServiceReportService {
       html.Url.revokeObjectUrl(url);
     }
   }
-  
+
   // Collect session data from territories
   static SessionReport collectSessionData({
     required List<Territory> territories,
@@ -177,7 +197,7 @@ class ServiceReportService {
     int interestedCount = 0;
     int otherCount = 0;
     List<NotHomeAddress> notHomeAddresses = [];
-    
+
     for (var territory in territories) {
       for (var street in territory.streets) {
         for (var address in street.addresses) {
@@ -185,7 +205,7 @@ class ServiceReportService {
             // Only count visits from this session
             if (visit.date.isAfter(sessionStart)) {
               totalVisits++;
-              
+
               switch (visit.status) {
                 case VisitStatus.notHome:
                   notHomeCount++;
@@ -209,7 +229,7 @@ class ServiceReportService {
         }
       }
     }
-    
+
     return SessionReport(
       workTime: workTime,
       totalVisits: totalVisits,
@@ -256,5 +276,3 @@ class NotHomeAddress {
     this.notes,
   });
 }
-
-

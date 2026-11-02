@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
@@ -7,7 +6,7 @@ import 'backup_service.dart';
 class DropboxService implements BackupService {
   static const String backupFolder = '/Field Ministry Backups';
   BackupUser? _currentUser;
-  
+
   // In a real implementation, you would use:
   // - dropbox_sdk_flutter package
   // - OAuth2 flow with Dropbox API
@@ -24,12 +23,12 @@ class DropboxService implements BackupService {
       // NOTE: This is a placeholder implementation
       // In production, implement actual OAuth2 flow for Dropbox
       debugPrint('Dropbox sign-in not yet implemented. Using mock user.');
-      
+
       // For Dropbox, you would use:
       // - Dropbox Flutter SDK or dropbox_sdk_flutter package
       // - OAuth2 authentication flow
       _currentUser = null; // Placeholder
-      
+
       return _currentUser;
     } catch (e) {
       debugPrint('Error signing in to Dropbox: $e');
@@ -58,14 +57,14 @@ class DropboxService implements BackupService {
       // In production, use Dropbox API:
       // POST /files/upload
       // With path: /Field Ministry Backups/$fileName
-      
+
       final directory = await getTemporaryDirectory();
       final localFile = File('${directory.path}/$fileName');
       await localFile.writeAsString(jsonData);
-      
+
       debugPrint('Dropbox backup would be uploaded: $fileName');
       debugPrint('File size: ${localFile.lengthSync()} bytes');
-      
+
       // In real implementation, upload to Dropbox via Dropbox API
       // For now, just store locally as proof of concept
     } catch (e) {
@@ -85,12 +84,12 @@ class DropboxService implements BackupService {
       // In production, use Dropbox API:
       // POST /files/download
       // With path: /Field Ministry Backups/$fileName
-      
+
       debugPrint('Dropbox backup would be downloaded: $fileName');
-      
+
       // Return null to indicate backup not found (placeholder)
       return null;
-      
+
       // In real implementation, download from Dropbox via Dropbox API
     } catch (e) {
       debugPrint('Error downloading backup from Dropbox: $e');
@@ -107,12 +106,12 @@ class DropboxService implements BackupService {
       // In production, use Dropbox API:
       // POST /files/get_metadata
       // With path: /Field Ministry Backups/$fileName
-      
+
       debugPrint('Dropbox backup time check for: $fileName');
-      
+
       // Return null to indicate no backup found (placeholder)
       return null;
-      
+
       // In real implementation, check file metadata from Dropbox API
     } catch (e) {
       debugPrint('Error getting backup info from Dropbox: $e');

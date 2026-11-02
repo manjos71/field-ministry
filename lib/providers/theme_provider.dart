@@ -123,11 +123,13 @@ final themeColorProvider = StateNotifierProvider<ThemeNotifier, Color>((ref) {
   return ThemeNotifier(ref);
 });
 
-final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+final themeModeProvider =
+    StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
   return ThemeModeNotifier();
 });
 
-final customColorsProvider = StateNotifierProvider<CustomColorsNotifier, List<Color>>((ref) {
+final customColorsProvider =
+    StateNotifierProvider<CustomColorsNotifier, List<Color>>((ref) {
   return CustomColorsNotifier();
 });
 
@@ -146,7 +148,7 @@ final darkThemeProvider = Provider<ThemeData>((ref) {
 // Helper to build theme
 ThemeData _buildTheme(Color themeColor, Brightness brightness) {
   final isDark = brightness == Brightness.dark;
-  
+
   return ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(
@@ -155,8 +157,9 @@ ThemeData _buildTheme(Color themeColor, Brightness brightness) {
       primary: themeColor,
       // Adjust onPrimary for dark mode validity if needed, but seed usually handles it
     ),
-    scaffoldBackgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5),
-    
+    scaffoldBackgroundColor:
+        isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5),
+
     // AppBar
     appBarTheme: AppBarTheme(
       backgroundColor: isDark ? const Color(0xFF1E1E1E) : themeColor,
@@ -169,7 +172,7 @@ ThemeData _buildTheme(Color themeColor, Brightness brightness) {
         color: Colors.white,
       ),
     ),
-    
+
     // Cards
     cardTheme: CardThemeData(
       color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
@@ -179,7 +182,7 @@ ThemeData _buildTheme(Color themeColor, Brightness brightness) {
       ),
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     ),
-    
+
     // Texto
     textTheme: TextTheme(
       headlineLarge: TextStyle(
@@ -215,13 +218,13 @@ ThemeData _buildTheme(Color themeColor, Brightness brightness) {
         color: isDark ? Colors.white54 : const Color(0xFFBDBDBD),
       ),
     ),
-    
+
     // Botões
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: themeColor,
       foregroundColor: Colors.white,
     ),
-    
+
     // ListTile
     listTileTheme: ListTileThemeData(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -229,14 +232,14 @@ ThemeData _buildTheme(Color themeColor, Brightness brightness) {
       textColor: isDark ? Colors.white : Colors.black,
       iconColor: isDark ? Colors.white70 : Colors.black54,
     ),
-    
+
     // Divider
     dividerTheme: DividerThemeData(
       color: isDark ? const Color(0xFF424242) : const Color(0xFFE0E0E0),
       thickness: 1,
       space: 1,
     ),
-    
+
     // ExpansionTile (Accordion)
     expansionTileTheme: ExpansionTileThemeData(
       backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
@@ -246,19 +249,23 @@ ThemeData _buildTheme(Color themeColor, Brightness brightness) {
       textColor: isDark ? Colors.white : Colors.black,
       collapsedTextColor: isDark ? Colors.white : Colors.black,
     ),
-    
+
     // Input
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: isDark ? const Color(0xFF424242) : Colors.white, // Lighter than background
+      fillColor: isDark
+          ? const Color(0xFF424242)
+          : Colors.white, // Lighter than background
       prefixIconColor: isDark ? Colors.white70 : const Color(0xFF546E7A),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: isDark ? const Color(0xFF757575) : const Color(0xFFB0BEC5)),
+        borderSide: BorderSide(
+            color: isDark ? const Color(0xFF757575) : const Color(0xFFB0BEC5)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: isDark ? const Color(0xFF757575) : const Color(0xFFB0BEC5)),
+        borderSide: BorderSide(
+            color: isDark ? const Color(0xFF757575) : const Color(0xFFB0BEC5)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -268,7 +275,7 @@ ThemeData _buildTheme(Color themeColor, Brightness brightness) {
       hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.grey),
       labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey[800]),
     ),
-    
+
     // Dialog
     dialogTheme: DialogThemeData(
       backgroundColor: isDark ? const Color(0xFF303030) : Colors.white,
@@ -276,16 +283,13 @@ ThemeData _buildTheme(Color themeColor, Brightness brightness) {
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
       titleTextStyle: TextStyle(
-         fontSize: 20, 
-         fontWeight: FontWeight.bold,
-         color: isDark ? Colors.white : Colors.black
-      ),
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.white : Colors.black),
       contentTextStyle: TextStyle(
-         fontSize: 16,
-         color: isDark ? Colors.white70 : Colors.black87
-      ),
+          fontSize: 16, color: isDark ? Colors.white70 : Colors.black87),
     ),
-    
+
     // BottomSheet
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: isDark ? const Color(0xFF303030) : Colors.white,
@@ -325,6 +329,7 @@ class LanguageNotifier extends StateNotifier<Locale?> {
   }
 }
 
-final languageProvider = StateNotifierProvider<LanguageNotifier, Locale?>((ref) {
+final languageProvider =
+    StateNotifierProvider<LanguageNotifier, Locale?>((ref) {
   return LanguageNotifier();
 });

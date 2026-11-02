@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/publisher_profile_provider.dart';
+import '../providers/service_timer_provider.dart';
 import '../providers/theme_provider.dart';
 import '../config/app_localizations.dart';
 
@@ -9,16 +10,37 @@ class ServicePlanningCalendar extends ConsumerStatefulWidget {
   const ServicePlanningCalendar({super.key});
 
   @override
-  ConsumerState<ServicePlanningCalendar> createState() => _ServicePlanningCalendarState();
+  ConsumerState<ServicePlanningCalendar> createState() =>
+      _ServicePlanningCalendarState();
 }
 
-class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalendar> {
-  late DateTime _selectedMonth;
-
+class _ServicePlanningCalendarState
+    extends ConsumerState<ServicePlanningCalendar> {
   @override
   void initState() {
     super.initState();
-    _selectedMonth = DateTime(DateTime.now().year, DateTime.now().month);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final currentMonth = ref.read(selectedCalendarMonthProvider);
+      ref
+          .read(monthlyServiceTimeProvider.notifier)
+          .setMonth(currentMonth.year, currentMonth.month);
+      ref
+          .read(monthlyPlanProvider.notifier)
+          .loadMonth(currentMonth.year, currentMonth.month);
+    });
+  }
+
+  Future<void> _changeMonth(DateTime newMonth) async {
+    ref.read(selectedCalendarMonthProvider.notifier).state = newMonth;
+    await Future.wait([
+      ref
+          .read(monthlyServiceTimeProvider.notifier)
+          .setMonth(newMonth.year, newMonth.month),
+      ref
+          .read(monthlyPlanProvider.notifier)
+          .loadMonth(newMonth.year, newMonth.month),
+    ]);
   }
 
   @override
@@ -26,14 +48,17 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
     final l10n = AppLocalizations.of(context);
     final plan = ref.watch(monthlyPlanProvider);
     final profile = ref.watch(publisherProfileProvider);
-    
-    final daysInMonth = DateTime(_selectedMonth.year, _selectedMonth.month + 1, 0).day;
-    final firstDayOfMonth = DateTime(_selectedMonth.year, _selectedMonth.month, 1);
+    final selectedMonth = ref.watch(selectedCalendarMonthProvider);
+
+    final daysInMonth =
+        DateTime(selectedMonth.year, selectedMonth.month + 1, 0).day;
+    final firstDayOfMonth =
+        DateTime(selectedMonth.year, selectedMonth.month, 1);
     final firstWeekday = firstDayOfMonth.weekday; // 1 = Monday, 7 = Sunday
-    
+
     // Adjust for Sunday start (0) instead of Monday start (1)
     final startOffset = firstWeekday % 7;
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -47,22 +72,21 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
                 IconButton(
                   icon: const Icon(Icons.chevron_left),
                   onPressed: () {
-                    setState(() {
-                      _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month - 1);
-                    });
+                    _changeMonth(DateTime(
+                        selectedMonth.year, selectedMonth.month - 1));
                   },
                 ),
                 Column(
                   children: [
                     Text(
-                      l10n.getMonthName(_selectedMonth.month),
+                      l10n.getMonthName(selectedMonth.month),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      '${_selectedMonth.year}',
+                      '${selectedMonth.year}',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.grey,
@@ -73,26 +97,28 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
                 IconButton(
                   icon: const Icon(Icons.chevron_right),
                   onPressed: () {
-                    setState(() {
-                      _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month + 1);
-                    });
+                    _changeMonth(DateTime(
+                        selectedMonth.year, selectedMonth.month + 1));
                   },
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            
+
             // Summary row with planned hours and target - transparencia + contorno no tema escuro
             Builder(
               builder: (context) {
                 final isDark = Theme.of(context).brightness == Brightness.dark;
                 final primaryColor = ref.watch(themeColorProvider);
                 return Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   decoration: BoxDecoration(
                     color: primaryColor.withOpacity(isDark ? 0.5 : 1.0),
                     borderRadius: BorderRadius.circular(8),
-                    border: isDark ? Border.all(color: primaryColor, width: 1.5) : null,
+                    border: isDark
+                        ? Border.all(color: primaryColor, width: 1.5)
+                        : null,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -102,7 +128,11 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
                         '${plan.totalPlannedHours.toStringAsFixed(1)}h',
                         Icons.event_note,
                       ),
-                      Container(width: 1, height: 30, color: isDark ? Colors.white54 : Colors.grey.shade300),
+                      Container(
+                          width: 1,
+                          height: 30,
+                          color:
+                              isDark ? Colors.white54 : Colors.grey.shade300),
                       _buildSummaryItem(
                         l10n.target,
                         '${profile.effectiveTargetHours}h',
@@ -147,20 +177,21 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
                 if (index < startOffset) {
                   return const SizedBox();
                 }
-                
+
                 final day = index - startOffset + 1;
                 final plannedHours = plan.dailyPlans[day] ?? 0;
                 final actualHours = plan.dailyActual[day] ?? 0;
                 final isToday = _isToday(day);
                 final isPast = _isPastDay(day);
-                
+
                 return _DayCell(
                   day: day,
                   plannedHours: plannedHours,
                   actualHours: actualHours,
                   isToday: isToday,
                   isPast: isPast,
-                  onTap: () => _showPlanDialog(context, day, plannedHours, actualHours, isPast),
+                  onTap: () => _showPlanDialog(
+                      context, day, plannedHours, actualHours, isPast),
                 );
               },
             ),
@@ -195,18 +226,21 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
 
   bool _isToday(int day) {
     final now = DateTime.now();
-    return _selectedMonth.year == now.year &&
-        _selectedMonth.month == now.month &&
+    final selectedMonth = ref.read(selectedCalendarMonthProvider);
+    return selectedMonth.year == now.year &&
+        selectedMonth.month == now.month &&
         day == now.day;
   }
 
   bool _isPastDay(int day) {
     final now = DateTime.now();
-    final date = DateTime(_selectedMonth.year, _selectedMonth.month, day);
+    final selectedMonth = ref.read(selectedCalendarMonthProvider);
+    final date = DateTime(selectedMonth.year, selectedMonth.month, day);
     return date.isBefore(DateTime(now.year, now.month, now.day));
   }
 
-  void _showPlanDialog(BuildContext context, int day, double currentPlanned, double currentActual, bool isPast) {
+  void _showPlanDialog(BuildContext context, int day, double currentPlanned,
+      double currentActual, bool isPast) {
     final l10n = AppLocalizations.of(context);
     final plannedController = TextEditingController(
       text: currentPlanned > 0 ? currentPlanned.toString() : '',
@@ -225,11 +259,11 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
           children: [
             TextField(
               controller: plannedController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: TextInputType.number,
               autofocus: !isPast,
               decoration: InputDecoration(
                 labelText: l10n.plannedHours,
-                hintText: 'Ex: 2.5',
+                hintText: l10n.exampleHours,
                 border: const OutlineInputBorder(),
                 suffixText: l10n.hours.toLowerCase(),
                 prefixIcon: const Icon(Icons.event_note),
@@ -239,11 +273,11 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
               const SizedBox(height: 16),
               TextField(
                 controller: actualController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: TextInputType.number,
                 autofocus: isPast,
                 decoration: InputDecoration(
                   labelText: l10n.actualHours,
-                  hintText: 'Ex: 2.0',
+                  hintText: l10n.exampleHours,
                   border: const OutlineInputBorder(),
                   suffixText: l10n.hours.toLowerCase(),
                   prefixIcon: const Icon(Icons.check_circle_outline),
@@ -261,7 +295,8 @@ class _ServicePlanningCalendarState extends ConsumerState<ServicePlanningCalenda
                 notifier.removeActualForDay(day, updateMonthlyTotal: true);
                 Navigator.pop(context);
               },
-              child: Text(l10n.remove, style: const TextStyle(color: Colors.red)),
+              child:
+                  Text(l10n.remove, style: const TextStyle(color: Colors.red)),
             ),
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -309,13 +344,14 @@ class _DayCell extends ConsumerWidget {
     // Usar a cor selecionada diretamente do provider para garantir visibilidade no tema escuro
     final primaryColor = ref.watch(themeColorProvider);
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     // Determinar se o objetivo foi atingido (apenas para dias passados ou hoje com planejamento)
     final bool canShowResult = (isPast || isToday) && hasPlanning;
     final bool achievedGoal = canShowResult && actualHours >= plannedHours;
-    final bool missedGoal = canShowResult && actualHours < plannedHours && actualHours > 0;
+    final bool missedGoal =
+        canShowResult && actualHours < plannedHours && actualHours > 0;
     final bool noActual = canShowResult && actualHours == 0;
-    
+
     // Cores com transparência suave - mais visível no tema escuro sem ser muito forte
     final Color planningBgColor;
     if (hasPlanning) {
@@ -327,7 +363,7 @@ class _DayCell extends ConsumerWidget {
     } else {
       planningBgColor = Colors.transparent;
     }
-    
+
     // Cor do texto das horas - baseado no resultado
     Color hoursTextColor;
     if (achievedGoal) {
@@ -340,15 +376,15 @@ class _DayCell extends ConsumerWidget {
       // Cor padrão para dias futuros
       hoursTextColor = isDarkMode ? Colors.white : primaryColor;
     }
-    
+
     // Cor do texto do dia
-    final dayTextColor = isPast && !isToday 
-        ? Colors.grey 
+    final dayTextColor = isPast && !isToday
+        ? Colors.grey
         : (hasPlanning && isDarkMode ? Colors.white : null);
-    
+
     // Mostrar borda no dia atual e nos dias com planejamento no tema escuro
     final bool showBorder = isToday || (hasPlanning && isDarkMode);
-    
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -357,7 +393,7 @@ class _DayCell extends ConsumerWidget {
         decoration: BoxDecoration(
           color: planningBgColor,
           borderRadius: BorderRadius.circular(8),
-          border: showBorder 
+          border: showBorder
               ? Border.all(color: primaryColor, width: isToday ? 2 : 1.5)
               : null,
         ),
@@ -374,8 +410,8 @@ class _DayCell extends ConsumerWidget {
             ),
             if (hasPlanning)
               Text(
-                canShowResult && actualHours > 0 
-                    ? '${actualHours}h' 
+                canShowResult && actualHours > 0
+                    ? '${actualHours}h'
                     : '${plannedHours}h',
                 style: TextStyle(
                   fontSize: 8,

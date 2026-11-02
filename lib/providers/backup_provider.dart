@@ -32,30 +32,34 @@ final backupServiceProvider = Provider<BackupService>((ref) {
 
 class BackupState {
   final bool isLoading;
-  final String? error;
-  final String? successMessage;
+  final String? errorKey;
+  final String? errorDetail;
+  final String? successKey;
   final DateTime? lastBackupDate;
   final BackupUser? currentUser;
 
   BackupState({
     this.isLoading = false,
-    this.error,
-    this.successMessage,
+    this.errorKey,
+    this.errorDetail,
+    this.successKey,
     this.lastBackupDate,
     this.currentUser,
   });
 
   BackupState copyWith({
     bool? isLoading,
-    String? error,
-    String? successMessage,
+    String? errorKey,
+    String? errorDetail,
+    String? successKey,
     DateTime? lastBackupDate,
     BackupUser? currentUser,
   }) {
     return BackupState(
       isLoading: isLoading ?? this.isLoading,
-      error: error, // Clear error if not provided
-      successMessage: successMessage, // Clear message if not provided
+      errorKey: errorKey,
+      errorDetail: errorDetail,
+      successKey: successKey,
       lastBackupDate: lastBackupDate ?? this.lastBackupDate,
       currentUser: currentUser ?? this.currentUser,
     );
@@ -74,6 +78,13 @@ class BackupNotifier extends StateNotifier<BackupState> {
       : super(BackupState()) {
     _initializeAndCheckSignIn();
   }
+
+  static const String _errLoginCanceled = 'backup_login_canceled';
+  static const String _errNotFound = 'backup_not_found';
+  static const String _errBackupFailed = 'backup_failed';
+  static const String _errRestoreFailed = 'restore_failed';
+  static const String _successBackup = 'backup_success';
+  static const String _successRestore = 'restore_success';
 
   Future<void> _initializeAndCheckSignIn() async {
     // Initialize the backup service (loads saved credentials)
@@ -97,17 +108,25 @@ class BackupNotifier extends StateNotifier<BackupState> {
   }
 
   Future<void> signIn() async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(
+      isLoading: true,
+      errorKey: null,
+      errorDetail: null,
+    );
     try {
       final user = await _backupService.signIn();
       if (user != null) {
         state = state.copyWith(currentUser: user, isLoading: false);
         await _checkLastBackup();
       } else {
-        state = state.copyWith(isLoading: false, error: 'Login cancelado');
+        state = state.copyWith(isLoading: false, errorKey: _errLoginCanceled);
       }
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        errorKey: _errLoginCanceled,
+        errorDetail: e.toString(),
+      );
     }
   }
 
@@ -120,7 +139,12 @@ class BackupNotifier extends StateNotifier<BackupState> {
     if (state.currentUser == null) await signIn();
     if (state.currentUser == null) return;
 
-    state = state.copyWith(isLoading: true, error: null, successMessage: null);
+    state = state.copyWith(
+      isLoading: true,
+      errorKey: null,
+      errorDetail: null,
+      successKey: null,
+    );
     try {
       final data = Map<String, dynamic>.from(_dbService.exportAllData());
       final embeddedImages = await _collectImagePayload(data);
@@ -134,10 +158,14 @@ class BackupNotifier extends StateNotifier<BackupState> {
 
       state = state.copyWith(
           isLoading: false,
-          successMessage: 'Backup realizado com sucesso!',
+          successKey: _successBackup,
           lastBackupDate: DateTime.now());
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: 'Falha no backup: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorKey: _errBackupFailed,
+        errorDetail: e.toString(),
+      );
     }
   }
 
@@ -145,13 +173,17 @@ class BackupNotifier extends StateNotifier<BackupState> {
     if (state.currentUser == null) await signIn();
     if (state.currentUser == null) return;
 
-    state = state.copyWith(isLoading: true, error: null, successMessage: null);
+    state = state.copyWith(
+      isLoading: true,
+      errorKey: null,
+      errorDetail: null,
+      successKey: null,
+    );
     try {
       final jsonString = await _backupService.downloadBackup(_backupFileName);
 
       if (jsonString == null) {
-        state =
-            state.copyWith(isLoading: false, error: 'Backup não encontrado');
+        state = state.copyWith(isLoading: false, errorKey: _errNotFound);
         return;
       }
 
@@ -164,9 +196,13 @@ class BackupNotifier extends StateNotifier<BackupState> {
       _ref.invalidate(territoriesProvider);
 
       state = state.copyWith(
-          isLoading: false, successMessage: 'Dados restaurados com sucesso!');
+          isLoading: false, successKey: _successRestore);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: 'Falha ao restaurar: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorKey: _errRestoreFailed,
+        errorDetail: e.toString(),
+      );
     }
   }
 

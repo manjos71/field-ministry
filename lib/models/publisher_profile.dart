@@ -1,14 +1,14 @@
 /// Tipo de publicador/pioneiro
 enum PublisherType {
-  publisher,       // Publicador - escolhe suas horas
+  publisher, // Publicador - escolhe suas horas
   auxiliaryPioneer, // Pioneiro Auxiliar - 15 ou 30 horas
-  regularPioneer,   // Pioneiro Regular - 50 horas
+  regularPioneer, // Pioneiro Regular - 50 horas
 }
 
 /// Alvo de horas para Pioneiro Auxiliar
 enum AuxiliaryPioneerTarget {
-  hours15,  // 15 horas
-  hours30,  // 30 horas
+  hours15, // 15 horas
+  hours30, // 30 horas
 }
 
 /// Modelo do perfil do publicador
@@ -16,7 +16,8 @@ class PublisherProfile {
   final PublisherType type;
   final int? customTargetHours; // Para publicador
   final AuxiliaryPioneerTarget? auxiliaryTarget; // Para pioneiro auxiliar
-  final int creditHours; // Crédito de horas de trabalho voluntário (para pioneiro regular)
+  final int
+      creditHours; // Crédito de horas de trabalho voluntário (para pioneiro regular)
 
   const PublisherProfile({
     this.type = PublisherType.publisher,
@@ -84,8 +85,8 @@ class PublisherProfile {
     return PublisherProfile(
       type: PublisherType.values[json['type'] ?? 0],
       customTargetHours: json['customTargetHours'],
-      auxiliaryTarget: json['auxiliaryTarget'] != null 
-          ? AuxiliaryPioneerTarget.values[json['auxiliaryTarget']] 
+      auxiliaryTarget: json['auxiliaryTarget'] != null
+          ? AuxiliaryPioneerTarget.values[json['auxiliaryTarget']]
           : null,
       creditHours: json['creditHours'] ?? 0,
     );

@@ -12,6 +12,7 @@ class MonthlyStats {
   final int month;
   final double hours;
   final int returnVisits;
+  final int bibleStudies;
   final int visitedHouses;
 
   MonthlyStats({
@@ -19,69 +20,75 @@ class MonthlyStats {
     required this.month,
     required this.hours,
     required this.returnVisits,
+    required this.bibleStudies,
     required this.visitedHouses,
   });
 }
 
-final monthlyStatsByMonthsProvider =
-    FutureProvider.family<List<MonthlyStats>, int>((ref, months) async {
+final monthlyStatsForMonthProvider =
+    FutureProvider.family<MonthlyStats, DateTime>((ref, date) async {
+  ref.watch(monthlyServiceTimeProvider);
   final monthlyNotifier = ref.read(monthlyServiceTimeProvider.notifier);
   final territories = ref.watch(territoriesProvider).asData?.value ?? [];
 
-  final safeMonths = months < 1 ? 1 : months;
+  final monthStart = DateTime(date.year, date.month, 1);
+  final monthEnd = DateTime(date.year, date.month + 1, 0, 23, 59, 59);
 
-  // Get historical hours data
-  final hoursHistory = await monthlyNotifier.getHistoricalData(safeMonths);
-
-  // Calculate return visits per month
-  final now = DateTime.now();
-  final List<MonthlyStats> stats = [];
-
-  for (int i = 0; i < safeMonths; i++) {
-    final targetMonth = DateTime(now.year, now.month - (safeMonths - 1 - i), 1);
-    final monthStart = DateTime(targetMonth.year, targetMonth.month, 1);
-    final monthEnd =
-        DateTime(targetMonth.year, targetMonth.month + 1, 0, 23, 59, 59);
-
-    // Count return visits for this month
-    int returnVisitCount = 0;
-    final visitedAddressKeys = <String>{};
-    for (final territory in territories) {
-      for (final street in territory.streets) {
-        for (final address in street.addresses) {
-          var hasVisitInMonth = false;
-          for (final visit in address.visits) {
-            if (visit.date
-                    .isAfter(monthStart.subtract(const Duration(days: 1))) &&
-                visit.date.isBefore(monthEnd.add(const Duration(days: 1)))) {
-              hasVisitInMonth = true;
-              if (visit.status == VisitStatus.returnVisit) {
-                returnVisitCount++;
-              }
+  // Count return visits for this month from territories
+  int territoryReturnVisits = 0;
+  final visitedAddressKeys = <String>{};
+  
+  for (final territory in territories) {
+    for (final street in territory.streets) {
+      for (final address in street.addresses) {
+        var hasVisitInMonth = false;
+        for (final visit in address.visits) {
+          if (visit.date.isAfter(monthStart.subtract(const Duration(days: 1))) &&
+              visit.date.isBefore(monthEnd.add(const Duration(days: 1)))) {
+            hasVisitInMonth = true;
+            if (visit.status == VisitStatus.returnVisit) {
+              territoryReturnVisits++;
             }
           }
-          if (hasVisitInMonth) {
-            visitedAddressKeys
-                .add('${territory.id}:${street.id}:${address.id}');
-          }
+        }
+        if (hasVisitInMonth) {
+          visitedAddressKeys.add('${territory.id}:${street.id}:${address.id}');
         }
       }
     }
+  }
 
-    // Find corresponding hours
-    final hoursData = hoursHistory.firstWhere(
-      (h) => h.year == targetMonth.year && h.month == targetMonth.month,
-      orElse: () =>
-          MonthlyServiceTime(year: targetMonth.year, month: targetMonth.month),
-    );
+  // Get manual/timer data from Hive via the historical data method (or direct get)
+  await monthlyNotifier.getHistoricalData(1); // Not efficient but works for now
+  // Wait, getHistoricalData(1) always gets 'now'. I need a specific month.
+  // I'll add a helper to MonthlyServiceTimeNotifier for single month get.
+  
+  // For now, let's use the DB directly if we can, or just trust the provider's state if it's the right month.
+  // Better: I'll use a new method I'll add to MonthlyServiceTimeNotifier.
+  final manualData = await monthlyNotifier.getStatsForSpecificMonth(date.year, date.month);
 
-    stats.add(MonthlyStats(
-      year: targetMonth.year,
-      month: targetMonth.month,
-      hours: hoursData.totalMinutes / 60,
-      returnVisits: returnVisitCount + hoursData.revisitCount,
-      visitedHouses: visitedAddressKeys.length,
-    ));
+  return MonthlyStats(
+    year: date.year,
+    month: date.month,
+    hours: manualData.totalMinutes / 60,
+    // manualData.revisitCount já inclui as revisitas de território
+    // (incrementadas via incrementRevisitCount/recordBibleStudyVisit),
+    // portanto não somamos territoryReturnVisits para evitar duplicidade.
+    returnVisits: manualData.revisitCount,
+    bibleStudies: manualData.bibleStudyCount,
+    visitedHouses: visitedAddressKeys.length,
+  );
+});
+
+final monthlyStatsByMonthsProvider =
+    FutureProvider.family<List<MonthlyStats>, int>((ref, months) async {
+  final now = DateTime.now();
+  final List<MonthlyStats> stats = [];
+
+  for (int i = 0; i < months; i++) {
+    final date = DateTime(now.year, now.month - (months - 1 - i), 1);
+    final monthStats = await ref.watch(monthlyStatsForMonthProvider(date).future);
+    stats.add(monthStats);
   }
 
   return stats;
@@ -146,6 +153,8 @@ class MonthlyStatsChart extends ConsumerWidget {
         _LegendItem(color: Colors.blue, label: l10n.hours),
         const SizedBox(width: 24),
         _LegendItem(color: Colors.orange, label: l10n.returnVisit),
+        const SizedBox(width: 24),
+        const _LegendItem(color: Colors.purple, label: 'Estudos'),
       ],
     );
   }
@@ -156,17 +165,17 @@ class MonthlyStatsChart extends ConsumerWidget {
     final maxVisits = stats
         .map((s) => s.returnVisits.toDouble())
         .reduce((a, b) => a > b ? a : b);
-    final chartMaxY = maxHours > 0 ? maxHours * 1.1 : 10.0;
+    final maxStudies = stats
+        .map((s) => s.bibleStudies.toDouble())
+        .reduce((a, b) => a > b ? a : b);
+    // Escala fixa (mesma régua): 1 revisita/estudo = 1 unidade no eixo Y.
+    // Assim, um valor 1 fica visualmente abaixo da marca de 2h no eixo esquerdo.
+    final maxYBase = [maxHours, maxVisits, maxStudies]
+        .reduce((a, b) => a > b ? a : b);
+    final chartMaxY = maxYBase > 0 ? maxYBase * 1.1 : 10.0;
 
-    // Conversion factors for dual Y axes (hours on left, revisits on right).
-    final chartUnitPerVisit = maxVisits > 0 ? chartMaxY / maxVisits : 0.0;
-
-    final leftInterval = (chartMaxY / 4).clamp(1.0, chartMaxY);
-    final visitsTickStep =
-        maxVisits > 0 ? (maxVisits / 4).ceil().toDouble() : 1.0;
-    final rightInterval = maxVisits > 0
-        ? (chartUnitPerVisit * visitsTickStep).clamp(1.0, chartMaxY)
-        : chartMaxY;
+    final leftInterval = chartMaxY >= 2 ? 2.0 : 1.0;
+    final rightInterval = 1.0;
 
     return LineChart(
       LineChartData(
@@ -189,31 +198,46 @@ class MonthlyStatsChart extends ConsumerWidget {
           rightTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 40,
+              reservedSize: 56,
               interval: rightInterval,
               getTitlesWidget: (value, meta) {
-                if (maxVisits <= 0) {
-                  if (value.abs() > 0.001) return const SizedBox.shrink();
-                  return Text(
-                    '0',
-                    style: TextStyle(
-                      color: Colors.orange.shade700,
-                      fontSize: 10,
-                    ),
-                  );
-                }
+                final visitValue = maxVisits > 0 ? value.round() : null;
+                final studyValue = maxStudies > 0 ? value.round() : null;
 
-                final tickIndex = (value / rightInterval).round();
-                final visitValue = (tickIndex * visitsTickStep).round();
-                if (visitValue < 0 || visitValue > maxVisits.round()) {
+                final canShowVisits =
+                    visitValue != null && visitValue >= 0 && visitValue <= maxVisits.round();
+                final canShowStudies =
+                    studyValue != null && studyValue >= 0 && studyValue <= maxStudies.round();
+
+                if (!canShowVisits && !canShowStudies) {
                   return const SizedBox.shrink();
                 }
 
-                return Text(
-                  '$visitValue',
-                  style: TextStyle(
-                    color: Colors.orange.shade700,
-                    fontSize: 10,
+                return Padding(
+                  padding: const EdgeInsets.only(left: 6),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (canShowVisits)
+                        Text(
+                          '$visitValue',
+                          style: TextStyle(
+                            color: Colors.orange.shade700,
+                            fontSize: 10,
+                            height: 1.0,
+                          ),
+                        ),
+                      if (canShowStudies)
+                        Text(
+                          '$studyValue',
+                          style: TextStyle(
+                            color: Colors.purple.shade700,
+                            fontSize: 10,
+                            height: 1.0,
+                          ),
+                        ),
+                    ],
                   ),
                 );
               },
@@ -299,8 +323,7 @@ class MonthlyStatsChart extends ConsumerWidget {
           // Return visits line (orange) - scaled to hours
           LineChartBarData(
             spots: stats.asMap().entries.map((e) {
-              final scaledValue = e.value.returnVisits * chartUnitPerVisit;
-              return FlSpot(e.key.toDouble(), scaledValue);
+              return FlSpot(e.key.toDouble(), e.value.returnVisits.toDouble());
             }).toList(),
             isCurved: true,
             color: Colors.orange,
@@ -322,19 +345,51 @@ class MonthlyStatsChart extends ConsumerWidget {
               color: Colors.orange.withOpacity(0.1),
             ),
           ),
+          // Bible studies line (purple) - scaled to hours
+          LineChartBarData(
+            spots: stats.asMap().entries.map((e) {
+              return FlSpot(e.key.toDouble(), e.value.bibleStudies.toDouble());
+            }).toList(),
+            isCurved: true,
+            color: Colors.purple,
+            barWidth: 3,
+            isStrokeCapRound: true,
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, barData, index) {
+                return FlDotCirclePainter(
+                  radius: 5,
+                  color: Colors.purple,
+                  strokeWidth: 2,
+                  strokeColor: Colors.white,
+                );
+              },
+            ),
+            belowBarData: BarAreaData(
+              show: true,
+              color: Colors.purple.withOpacity(0.08),
+            ),
+          ),
         ],
         lineTouchData: LineTouchData(
           touchTooltipData: LineTouchTooltipData(
             getTooltipItems: (touchedSpots) {
               return touchedSpots.map((spot) {
                 final isHours = spot.barIndex == 0;
+                final isVisits = spot.barIndex == 1;
                 final value = isHours
                     ? '${spot.y.toStringAsFixed(1)}h'
-                    : '${stats[spot.x.toInt()].returnVisits} ${l10n.returnVisit.toLowerCase()}';
+                    : isVisits
+                        ? '${stats[spot.x.toInt()].returnVisits} ${l10n.returnVisit.toLowerCase()}'
+                        : '${stats[spot.x.toInt()].bibleStudies} estudos';
                 return LineTooltipItem(
                   value,
                   TextStyle(
-                    color: isHours ? Colors.blue : Colors.orange,
+                    color: isHours
+                        ? Colors.blue
+                        : isVisits
+                            ? Colors.orange
+                            : Colors.purple,
                     fontWeight: FontWeight.bold,
                   ),
                 );
@@ -347,7 +402,10 @@ class MonthlyStatsChart extends ConsumerWidget {
   }
 
   String _getLocalizedMonth(int month, AppLocalizations l10n) {
-    return l10n.getMonthName(month).substring(0, 3);
+    final monthName = l10n.getMonthName(month);
+    if (monthName.isEmpty) return '';
+    final short = monthName.length >= 3 ? monthName.substring(0, 3) : monthName;
+    return short[0].toUpperCase() + short.substring(1).toLowerCase();
   }
 }
 

@@ -19,13 +19,11 @@ class Street {
   int get addressCount => addresses.length;
 
   /// Conta endereços visitados
-  int get visitedCount => addresses
-      .where((a) => a.currentStatus != VisitStatus.unvisited)
-      .length;
+  int get visitedCount =>
+      addresses.where((a) => a.currentStatus != VisitStatus.unvisited).length;
 
   /// Porcentagem de progresso
-  double get progress =>
-      addressCount > 0 ? visitedCount / addressCount : 0.0;
+  double get progress => addressCount > 0 ? visitedCount / addressCount : 0.0;
 
   /// Adiciona um endereço
   void addAddress(Address address) {
@@ -63,7 +61,7 @@ class Street {
     for (var i = from; i <= to; i++) {
       if (oddOnly && i.isEven) continue;
       if (evenOnly && i.isOdd) continue;
-      
+
       final numberStr = i.toString();
       if (existingNumbers.contains(numberStr)) continue;
 
