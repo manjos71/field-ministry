@@ -234,7 +234,7 @@ class _CardTabState extends ConsumerState<CardTab> {
     return OverlapStack(
       overlap: 12.0,
       activeIndex: activeIndex >= 0 ? activeIndex : null,
-      children: items.asMap().entries.map((entry) {
+      children: items.asMap().entries.map<Widget>((entry) {
         final index = entry.key;
         final item = entry.value;
         final isExpanded = index == activeIndex;
@@ -263,7 +263,7 @@ class _CardTabState extends ConsumerState<CardTab> {
     return OverlapStack(
       overlap: 12.0,
       activeIndex: activeIndex >= 0 ? activeIndex : null,
-      children: items.asMap().entries.map((entry) {
+      children: items.asMap().entries.map<Widget>((entry) {
         final index = entry.key;
         final item = entry.value;
         final isExpanded = index == activeIndex;
@@ -375,6 +375,7 @@ class _InterestedStackCard extends ConsumerWidget {
   final VoidCallback onActionTap;
 
   const _InterestedStackCard({
+    super.key,
     required this.item,
     required this.isExpanded,
     required this.isBibleStudy,
@@ -673,7 +674,7 @@ class _InterestedStackCard extends ConsumerWidget {
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            '${item.street.name}, ${item.address.number}${item.territory.neighborhood.isNotEmpty ? ' - ${item.territory.neighborhood}' : ''}',
+                            '${item.street.name}, ${item.address.number}${item.territory.neighborhood?.isNotEmpty == true ? ' - ${item.territory.neighborhood}' : ''}',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
