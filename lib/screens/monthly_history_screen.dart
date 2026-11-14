@@ -37,6 +37,7 @@ class _MonthlyHistoryScreenState extends ConsumerState<MonthlyHistoryScreen> {
     final n = ref.read(monthlyServiceTimeProvider.notifier);
     // Sincroniza o provider com o mês exibido
     await n.loadMonth(widget.year, widget.month);
+    await n.backfillDailyRevisits(widget.year, widget.month);
     final h = await n.getDailyHours(widget.year, widget.month);
     final r = await n.getDailyRevisits(widget.year, widget.month);
     final s = await n.getDailyStudies(widget.year, widget.month);

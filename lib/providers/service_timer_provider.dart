@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/models.dart';
 import '../services/database_service.dart';
 
 // Service session state
@@ -306,6 +307,42 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
       map.remove(date.day);
     }
     await _writeDaily(db, kind, date.year, date.month, map);
+  }
+
+
+  /// Reconstrói as revisitas por dia a partir das visitas já registradas nos
+  /// territórios (feitas antes de existir o registro diário). Roda uma vez por
+  /// mês e só preenche dias que ainda não têm valor; não altera os totais.
+  Future<void> backfillDailyRevisits(int year, int month) async {
+    final db = await DatabaseService.getInstance();
+    final flag = 'daily_backfill_${year}_$month';
+    if (db.getSetting<bool>(flag) == true) return;
+
+    final computed = <int, int>{};
+    for (final t in db.getAllTerritories()) {
+      for (final st in t.streets) {
+        for (final a in st.addresses) {
+          for (final v in a.visits) {
+            if (v.parentId == null) continue;
+            if (v.status != VisitStatus.returnVisit &&
+                v.status != VisitStatus.bibleStudy) continue;
+            if (v.date.year != year || v.date.month != month) continue;
+            computed[v.date.day] = (computed[v.date.day] ?? 0) + 1;
+          }
+        }
+      }
+    }
+
+    final stored = _readDaily(db, 'revisits', year, month);
+    var changed = false;
+    computed.forEach((day, n) {
+      if (!stored.containsKey(day)) {
+        stored[day] = n;
+        changed = true;
+      }
+    });
+    if (changed) await _writeDaily(db, 'revisits', year, month, stored);
+    await db.saveSetting(flag, true);
   }
 
   /// Revisitas por dia do mês (dia -> quantidade).
