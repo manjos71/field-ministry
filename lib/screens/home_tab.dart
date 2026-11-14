@@ -11,6 +11,7 @@ import '../models/publisher_profile.dart';
 import '../widgets/service_planning_calendar.dart';
 import '../providers/territory_provider.dart';
 import '../config/app_localizations.dart';
+import 'monthly_history_screen.dart';
 
 class HomeTab extends ConsumerStatefulWidget {
   const HomeTab({super.key});
@@ -698,6 +699,18 @@ class _MonthlyTimeDisplayState extends ConsumerState<_MonthlyTimeDisplay> {
                   ],
                 ],
               ),
+            ),
+            IconButton(
+              icon: Icon(Icons.history, color: statusColor),
+              tooltip: 'Histórico',
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => MonthlyHistoryScreen(
+                    year: selected.year,
+                    month: selected.month,
+                  ),
+                ));
+              },
             ),
           ],
         ),

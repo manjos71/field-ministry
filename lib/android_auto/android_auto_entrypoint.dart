@@ -25,6 +25,7 @@ class AndroidAutoChannel {
 
   static Future<List<Map<String, dynamic>>> _getInterestedCards() async {
     final db = await DatabaseService.getInstance();
+    await db.reload();
     final territories = db.getAllTerritories();
     final items = _collectPeopleCards(
       territories: territories,
@@ -35,6 +36,7 @@ class AndroidAutoChannel {
 
   static Future<List<Map<String, dynamic>>> _getBibleStudyCards() async {
     final db = await DatabaseService.getInstance();
+    await db.reload();
     final territories = db.getAllTerritories();
     final items = _collectPeopleCards(
       territories: territories,

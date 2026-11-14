@@ -1,62 +1,115 @@
 package com.manjos71.fieldservice.auto
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import io.flutter.FlutterInjector
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.dart.DartExecutor
-import io.flutter.plugins.GeneratedPluginRegistrant
 import io.flutter.plugin.common.MethodChannel
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import io.flutter.plugins.GeneratedPluginRegistrant
 
+/**
+ * Ponte entre o Android Auto e o Dart. Todo o acesso ao FlutterEngine
+ * (criação e invokeMethod) acontece na thread principal, como o Flutter exige.
+ */
 class AndroidAutoFlutterBridge private constructor(
-    private val context: Context,
+    context: Context,
 ) {
+    private val appContext = context.applicationContext
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var engine: FlutterEngine? = null
+    private var channel: MethodChannel? = null
 
-    private val engine: FlutterEngine = FlutterEngine(context.applicationContext)
-    private val channel: MethodChannel
+    private fun ensureEngine(): MethodChannel {
+        channel?.let { return it }
 
-    init {
         val loader = FlutterInjector.instance().flutterLoader()
         if (!loader.initialized()) {
-            loader.startInitialization(context.applicationContext)
-            loader.ensureInitializationComplete(context.applicationContext, null)
+            loader.startInitialization(appContext)
+            loader.ensureInitializationComplete(appContext, null)
         }
 
-        GeneratedPluginRegistrant.registerWith(engine)
+        val e = FlutterEngine(appContext)
+        GeneratedPluginRegistrant.registerWith(e)
 
-        val appBundlePath = loader.findAppBundlePath()
-        val entrypoint = DartExecutor.DartEntrypoint(appBundlePath, "androidAutoMain")
-        engine.dartExecutor.executeDartEntrypoint(entrypoint)
+        // androidAutoMain está em outra biblioteca: o URI precisa ser informado.
+        val entrypoint = DartExecutor.DartEntrypoint(
+            loader.findAppBundlePath(),
+            ENTRYPOINT_LIBRARY,
+            ENTRYPOINT_FUNCTION,
+        )
+        e.dartExecutor.executeDartEntrypoint(entrypoint)
 
-        channel = MethodChannel(engine.dartExecutor.binaryMessenger, CHANNEL_NAME)
+        engine = e
+        return MethodChannel(e.dartExecutor.binaryMessenger, CHANNEL_NAME).also {
+            channel = it
+        }
     }
 
-    fun fetchCards(method: String): List<AndroidAutoCard> {
-        val latch = CountDownLatch(1)
-        var result: List<AndroidAutoCard> = emptyList()
+    /** Assíncrono; [callback] é sempre chamado na thread principal. */
+    fun fetchCards(method: String, callback: (List<AndroidAutoCard>) -> Unit) {
+        mainHandler.post { invoke(method, attempt = 0, callback = callback) }
+    }
 
-        channel.invokeMethod(method, null, object : MethodChannel.Result {
-            override fun success(res: Any?) {
-                result = AndroidAutoCardMapper.fromFlutterResult(res)
-                latch.countDown()
+    private fun invoke(method: String, attempt: Int, callback: (List<AndroidAutoCard>) -> Unit) {
+        val ch = try {
+            ensureEngine()
+        } catch (_: Throwable) {
+            callback(emptyList())
+            return
+        }
+
+        var done = false
+        val timeout = Runnable {
+            if (!done) {
+                done = true
+                callback(emptyList())
+            }
+        }
+        mainHandler.postDelayed(timeout, TIMEOUT_MS)
+
+        fun finish(cards: List<AndroidAutoCard>) {
+            if (done) return
+            done = true
+            mainHandler.removeCallbacks(timeout)
+            callback(cards)
+        }
+
+        ch.invokeMethod(method, null, object : MethodChannel.Result {
+            override fun success(result: Any?) {
+                finish(AndroidAutoCardMapper.fromFlutterResult(result))
             }
 
-            override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
-                latch.countDown()
+            override fun error(code: String, message: String?, details: Any?) {
+                finish(emptyList())
             }
 
             override fun notImplemented() {
-                latch.countDown()
+                // O isolate Dart ainda está iniciando e o handler não foi registrado: tenta de novo.
+                if (done) return
+                if (attempt < MAX_RETRIES) {
+                    done = true
+                    mainHandler.removeCallbacks(timeout)
+                    mainHandler.postDelayed(
+                        { invoke(method, attempt + 1, callback) },
+                        RETRY_DELAY_MS,
+                    )
+                } else {
+                    finish(emptyList())
+                }
             }
         })
-
-        latch.await(8, TimeUnit.SECONDS)
-        return result
     }
 
     companion object {
         const val CHANNEL_NAME = "field_ministry/android_auto"
+        private const val ENTRYPOINT_LIBRARY =
+            "package:field_ministry/android_auto/android_auto_entrypoint.dart"
+        private const val ENTRYPOINT_FUNCTION = "androidAutoMain"
+        private const val TIMEOUT_MS = 10_000L
+        private const val RETRY_DELAY_MS = 700L
+        private const val MAX_RETRIES = 6
 
         @Volatile
         private var instance: AndroidAutoFlutterBridge? = null

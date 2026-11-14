@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/database_service.dart';
 
@@ -231,6 +232,7 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
     final newCount = currentStats.revisitCount + 1;
 
     await db.saveSetting(_getRevisitKey(now.year, now.month), newCount);
+    await _bumpDaily(db, 'revisits', now, 1);
 
     if (state.year == now.year && state.month == now.month) {
       state = state.copyWith(revisitCount: newCount);
@@ -255,12 +257,142 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
     await db.saveSetting(_getRevisitKey(now.year, now.month), newRevisitCount);
     await db.saveSetting(_getBibleStudyKey(now.year, now.month), newStudyCount);
     await db.saveSetting(_getBibleStudyPersonsKey(now.year, now.month), newPersons.toList());
+    await _bumpDaily(db, 'revisits', now, 1);
+    if (newStudyCount > currentStats.bibleStudyCount) {
+      await _bumpDaily(db, 'studies', now, 1);
+    }
 
     if (state.year == now.year && state.month == now.month) {
       state = state.copyWith(
         revisitCount: newRevisitCount,
         bibleStudyCount: newStudyCount,
         bibleStudyPersonIds: newPersons,
+      );
+    }
+  }
+
+
+  // ── Histórico diário (revisitas / estudos por dia) ─────────────────────────
+
+  String _dailyKey(String kind, int year, int month) =>
+      'monthly_daily_${kind}_${year}_$month';
+
+  Map<int, int> _readDaily(DatabaseService db, String kind, int year, int month) {
+    final raw = db.getSetting<String>(_dailyKey(kind, year, month));
+    if (raw == null) return {};
+    try {
+      final data = jsonDecode(raw) as Map<String, dynamic>;
+      return data.map((k, v) => MapEntry(int.parse(k), (v as num).toInt()));
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> _writeDaily(DatabaseService db, String kind, int year,
+      int month, Map<int, int> map) async {
+    await db.saveSetting(
+      _dailyKey(kind, year, month),
+      jsonEncode(map.map((k, v) => MapEntry(k.toString(), v))),
+    );
+  }
+
+  Future<void> _bumpDaily(
+      DatabaseService db, String kind, DateTime date, int delta) async {
+    final map = _readDaily(db, kind, date.year, date.month);
+    final value = (map[date.day] ?? 0) + delta;
+    if (value > 0) {
+      map[date.day] = value;
+    } else {
+      map.remove(date.day);
+    }
+    await _writeDaily(db, kind, date.year, date.month, map);
+  }
+
+  /// Revisitas por dia do mês (dia -> quantidade).
+  Future<Map<int, int>> getDailyRevisits(int year, int month) async =>
+      _readDaily(await DatabaseService.getInstance(), 'revisits', year, month);
+
+  /// Estudos por dia do mês (dia -> quantidade).
+  Future<Map<int, int>> getDailyStudies(int year, int month) async =>
+      _readDaily(await DatabaseService.getInstance(), 'studies', year, month);
+
+  /// Horas realizadas por dia do mês (dia -> horas). Mesmo armazenamento do calendário.
+  Future<Map<int, double>> getDailyHours(int year, int month) async {
+    final db = await DatabaseService.getInstance();
+    final raw = db.getSetting<String>('monthly_actual_${year}_$month');
+    if (raw == null) return {};
+    try {
+      final data = jsonDecode(raw) as Map<String, dynamic>;
+      return data.map((k, v) => MapEntry(int.parse(k), (v as num).toDouble()));
+    } catch (_) {
+      return {};
+    }
+  }
+
+  /// Edita um dia do histórico e propaga a diferença para os totais do mês,
+  /// funcionando para qualquer mês (não apenas o atual).
+  Future<void> editDay({
+    required int year,
+    required int month,
+    required int day,
+    required double hours,
+    required int revisits,
+    required int studies,
+  }) async {
+    await _loadFuture;
+    final db = await DatabaseService.getInstance();
+
+    // Horas (mesma chave usada pelo calendário de planejamento)
+    final hoursMap = await getDailyHours(year, month);
+    final oldHours = hoursMap[day] ?? 0;
+    final newHours = double.parse(hours.toStringAsFixed(2));
+    if (newHours > 0) {
+      hoursMap[day] = newHours;
+    } else {
+      hoursMap.remove(day);
+    }
+    await db.saveSetting(
+      'monthly_actual_${year}_$month',
+      jsonEncode(hoursMap.map((k, v) => MapEntry(k.toString(), v))),
+    );
+
+    final revMap = _readDaily(db, 'revisits', year, month);
+    final oldRevisits = revMap[day] ?? 0;
+    if (revisits > 0) {
+      revMap[day] = revisits;
+    } else {
+      revMap.remove(day);
+    }
+    await _writeDaily(db, 'revisits', year, month, revMap);
+
+    final stuMap = _readDaily(db, 'studies', year, month);
+    final oldStudies = stuMap[day] ?? 0;
+    if (studies > 0) {
+      stuMap[day] = studies;
+    } else {
+      stuMap.remove(day);
+    }
+    await _writeDaily(db, 'studies', year, month, stuMap);
+
+    // Totais do mês = total atual + diferença
+    final current = await _getStatsForMonth(db, year, month);
+    final minutes = (current.totalMinutes +
+            ((newHours - oldHours) * 60).round())
+        .clamp(0, 1 << 30);
+    final totalRevisits =
+        (current.revisitCount + revisits - oldRevisits).clamp(0, 99999);
+    final totalStudies =
+        (current.bibleStudyCount + studies - oldStudies).clamp(0, 99999);
+
+    await db.saveSetting(_getStorageKey(year, month), minutes);
+    await db.saveSetting(_getRevisitKey(year, month), totalRevisits);
+    await db.saveSetting(_getBibleStudyKey(year, month), totalStudies);
+
+    if (state.year == year && state.month == month) {
+      state = state.copyWith(
+        totalMinutes: minutes,
+        revisitCount: totalRevisits,
+        bibleStudyCount: totalStudies,
       );
     }
   }

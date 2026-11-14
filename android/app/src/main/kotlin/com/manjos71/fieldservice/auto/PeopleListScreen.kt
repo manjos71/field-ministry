@@ -2,6 +2,8 @@ package com.manjos71.fieldservice.auto
 
 import android.net.Uri
 import androidx.car.app.CarContext
+import androidx.car.app.CarToast
+import androidx.car.app.constraints.ConstraintManager
 import androidx.car.app.Screen
 import androidx.car.app.model.Action
 import androidx.car.app.model.ActionStrip
@@ -11,7 +13,6 @@ import androidx.car.app.model.ListTemplate
 import androidx.car.app.model.Row
 import androidx.car.app.model.Template
 import java.net.URLEncoder
-import java.util.concurrent.Executors
 
 enum class PeopleListType {
     INTERESTED,
@@ -23,19 +24,28 @@ class PeopleListScreen(
     private val type: PeopleListType,
 ) : Screen(carContext) {
 
-    private val executor = Executors.newSingleThreadExecutor()
     private var isLoading: Boolean = true
+    private var requested: Boolean = false
     private var items: List<AndroidAutoCard> = emptyList()
 
     override fun onGetTemplate(): Template {
-        if (isLoading) {
-            loadItemsIfNeeded()
+        if (!requested) {
+            requested = true
+            load()
         }
 
         val listBuilder = ItemList.Builder()
             .setNoItemsMessage("Nenhum registro encontrado")
 
-        for (item in items) {
+        // O template limita o número de linhas enquanto o carro está em movimento.
+        val limit = try {
+            carContext.getCarService(ConstraintManager::class.java)
+                .getContentLimit(ConstraintManager.CONTENT_LIMIT_TYPE_LIST)
+        } catch (_: Throwable) {
+            6
+        }
+
+        for (item in items.take(limit)) {
             val rowBuilder = Row.Builder()
                 .setTitle(item.title)
                 .addText(item.subtitle)
@@ -45,13 +55,7 @@ class PeopleListScreen(
                 rowBuilder.addText(notes)
             }
 
-            rowBuilder.setOnClickListener {
-                val query = URLEncoder.encode(item.navigationQuery, "UTF-8")
-                val uri = Uri.parse("geo:0,0?q=$query")
-                val intent = android.content.Intent(androidx.car.app.CarContext.ACTION_NAVIGATE)
-                    .setData(uri)
-                carContext.startCarApp(intent)
-            }
+            rowBuilder.setOnClickListener { navigateTo(item) }
             listBuilder.addItem(rowBuilder.build())
         }
 
@@ -62,19 +66,13 @@ class PeopleListScreen(
 
         val refreshAction = Action.Builder()
             .setTitle("Atualizar")
-            .setOnClickListener {
-                forceReload()
-            }
-            .build()
-
-        val actionStrip = ActionStrip.Builder()
-            .addAction(refreshAction)
+            .setOnClickListener { load() }
             .build()
 
         val templateBuilder = ListTemplate.Builder()
             .setTitle(title)
             .setHeaderAction(Action.BACK)
-            .setActionStrip(actionStrip)
+            .setActionStrip(ActionStrip.Builder().addAction(refreshAction).build())
 
         if (isLoading) {
             templateBuilder.setLoading(true)
@@ -85,31 +83,32 @@ class PeopleListScreen(
         return templateBuilder.build()
     }
 
-    private fun forceReload() {
+    private fun navigateTo(item: AndroidAutoCard) {
+        try {
+            val query = URLEncoder.encode(item.navigationQuery, "UTF-8")
+            val intent = android.content.Intent(CarContext.ACTION_NAVIGATE)
+                .setData(Uri.parse("geo:0,0?q=$query"))
+            carContext.startCarApp(intent)
+        } catch (_: Throwable) {
+            CarToast.makeText(carContext, "Nenhum app de navegação disponível", CarToast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun load() {
         isLoading = true
         items = emptyList()
         invalidate()
-    }
 
-    private fun loadItemsIfNeeded() {
-        if (!isLoading) return
+        val method = when (type) {
+            PeopleListType.INTERESTED -> "getInterestedCards"
+            PeopleListType.BIBLE_STUDY -> "getBibleStudyCards"
+        }
 
-        executor.execute {
-            try {
-                val method = when (type) {
-                    PeopleListType.INTERESTED -> "getInterestedCards"
-                    PeopleListType.BIBLE_STUDY -> "getBibleStudyCards"
-                }
-
-                val bridge = AndroidAutoFlutterBridge.getInstance(carContext)
-                val result = bridge.fetchCards(method)
-                items = result
-            } catch (_: Throwable) {
-                items = emptyList()
-            } finally {
-                isLoading = false
-                invalidate()
-            }
+        // Callback sempre na thread principal.
+        AndroidAutoFlutterBridge.getInstance(carContext).fetchCards(method) { result ->
+            items = result
+            isLoading = false
+            invalidate()
         }
     }
 }

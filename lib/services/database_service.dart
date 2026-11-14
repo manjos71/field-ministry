@@ -33,6 +33,15 @@ class DatabaseService {
     _settingsBoxInstance = await Hive.openBox<dynamic>(_settingsBox);
   }
 
+  /// Fecha e reabre as boxes para ler o que outro isolate/engine gravou em disco
+  /// (usado pelo engine do Android Auto, cujo cache Hive é independente do app).
+  Future<void> reload() async {
+    await _territoriesBoxInstance.close();
+    await _settingsBoxInstance.close();
+    _territoriesBoxInstance = await Hive.openBox<String>(_territoriesBox);
+    _settingsBoxInstance = await Hive.openBox<dynamic>(_settingsBox);
+  }
+
   // ==================== TERRITORIES ====================
 
   /// Salva um território
