@@ -612,8 +612,9 @@ class _MonthlyTimeDisplayState extends ConsumerState<_MonthlyTimeDisplay> {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    runSpacing: 4,
                     children: [
                       Text(
                         data.formattedTime,
@@ -701,6 +702,9 @@ class _MonthlyTimeDisplayState extends ConsumerState<_MonthlyTimeDisplay> {
               ),
             ),
             IconButton(
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
               icon: Icon(Icons.history, color: statusColor),
               tooltip: 'Histórico',
               onPressed: () {

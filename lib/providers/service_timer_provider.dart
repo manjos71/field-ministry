@@ -346,6 +346,11 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
     final hoursMap = await getDailyHours(year, month);
     final oldHours = hoursMap[day] ?? 0;
     final newHours = double.parse(hours.toStringAsFixed(2));
+    if ((newHours - oldHours).abs() > 0.0001) {
+      // Edição manual substitui os intervalos registrados daquele dia
+      await db.saveSetting(
+          _intervalsKey(DateTime(year, month, day)), null);
+    }
     if (newHours > 0) {
       hoursMap[day] = newHours;
     } else {
@@ -395,6 +400,92 @@ class MonthlyServiceTimeNotifier extends StateNotifier<MonthlyServiceTime> {
         bibleStudyCount: totalStudies,
       );
     }
+  }
+
+
+  // ── Intervalos de serviço (sem duplicar horas coincidentes) ────────────────
+
+  String _intervalsKey(DateTime d) =>
+      'service_intervals_${d.year}_${d.month}_${d.day}';
+
+  List<List<int>> _readIntervals(DatabaseService db, DateTime d) {
+    final raw = db.getSetting<String>(_intervalsKey(d));
+    if (raw == null) return [];
+    try {
+      return (jsonDecode(raw) as List)
+          .map((e) => (e as List).map((x) => (x as num).toInt()).toList())
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// União de intervalos sobrepostos/adjacentes (minutos desde 00:00).
+  static List<List<int>> _mergeIntervals(List<List<int>> list) {
+    final sorted = [...list]..sort((a, b) => a[0].compareTo(b[0]));
+    final out = <List<int>>[];
+    for (final i in sorted) {
+      if (out.isNotEmpty && i[0] <= out.last[1]) {
+        if (i[1] > out.last[1]) out.last[1] = i[1];
+      } else {
+        out.add([i[0], i[1]]);
+      }
+    }
+    return out;
+  }
+
+  static int _sumIntervals(List<List<int>> l) =>
+      l.fold(0, (a, i) => a + (i[1] - i[0]));
+
+  /// Registra um intervalo de serviço. Trechos que coincidem com intervalos já
+  /// registrados no mesmo dia não são contados duas vezes
+  /// (10:00–11:00 + 10:00–11:30 = 1:30). Retorna os minutos realmente adicionados.
+  Future<int> addInterval(DateTime start, DateTime end) async {
+    await _loadFuture;
+    if (!end.isAfter(start)) end = end.add(const Duration(days: 1));
+    final db = await DatabaseService.getInstance();
+    var added = 0;
+
+    var cursor = start;
+    while (cursor.isBefore(end)) {
+      final dayStart = DateTime(cursor.year, cursor.month, cursor.day);
+      final nextDay = dayStart.add(const Duration(days: 1));
+      final segEnd = end.isBefore(nextDay) ? end : nextDay;
+      final s = cursor.difference(dayStart).inMinutes;
+      final e = segEnd.difference(dayStart).inMinutes;
+
+      if (e > s) {
+        final old = _readIntervals(db, dayStart);
+        final oldSum = _sumIntervals(_mergeIntervals(old));
+        final merged = _mergeIntervals([...old, [s, e]]);
+        final newSum = _sumIntervals(merged);
+        final delta = newSum - oldSum;
+
+        await db.saveSetting(_intervalsKey(dayStart), jsonEncode(merged));
+
+        if (delta > 0) {
+          added += delta;
+          // Horas do dia (mesma chave do calendário)
+          final hoursMap = await getDailyHours(dayStart.year, dayStart.month);
+          final oldDayMin = ((hoursMap[dayStart.day] ?? 0) * 60).round();
+          hoursMap[dayStart.day] =
+              double.parse(((oldDayMin + delta) / 60).toStringAsFixed(4));
+          await db.saveSetting(
+            'monthly_actual_${dayStart.year}_${dayStart.month}',
+            jsonEncode(hoursMap.map((k, v) => MapEntry(k.toString(), v))),
+          );
+          // Total do mês
+          final cur = await _getStatsForMonth(db, dayStart.year, dayStart.month);
+          final total = cur.totalMinutes + delta;
+          await db.saveSetting(_getStorageKey(dayStart.year, dayStart.month), total);
+          if (state.year == dayStart.year && state.month == dayStart.month) {
+            state = state.copyWith(totalMinutes: total);
+          }
+        }
+      }
+      cursor = segEnd;
+    }
+    return added;
   }
 
   Future<void> _saveMonthlyTime() async {
@@ -459,14 +550,9 @@ class ServiceTimerNotifier extends StateNotifier<ServiceSession> {
 
   Future<void> _loadSession() async {
     try {
-      final db = await DatabaseService.getInstance();
-      final startTimeStr = db.getSetting<String>('service_start_time');
-      final endTimeStr = db.getSetting<String>('service_end_time');
-
-      state = ServiceSession(
-        startTime: startTimeStr != null ? DateTime.parse(startTimeStr) : null,
-        endTime: endTimeStr != null ? DateTime.parse(endTimeStr) : null,
-      );
+      // O app sempre inicia com Início/Término limpos.
+      state = ServiceSession();
+      await _clearSession();
     } catch (_) {
       // Keep default
     }

@@ -283,17 +283,13 @@ class _ServiceTimerCard extends ConsumerWidget {
                     onPressed: (session.startTime != null &&
                             session.endTime != null)
                         ? () async {
-                            // Add time to monthly total
-                            await monthlyNotifier.addTime(session.duration);
-
-                            // Also add to daily actual for today
-                            final today = DateTime.now().day;
-                            final plan = ref.read(monthlyPlanProvider);
-                            final currentActual = plan.dailyActual[today] ?? 0;
-                            final hoursToAdd =
-                                session.duration.inMinutes / 60.0;
-                            await monthlyPlanNotifier.setActualForDay(
-                                today, currentActual + hoursToAdd);
+                            // Soma apenas o tempo ainda não registrado
+                            // (intervalos coincidentes não duplicam horas)
+                            await monthlyNotifier.addInterval(
+                                session.startTime!, session.endTime!);
+                            final sel = ref.read(selectedCalendarMonthProvider);
+                            await monthlyPlanNotifier.loadMonth(
+                                sel.year, sel.month);
 
                             // Reset session
                             await notifier.reset();
@@ -308,10 +304,11 @@ class _ServiceTimerCard extends ConsumerWidget {
                           }
                         : null,
                     icon: const Icon(Icons.add_circle),
-                    label: Text(l10n.add.toUpperCase()),
+                    label: FittedBox(
+                        child: Text(l10n.add.toUpperCase(), maxLines: 1)),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                          horizontal: 8, vertical: 12),
                     ),
                   ),
                 ),
@@ -323,10 +320,11 @@ class _ServiceTimerCard extends ConsumerWidget {
                             ? () => _generateReport(context, ref)
                             : null,
                     icon: const Icon(Icons.assessment),
-                    label: Text(l10n.report.toUpperCase()),
+                    label: FittedBox(
+                        child: Text(l10n.report.toUpperCase(), maxLines: 1)),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                          horizontal: 8, vertical: 12),
                     ),
                   ),
                 ),
